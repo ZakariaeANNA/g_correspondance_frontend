@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React,{ useState , useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -6,22 +6,35 @@ import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import { LockOutlinedIcon , Email }  from '@mui/icons-material';
+import { Email }  from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import { useSnackbar } from 'notistack';
+import axios from "axios";
+import { isExpired, decodeToken } from "react-jwt";
+import { useSigninUserMutation } from "../../store/api/authApi";
 
 const theme = createTheme();
 
 export default function Login() {
+
+  const { enqueueSnackbar } = useSnackbar();
+  const [signinUser, { data, isLoading, error, isError, isSuccess }] = useSigninUserMutation();
+
+  if (isError) {
+    enqueueSnackbar( error.data.message ,  { variant: "error" });
+  }
+  if (isSuccess) {
+    enqueueSnackbar( "Authentification successs" ,  { variant: "success" }) 
+  }
+  
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const auth = new FormData(event.currentTarget);
+    signinUser({ codeGRESA: auth.get('codeGRESA'), password: auth.get('password') });
   };
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -81,14 +94,25 @@ export default function Login() {
                 id="password"
                 autoComplete="current-password"
               />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Se Connecter
-              </Button>
+              { isLoading ? (
+                <LoadingButton 
+                  fullWidth
+                  loading 
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Submit
+                </LoadingButton>
+              ) : (
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Se Connecter
+                </Button>
+              )}
             </Box>
           </Box>
         </Grid>
