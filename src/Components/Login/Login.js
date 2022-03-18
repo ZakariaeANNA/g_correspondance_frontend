@@ -11,8 +11,7 @@ import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
-import axios from "axios";
-import { isExpired, decodeToken } from "react-jwt";
+import { useHistory } from 'react-router-dom';
 import { useSigninUserMutation } from "../../store/api/authApi";
 
 const theme = createTheme();
@@ -21,13 +20,19 @@ export default function Login() {
 
   const { enqueueSnackbar } = useSnackbar();
   const [signinUser, { data, isLoading, error, isError, isSuccess }] = useSigninUserMutation();
+  const history = useHistory();
 
-  if (isError) {
-    enqueueSnackbar( error.data.message ,  { variant: "error" });
-  }
-  if (isSuccess) {
-    enqueueSnackbar( "Authentification successs" ,  { variant: "success" }) 
-  }
+  useEffect(()=>{
+    if (isSuccess) {
+      localStorage.setItem( "token" , data.token );
+      enqueueSnackbar( "Authentification est effectué avec succes" ,  { variant: "success" });
+      history.push("/");
+    }
+    if (isError) {
+      enqueueSnackbar( "Error" ,  { variant: "error" });
+    }
+  });
+  
   
   const handleSubmit = (event) => {
     event.preventDefault();

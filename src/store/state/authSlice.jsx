@@ -1,25 +1,29 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit'
+import { isExpired, decodeToken } from "react-jwt";
 
-const initialState = {}; 
 
-export const authSlice = createSlice({
-  name: "auth",
+const initialState = { 
+    user : {}
+}
+
+const authSlice = createSlice({
+  name: 'auth',
   initialState,
   reducers: {
-    setUser: (
-      state,
-      action 
-    ) => {
-      state.name = action.payload.name;
-      state.token = action.payload.token;
-    },
-    defaultState: (state) => {
-      state = initialState;
-    },
   },
-});
+  extraReducers: function(builder){
+    builder.addCase("checkLogin" , (state,action)=>{
+      const token = localStorage.getItem("token");
+      if(isExpired(token)){
+        localStorage.clear("token");
+        action.history.push("/login");
+      }else{
+        state.user = decodeToken(token);
+      }
+      return state;
+    });
+  }
+})
 
-// Action creators are generated for each case reducer function
-export const { setUser, defaultState } = authSlice.actions;
-
-export default authSlice.reducer;
+export const { checkLogin } = authSlice.actions
+export default authSlice.reducer

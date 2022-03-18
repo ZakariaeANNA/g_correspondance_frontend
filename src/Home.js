@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React , { useEffect } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -11,7 +11,6 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -25,6 +24,8 @@ import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { BrowserRouter as Router , Route , Switch } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 
 
@@ -81,11 +82,14 @@ const mdTheme = createTheme();
 
 
 export default function Home() {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
+  const dispatch = useDispatch();
   const toggleDrawer = () => {
     setOpen(!open);
   };
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const auth = useSelector( state => state.auth.user );
+  const history = useHistory();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -94,6 +98,12 @@ export default function Home() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+  
+
+  useEffect(() => {
+    dispatch({ type : "checkLogin" , history : history});
+  },[]);
+
 
 
   return (
