@@ -26,11 +26,14 @@ import MenuItem from '@mui/material/MenuItem';
 import { BrowserRouter as Router , Route , Switch } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import Users from '../src/Components/Users/Users';
+import Importations from './Components/Importations/Importations';
+import Exportation from './Components/Exportations/Exportations';
 
 
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
+const notificationsList = ['mohamed addhamed have sent this notification', 'account that one sent from that one', 'hello body how are you ?', 'there is too many notifications'];
 
 const drawerWidth = 240;
 
@@ -88,6 +91,7 @@ export default function Home() {
     setOpen(!open);
   };
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [notifications, setNotifications] = React.useState(null);
   const auth = useSelector( state => state.auth.user );
   const history = useHistory();
 
@@ -99,13 +103,21 @@ export default function Home() {
     setAnchorElUser(null);
   };
   
+  const handleOpenNotification = (event) => {
+    setNotifications(event.currentTarget);
+  };
+
+  const handleCloseNotification = () => {
+    setNotifications(null);
+  };
+  
 
   useEffect(() => {
     dispatch({ type : "checkLogin" , history : history});
   },[]);
 
-
-
+  const username = "hassan";
+  const letter = username.charAt(0).toUpperCase();
   return (
     <Router>
       <ThemeProvider theme={mdTheme}>
@@ -139,17 +151,42 @@ export default function Home() {
                 Système de Gestion de Correspondance
               </Typography>
               <Box sx={{ marginRight : 2 }}>
-                  <IconButton color="inherit">
-                  <Badge badgeContent={4} color="secondary">
-                      <NotificationsIcon />
-                  </Badge>
+                <Tooltip title="notifications">
+                  <IconButton color="inherit" onClick={handleOpenNotification}>
+                      <Badge badgeContent={4} color="secondary">
+                          <NotificationsIcon />
+                      </Badge>
                   </IconButton>
+                </Tooltip>
+                <Menu
+                      sx={{ mt: '45px' }}
+                      id="menu-appbar"
+                      anchorEl={notifications}
+                      anchorOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                      }}
+                      open={Boolean(notifications)}
+                      onClose={handleCloseNotification}
+                      >
+                      {notificationsList.map((notification) => (
+                          <MenuItem key={notification} onClick={handleCloseNotification}>
+                          <Typography textAlign="center">{notification}</Typography>
+                          </MenuItem>
+                      ))}
+                  </Menu>
+
               </Box>
               <Box sx={{ flexGrow: 0 }}>
                   <Tooltip title="Open settings">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                      <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                  </IconButton>
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0,width: 40,height: 40,borderRadius: 20,backgroundColor: '#D3D3D3' }}>
+                        <Typography variant='h5'>{letter}</Typography>
+                    </IconButton>
                   </Tooltip>
                   <Menu
                       sx={{ mt: '45px' }}
@@ -217,27 +254,30 @@ export default function Home() {
                       p: 2,
                       display: 'flex',
                       flexDirection: 'column',
-                      height: 240,
                     }}
                   >
                     <Chart />
                   </Paper>
                 </Route>
-                <Route exact path="/">
+                <Route exact path="/exportations">
                   <Paper
                     sx={{
                       p: 2,
                       display: 'flex',
                       flexDirection: 'column',
-                      height: 240,
                     }}
                   >
-                    <Deposits />
+                    <Exportation />
                   </Paper>
                 </Route>
-                <Route path="/orders">
+                <Route path="/importations">
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                    <Orders />
+                    <Importations />
+                  </Paper>
+                </Route>
+                <Route path="/users">
+                  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                    <Users />
                   </Paper>
                 </Route>
               </Switch>
