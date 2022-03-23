@@ -1,7 +1,7 @@
 import React,{ useState,useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import { styled } from '@mui/material/styles';
-import { Button, DialogContent, IconButton , TextField , Autocomplete } from "@mui/material";
+import { Button, DialogContent, IconButton , TextField , CircularProgress } from "@mui/material";
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
@@ -18,7 +18,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import axios from "axios";
-import { useAddExportationsMutation } from "../../store/api/exportationApi";
+import { useAddExportationsMutation , useGetExportationBycodeGRESAQuery } from "../../store/api/exportationApi";
 import "./Exportations.css";
 import { isExpired, decodeToken } from "react-jwt";
 
@@ -272,15 +272,22 @@ function ViewExportation({params}){
 }
 
 export default function Exportation(){
+    const { data, isError, isLoading } = useGetExportationBycodeGRESAQuery(decodeToken(localStorage.getItem("token")).codeGRESA);
     const history = useHistory();
     const dispatch = useDispatch();
+    const [rows,setRows] = React.useState([]); 
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history});
-    },[]);
+        if(data){
+            setRows(data.emails);
+        }
+    },[data]);
+
     const columns = [
-        {field: "NameReceiver",headerName: "Envoyé pour", flex: 1 ,headerAlign : 'center'},
-        {field: "nameEtab",headerName: "Nom d'Etablissement", flex: 1 ,headerAlign : 'center'},
-        {field: "dateSend",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center'},
+        {field: "sender",headerName: "Expéditeur", flex: 1 ,headerAlign : 'center'},
+        {field: "emailTitle",headerName: "L'objet de l'email", flex: 1 ,headerAlign : 'center'},
+        {field: "updated_at",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center'},
+        {field: "status",headerName: "Statut", flex: 1 ,headerAlign : 'center'},
         {field: "Actions",headerName: "Actions", flex: 1 ,headerAlign : 'center',renderCell : (params)=>(
             <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
@@ -293,37 +300,42 @@ export default function Exportation(){
             </Box>
         )},        
     ]
-    const DataGridRows = [
-        {id:1,NameReceiver: 'hassan',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-03-17 18:19:38',status: 'lue'},
-        {id:2,NameReceiver: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-02-17 11:39:18',status: 'non lue'},
-        {id:3,NameReceiver: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-11-25 20:20:23',status: 'lue'},
-        {id:4,NameReceiver: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-03-07 12:19:12',status: 'nonlue'},
-        {id:5,NameReceiver: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-10-17 18:40:38',status: 'lue'},
-    ]
-    const [rows,setRows] = React.useState(DataGridRows); 
     return(
         <React.Fragment>
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
                 <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>La liste des exportations envoyés</Typography>
             </Box>
-            <Paper
-                sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                }}
-            >
-                <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
-                    <DataGrid
-                        rows={rows}
-                        columns={columns}
-                        pageSize={5}
-                        rowsPerPageOptions={[5]}
-                        checkboxSelection
-                    />
-                </div>
-                <AddExportation />
-            </Paper>
+                {   isLoading ? (
+                    <Paper
+                        sx={{
+                            position : "absolute",
+                            top : "50%",
+                            right : "50%",
+                            background : "transparent"
+                        }}
+                    >
+                        <CircularProgress/>
+                    </Paper>
+                ):(
+                    <Paper
+                        sx={{
+                            p: 2,
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}
+                    >
+                        <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
+                        <DataGrid
+                            rows={rows}
+                            columns={columns}
+                            pageSize={5}
+                            rowsPerPageOptions={[5]}
+                            checkboxSelection
+                            />
+                        </div>
+                        <AddExportation />
+                    </Paper>
+                )}
         </React.Fragment>
     )
 }

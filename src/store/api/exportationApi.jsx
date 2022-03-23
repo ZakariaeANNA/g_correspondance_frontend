@@ -17,17 +17,21 @@ export const exportationApi = createApi({
     addExportations: builder.mutation({
       query: (body) => {
         return {
-          url: "/api/sendMail",
+          url: "/api/sendmail",
           method: "post",
           body,
         };
       },
-    })
+    }),
+    getExportationBycodeGRESA: builder.query({
+      query: (codeGRESA) => `api/exportations/${codeGRESA}`,
+    }),
   }),
 });
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
-  useAddExportationsMutation
+  useAddExportationsMutation,
+  useGetExportationBycodeGRESAQuery
 } = exportationApi;
