@@ -216,7 +216,7 @@ export default function Importations(){
         {field: "nameEtab",headerName: "Nom d'Etablissement", flex: 1 ,headerAlign : 'center'},
         {field: "dateSend",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center'},
         {field: "Actions",headerName: "Actions", flex: 1 ,headerAlign : 'center',renderCell : (params)=>(
-            <div style={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start'}}>
+            <div style={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',alignContent:"center"}}>
                 <ViewImportation params={params.row}/>
                 <SendFeedback params={params.row}/>
                 <DeleteImportation params={params.row} />

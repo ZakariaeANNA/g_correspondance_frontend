@@ -1,7 +1,7 @@
-import * as React from 'react'
+import React,{ useState,useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import { styled } from '@mui/material/styles';
-import { Button, DialogContent, IconButton } from "@mui/material";
+import { Button, DialogContent, IconButton , TextField , Autocomplete } from "@mui/material";
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
@@ -12,6 +12,16 @@ import { Close, Visibility } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import {Delete} from "@mui/icons-material";
 import { Tooltip } from '@material-ui/core';
+import Paper from '@mui/material/Paper';
+import { IosShare,Chat,Send } from "@mui/icons-material";
+import SendIcon from '@mui/icons-material/Send';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import axios from "axios";
+import { useAddExportationsMutation } from "../../store/api/exportationApi";
+import "./Exportations.css";
+import { isExpired, decodeToken } from "react-jwt";
+
 
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -48,6 +58,114 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     children: PropTypes.node,
     onClose: PropTypes.func.isRequired,
 };
+
+function AddExportation(){
+    const [open, setOpen] = useState(false);
+    const [type, setType] = useState();
+    const [files,setFiles] = useState();
+    const [tags, setTags] = React.useState([]);
+    const [addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation();
+  
+    const handleClickOpen = () => {
+      setOpen(true);
+    };
+    const handleClose = () => {
+      setOpen(false);
+    };
+
+    const removeTags = indexToRemove => {
+		setTags([...tags.filter((_, index) => index !== indexToRemove)]);
+	};
+
+    useEffect(()=>{
+        if (isSuccess) {
+          console.log("fffffff");
+        }
+        if (isError) {
+          console.log(error);
+        }
+    });
+
+    const changeFile = (event) => {
+        setFiles(event.target.files[0]);
+        setType(event.target.files[0].type);
+    }
+
+    const addTags = event => {
+        if (event.key === " " && event.target.value !== "") {
+            setTags([...tags, { idReceiver : event.target.value.replace(/\s+/g, '') } ]);
+            event.target.value = "";
+        }
+    }
+
+    const onAddExportations = (event) => {
+        event.preventDefault();
+        const token = localStorage.getItem("token");
+        const user = decodeToken(token);
+        const formData = new FormData(event.currentTarget);
+        console.log(tags);
+        console.log(event.target);
+        formData.append('receiver', JSON.stringify(tags));
+        formData.append('sender',user.codeGRESA);
+        formData.append('file', files);
+        formData.append("type",type);
+        addExportations(formData);
+    }
+  
+    return (
+      <div>
+        <Box sx={{ justifyContent:"flex-end", display:"flex" ,paddingTop:2}} onClick={handleClickOpen}>
+            <Button variant="contained" endIcon={<SendIcon />} >
+                Envoyer une exportation
+            </Button>
+        </Box>
+        <BootstrapDialog
+          onClose={handleClose}
+          aria-labelledby="customized-dialog-title"
+          open={open}
+          fullWidth
+          maxWidth="md" 
+        >
+            <form onSubmit={onAddExportations} encType="multipart/form-data">
+            <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+                Envoyer une exportation
+            </BootstrapDialogTitle>
+            <DialogContent dividers>
+                <div className="tags-input">
+                    <ul id="tags">
+                        {tags.map((tag, index) => (
+                            <li key={index} className="tag">
+                                <span className='tag-title'>{tag.idReceiver}</span>
+                                <span className='tag-close-icon'
+                                    onClick={() => removeTags(index)}
+                                >
+                                    x
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                    <input
+                        type="text"
+                        onKeyDown={event => event.key === " " ? addTags(event) : null}
+                        placeholder="Code GRESA"
+                    />
+                </div>
+                <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label="Objet" variant="outlined" name="emailTitle" required/>
+                <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Message" variant="outlined" rows={4} name="message" required/>
+                <input type="file" name="ffff" onChange={changeFile}/>
+            </DialogContent>
+            <DialogActions>
+                <Button variant='contained' type="submit" startIcon={<Send />} autoFocus >
+                    Envoyer
+                </Button>
+            </DialogActions>
+            </form>
+        </BootstrapDialog>
+      </div>
+    );
+  
+}
+
 function DeleteExportation({params}){
   
     const [open, setOpen] = React.useState(false);
@@ -154,17 +272,25 @@ function ViewExportation({params}){
 }
 
 export default function Exportation(){
+    const history = useHistory();
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch({ type : "checkLogin" , history : history});
+    },[]);
     const columns = [
         {field: "NameReceiver",headerName: "Envoyé pour", flex: 1 ,headerAlign : 'center'},
-        {field: "role",headerName: "Role", flex: 1 ,headerAlign : 'center'},
         {field: "nameEtab",headerName: "Nom d'Etablissement", flex: 1 ,headerAlign : 'center'},
         {field: "dateSend",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center'},
-        {field: "status",headerName: "Status", flex: 1 ,headerAlign : 'center'},
         {field: "Actions",headerName: "Actions", flex: 1 ,headerAlign : 'center',renderCell : (params)=>(
-            <div style={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start'}}>
+            <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
                 <DeleteExportation params={params.row}/>
-            </div>
+                <Tooltip title="FeedBack">
+                    <IconButton aria-label="delete" size="large"> 
+                        <Chat />
+                    </IconButton>
+                </Tooltip>
+            </Box>
         )},        
     ]
     const DataGridRows = [
@@ -177,18 +303,27 @@ export default function Exportation(){
     const [rows,setRows] = React.useState(DataGridRows); 
     return(
         <React.Fragment>
-            <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start'}}>
-                <Typography variant='h6'>Mes Exportations</Typography>
+            <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
+                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>La liste des exportations envoyés</Typography>
             </Box>
-            <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5]}
-                    checkboxSelection
-                />
-            </div>
+            <Paper
+                sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
+            >
+                <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pageSize={5}
+                        rowsPerPageOptions={[5]}
+                        checkboxSelection
+                    />
+                </div>
+                <AddExportation />
+            </Paper>
         </React.Fragment>
     )
 }

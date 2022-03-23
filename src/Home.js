@@ -112,10 +112,6 @@ export default function Home() {
   };
   
 
-  useEffect(() => {
-    dispatch({ type : "checkLogin" , history : history});
-  },[]);
-
   const username = "hassan";
   const letter = username.charAt(0).toUpperCase();
   return (
@@ -246,7 +242,7 @@ export default function Home() {
             }}
           >
             <Toolbar />
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
               <Switch>
                 <Route exact path="/f" >
                   <Paper
@@ -260,15 +256,7 @@ export default function Home() {
                   </Paper>
                 </Route>
                 <Route exact path="/exportations">
-                  <Paper
-                    sx={{
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
                     <Exportation />
-                  </Paper>
                 </Route>
                 <Route path="/importations">
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
