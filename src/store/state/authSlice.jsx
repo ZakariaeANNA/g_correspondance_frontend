@@ -16,7 +16,7 @@ const authSlice = createSlice({
       const token = localStorage.getItem("token");
       if(isExpired(token)){
         localStorage.clear("token");
-        action.history.push("/login");
+        action.history.push(action.route);
       }else{
         state.user = decodeToken(token);
       }

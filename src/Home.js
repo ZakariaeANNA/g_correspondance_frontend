@@ -23,7 +23,7 @@ import Menu from '@mui/material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { BrowserRouter as Router , Route , Switch } from "react-router-dom";
+import { BrowserRouter as Router , Route , Switch ,Outlet, } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Users from '../src/Components/Users/Users';
@@ -36,6 +36,35 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const notificationsList = ['mohamed addhamed have sent this notification', 'account that one sent from that one', 'hello body how are you ?', 'there is too many notifications'];
 
 const drawerWidth = 240;
+
+function stringToColor(string) {
+  let hash = 0;
+  let i;
+
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = '#';
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  /* eslint-enable no-bitwise */
+
+  return color;
+}
+
+function stringAvatar(name) {
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+    },
+    children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+  };
+}
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -94,6 +123,10 @@ export default function Home() {
   const [notifications, setNotifications] = React.useState(null);
   const auth = useSelector( state => state.auth.user );
   const history = useHistory();
+
+  useEffect(() => {
+    dispatch({ type : "checkLogin" , history : history , route : "/login"});
+  },[]);
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -180,9 +213,7 @@ export default function Home() {
               </Box>
               <Box sx={{ flexGrow: 0 }}>
                   <Tooltip title="Open settings">
-                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0,width: 40,height: 40,borderRadius: 20,backgroundColor: '#D3D3D3' }}>
-                        <Typography variant='h5'>{letter}</Typography>
-                    </IconButton>
+                  <Avatar {...stringAvatar(`${auth.FirstName} ${auth.LastName})`)} onClick={handleOpenUserMenu} />
                   </Tooltip>
                   <Menu
                       sx={{ mt: '45px' }}
@@ -244,7 +275,7 @@ export default function Home() {
             <Toolbar />
             <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
               <Switch>
-                <Route exact path="/f" >
+                <Route exact path="/" >
                   <Paper
                     sx={{
                       p: 2,
