@@ -143,10 +143,7 @@ export default function Home() {
   const handleCloseNotification = () => {
     setNotifications(null);
   };
-  
 
-  const username = "hassan";
-  const letter = username.charAt(0).toUpperCase();
   return (
     <Router>
       <ThemeProvider theme={mdTheme}>
@@ -290,9 +287,7 @@ export default function Home() {
                     <Exportation />
                 </Route>
                 <Route path="/importations">
-                  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                     <Importations />
-                  </Paper>
                 </Route>
                 <Route path="/users">
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>

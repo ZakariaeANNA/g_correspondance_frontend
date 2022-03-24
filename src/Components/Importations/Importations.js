@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import { styled } from '@mui/material/styles';
-import { Button, DialogContent, IconButton, Tooltip } from "@mui/material";
+import { Button, DialogContent, IconButton, Tooltip , Paper } from "@mui/material";
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
@@ -236,15 +236,17 @@ export default function Importations(){
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start'}}>
                 <Typography variant='h6'>Mes Importations</Typography>
             </Box>
-            <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5]}
-                    checkboxSelection
-                />
-            </div>
+            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pageSize={5}
+                        rowsPerPageOptions={[5]}
+                        checkboxSelection
+                    />
+                </div>
+            </Paper>
         </React.Fragment>
     )
 }

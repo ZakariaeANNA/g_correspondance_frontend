@@ -299,7 +299,7 @@ export default function Exportation(){
                 <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>La liste des exportations envoyés</Typography>
             </Box>
                 {   isLoading ? (
-                    <Paper
+                    <Box
                         sx={{
                             position : "absolute",
                             top : "50%",
@@ -308,7 +308,7 @@ export default function Exportation(){
                         }}
                     >
                         <CircularProgress/>
-                    </Paper>
+                    </Box>
                 ):(
                     <Paper
                         sx={{
