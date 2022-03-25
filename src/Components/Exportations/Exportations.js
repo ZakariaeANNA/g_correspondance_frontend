@@ -1,31 +1,104 @@
 import React,{ useState,useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
-import { styled } from '@mui/material/styles';
-import { Button, DialogContent, IconButton , TextField , CircularProgress , Container  } from "@mui/material";
+import { Button, DialogContent, IconButton , TextField , CircularProgress , Container, ListItemButton  } from "@mui/material";
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
 import { Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { Close, Visibility } from '@mui/icons-material'; 
+import { AccountCircle, Visibility } from '@mui/icons-material'; 
 import { Box } from '@mui/system';
 import {Delete} from "@mui/icons-material";
 import { Tooltip } from '@material-ui/core';
 import Paper from '@mui/material/Paper';
-import { IosShare,Chat,Send,PictureAsPdf } from "@mui/icons-material";
+import { Chat,Send,PictureAsPdf } from "@mui/icons-material";
 import SendIcon from '@mui/icons-material/Send';
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import axios from "axios";
 import { useAddExportationsMutation , useGetExportationBycodeGRESAQuery } from "../../store/api/exportationApi";
 import "./Exportations.css";
-import { isExpired, decodeToken } from "react-jwt";
+import { decodeToken } from "react-jwt";
 import moment from 'moment';
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import Grid from "@material-ui/core/Grid";
+import Collapse from "@material-ui/core/Collapse";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import Avatar from "@material-ui/core/Avatar";
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { styled } from '@mui/material/styles';
+import { makeStyles } from "@material-ui/core/styles";
+import {FileIcon,defaultStyles} from 'react-file-icon';
+import Modal from '@mui/material/Modal';
+import Fade from '@mui/material/Fade';
+import Backdrop from '@mui/material/Backdrop';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableRow from '@mui/material/TableRow';
 
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 'fit-content',
+    minWidth:450,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    py:3
+};
+const useStyles = makeStyles((theme) => ({
+    root: {
+      width: "100%",
+      maxWidth: 360,
+      backgroundColor: theme.palette.background.paper,
+    },
+    nested: {
+      paddingLeft: theme.spacing(4),
+    },
+    demo: {
+      backgroundColor: theme.palette.background.paper,
+    },
+    color:{
+        backgroundColor: '#f0f0f0'
+    }
+}));
+function stringToColor(string) {
+    let hash = 0;
+    let i;
+  
+    /* eslint-disable no-bitwise */
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+  
+    let color = '#';
+  
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+    /* eslint-enable no-bitwise */
+  
+    return color;
+}
 
-
-
+function stringAvatar(name) {
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+    };
+  }
+    
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -192,7 +265,7 @@ function DeleteExportation({params}){
                 maxWidth="md" 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                Suprimer Un Exportation
+                    Suprimer Un Exportation
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                 <Typography>
@@ -208,6 +281,88 @@ function DeleteExportation({params}){
         </div>
     );
 }
+function ViewUserDetails({params}){
+  
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+  
+    return (
+        <div>
+            <IconButton onClick={handleOpen}>
+                <Visibility />
+            </IconButton>
+            <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            open={open}
+            onClose={handleClose}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+                timeout: 500,
+            }}
+            >
+                <Fade in={open}>
+                    <Box sx={style}>
+                        <Box style={{display: 'flex',justifyContent: 'flex-start',flexDirection:'row',paddingLeft: 10}}>
+                            <Avatar {...stringAvatar(`${params.FirstName} ${params.LastName})`)}/><Typography variant='h5' style={{marginTop : 3,marginLeft: 15}}>{params.FirstName} {params.LastName}</Typography>
+                        </Box>
+                        <hr
+                            style={{
+                            color: 'black',
+                            backgroundColor: 'black',
+                            height: 2
+                            }}
+                        />
+                        <TableContainer component={Paper} sx={{px:2}}>
+                            <Table sx={{ minWidth: '60%' }} aria-label="simple table">
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Nom</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.LastName}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Prénom</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.FirstName}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Code GRESA</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.codeGRESA}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Nom Departement</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.nameDepartement}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Type Departement</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.typeDepartement}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Delegation</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.delegation}
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
+                </Fade>
+            </Modal>
+        </div>
+    );
+}
 function ViewExportation({params}){
   
     const [open, setOpen] = React.useState(false);
@@ -218,6 +373,11 @@ function ViewExportation({params}){
     const handleClose = () => {
         setOpen(false);
     };
+    const [display,setDisplay] = React.useState(false);
+    const handleClick = () => {
+        setDisplay(!display);
+      };
+    const classes = useStyles()
     return(
         <div>
             <Tooltip title="Voir l'exportation">
@@ -236,19 +396,65 @@ function ViewExportation({params}){
                     Voir Mon Exportation
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Expéditeur" variant="filled" value={params.sender} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Expéditeur" variant="filled" value={params.sender.FirstName+' '+params.sender.LastName} inputProps={{ readOnly: true }}/>                                      
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Date d'Envoi" variant="filled" value={date} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Objet de l'exportation" variant="filled" value={params.emailTitle} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Message" variant="filled" rows={4} value={params.message} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Statut" variant="filled" value={params.status == 0 ? ("Non Lu") : ("Lu")} inputProps={{ readOnly: true }}/>
-                    <Paper
-                        sx={{
-                            p: 2
-                        }}
-                    >
-                        <PictureAsPdf sx={{ fontSize : 30 }} />
-                        qdqsqsdqs
-                    </Paper>
+                    {/*show users content*/}
+                    <Grid item variant='filled' id='outlined-basic'>
+                        <div>
+                            <List
+                                component="nav"
+                                aria-labelledby="nested-list-subheader"
+                            >
+                                
+                                <ListItemButton onClick={handleClick} className={classes.color}>
+                                    <ListItemText primary="Récepteurs" />
+                                    {display ? <ExpandLessIcon /> : <ExpandMoreIcon />} 
+                                </ListItemButton>                                   
+                                <Collapse in={display} timeout="auto" unmountOnExit >
+                                    <List component="div" disablePadding>
+                                        {
+                                            params.incoming_email.map(email=>(
+                                                email.receiver.map(receiver=>{
+                                                    return(
+                                                        <ListItem> 
+                                                            <ListItemAvatar>
+                                                            <Avatar
+                                                                {...stringAvatar(`${receiver.FirstName} ${receiver.LastName})`)}
+                                                            />
+                                                            </ListItemAvatar>
+                                                            <ListItemText
+                                                                primary={<Typography>{receiver.LastName} {receiver.FirstName}</Typography>}
+                                                            />
+                                                            <ListItemSecondaryAction>
+                                                                <ViewUserDetails params={receiver}/>
+                                                            </ListItemSecondaryAction>
+                                                        </ListItem>
+                                                    )
+                                            })))
+                                        }
+                                    </List>
+                                    </Collapse>
+                            </List>
+                        </div>
+                    </Grid>
+                    {/*end user content section*/}
+                    <a href={'http://localhost:8000/api/'+params.attachement} download="hello.pdf" style={{textDecoration: 'none'}}>
+                        <Paper
+                            sx={{
+                                p: 2,
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                flexDirection: 'column'
+                            }}
+                        >
+                            <div style={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center'}}>
+                                <FileIcon extension={params.type.split('/')[1]} {...defaultStyles[params.type.split('/')[1]]}/>
+                            </div>
+                            <Typography style={{marginTop: 10}}>{params.attachement}</Typography>
+                        </Paper>
+                    </a>
                 </DialogContent>
             </BootstrapDialog>
         </div>
@@ -270,7 +476,11 @@ export default function Exportation(){
     },[data]);
 
     const columns = [
-        {field: "sender",headerName: "Expéditeur", flex: 1 ,headerAlign : 'center',align:'center',fontWeight:"bold"},
+        {field: "sender",headerName: "Expéditeur", flex: 1 ,headerAlign : 'center',align:'center',fontWeight:"bold",renderCell : (params)=>{
+            return(
+                <Typography>{params.row.sender.LastName} {params.row.sender.FirstName}</Typography>
+            )
+        }},
         {field: "emailTitle",headerName: "L'objet de l'email", flex: 3 ,headerAlign : 'center',align:'center'},
         {field: "created_at",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
             const date = moment(params.row.created_at).format('DD-MM-YYYY');
