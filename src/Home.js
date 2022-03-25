@@ -29,6 +29,7 @@ import { useHistory } from 'react-router-dom';
 import Users from '../src/Components/Users/Users';
 import Importations from './Components/Importations/Importations';
 import Exportation from './Components/Exportations/Exportations';
+import Feedback from './Components/Feedback/Feedback';
 
 
 
@@ -125,7 +126,7 @@ export default function Home() {
   const history = useHistory();
 
   useEffect(() => {
-    dispatch({ type : "checkLogin" , history : history , route : "/login"});
+    dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
   },[]);
 
   const handleOpenUserMenu = (event) => {
@@ -272,7 +273,7 @@ export default function Home() {
             <Toolbar />
             <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
               <Switch>
-                <Route exact path="/" >
+                <Route exact path="/app/" >
                   <Paper
                     sx={{
                       p: 2,
@@ -283,13 +284,16 @@ export default function Home() {
                     <Chart />
                   </Paper>
                 </Route>
-                <Route exact path="/exportations">
+                <Route exact path="/app/exportations">
                     <Exportation />
                 </Route>
-                <Route path="/importations">
+                <Route exact path="/app/importations">
                     <Importations />
                 </Route>
-                <Route path="/users">
+                <Route exact path="/app/feedback">
+                    <Feedback />
+                </Route>
+                <Route exact path="/app/users">
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                     <Users />
                   </Paper>

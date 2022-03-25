@@ -1,7 +1,7 @@
-import * as React from 'react'
+import React,{ useEffect , useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import { styled } from '@mui/material/styles';
-import { Button, DialogContent, IconButton, Tooltip , Paper } from "@mui/material";
+import { Button, DialogContent, IconButton, Tooltip , Paper , TextField , CircularProgress  } from "@mui/material";
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
@@ -14,7 +14,10 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { Box } from '@mui/system';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import {Delete} from "@mui/icons-material";
-
+import { useGetImportationBycodeGRESAQuery } from "../../store/api/importationApi";
+import { useSelector, useDispatch } from 'react-redux';
+import moment from 'moment';
+import { useHistory } from 'react-router-dom';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -117,40 +120,11 @@ function ViewImportation({params}){
                 Voir Mon importation
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between'}}>
-                        <Box
-                                sx={{
-                                    width: '48%',
-                                    height: '60vh',
-                                    backgroundColor: 'primary.dark',
-                                    '&:hover': {
-                                    backgroundColor: 'primary.main',
-                                    opacity: [0.9, 0.8, 0.7],
-                                    },
-                                }}
-                        />
-                        <Box
-                            sx={{
-                                width: '48%',
-                                height: '60vh',
-                                backgroundColor: 'primary.dark',
-                                '&:hover': {
-                                backgroundColor: 'primary.main',
-                                opacity: [0.9, 0.8, 0.7],
-                                },
-                            }}
-                        />
-                    </Box>
-                    <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginTop: '10px'}}>
-                        <Button variant='contained'>Telecharger fichier</Button>
-                        <Button variant='contained'>Envoyer un FeedBack</Button>
-                    </Box>
+                <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Expéditeur" variant="filled" value={`${params.sender.FirstName} ${params.sender.LastName}`} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Objet de l'exportation" variant="filled" value={params.emailTitle} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Message" variant="filled" rows={4} value={params.message} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Statut" variant="filled" value={params.status == 0 ? ("Non Lu") : ("Lu")} inputProps={{ readOnly: true }}/>
                 </DialogContent>
-                <DialogActions>
-                <Button variant="contained" startIcon={<Close />} autoFocus onClick={handleClose}>
-                    Fermer
-                </Button>
-                </DialogActions>
             </BootstrapDialog>
         </div>
     );
@@ -210,43 +184,68 @@ function SendFeedback({params}){
     );
 }
 export default function Importations(){
+    const auth = useSelector( state => state.auth.user );
+    const { data, isError, isLoading } = useGetImportationBycodeGRESAQuery(auth.codeGRESA); 
+    const [rows,setRows] = React.useState([]); 
+    const dispatch = useDispatch();
+    const history = useHistory();
+    useEffect(() => {
+        dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
+        if(data){
+            setRows(data);
+        }
+    },[data]);
     const columns = [
-        {field: "Namesender",headerName: "Envoyé par", flex: 1 ,headerAlign : 'center'},
-        {field: "role",headerName: "Role", flex: 1 ,headerAlign : 'center'},
-        {field: "nameEtab",headerName: "Nom d'Etablissement", flex: 1 ,headerAlign : 'center'},
-        {field: "dateSend",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center'},
-        {field: "Actions",headerName: "Actions", flex: 1 ,headerAlign : 'center',renderCell : (params)=>(
-            <div style={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',alignContent:"center"}}>
+        {field: "sender",headerName: "Expéditeur", flex: 1 ,headerAlign : 'center' ,align : "center",renderCell : (params)=>(
+            <Box>{params.row.sender.FirstName} {params.row.sender.LastName}</Box>
+        )},
+        {field: "emailTitle",headerName: "L'objet de l'email", flex: 1 ,headerAlign : 'center',align : "center",renderCell : (params)=>(
+            <Box>{params.row.emailTitle}</Box>
+        )},
+        {field: "nameEtab",headerName: "Nom d'Etablissement", flex: 1 ,headerAlign : 'center',align : "center"},
+        {field: "created_at",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
+            const date = moment(params.row.created_at).format('DD-MM-YYYY');
+            return(
+                <Box>{date}</Box>
+            );
+        }},
+        {field: "Actions",headerName: "Actions", flex: 1 ,headerAlign : 'center',align : "center",renderCell : (params)=>(
+            <div style={{display: 'flex',flexDirection: 'row',alignContent:"center"}}>
                 <ViewImportation params={params.row}/>
-                <SendFeedback params={params.row}/>
                 <DeleteImportation params={params.row} />
+                <SendFeedback params={params.row}/>
             </div>
         )},        
     ]
-    const DataGridRows = [
-        {id:1,Namesender: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-03-17 18:19:38'},
-        {id:2,Namesender: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-02-17 11:39:18'},
-        {id:3,Namesender: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-11-25 20:20:23'},
-        {id:4,Namesender: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-03-07 12:19:12'},
-        {id:5,Namesender: 'raafat',role: 'Admin',nameEtab: 'Direction provaincial',dateSend: '2022-10-17 18:40:38'},
-    ]
-    const [rows,setRows] = React.useState(DataGridRows); 
     return(
         <React.Fragment>
-            <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start'}}>
-                <Typography variant='h6'>Mes Importations</Typography>
+            <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
+                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>La liste des importations recus</Typography>
             </Box>
-            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
-                    <DataGrid
-                        rows={rows}
-                        columns={columns}
-                        pageSize={5}
-                        rowsPerPageOptions={[5]}
-                        checkboxSelection
-                    />
-                </div>
-            </Paper>
+            {   isLoading ? (
+                <Box
+                    sx={{
+                        position : "absolute",
+                        top : "50%",
+                        right : "50%",
+                        background : "transparent"
+                    }}
+                >
+                    <CircularProgress/>
+                </Box>
+            ):(
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
+                        <DataGrid
+                            rows={rows}
+                            columns={columns}
+                            pageSize={5}
+                            rowsPerPageOptions={[5]}
+                            checkboxSelection
+                        />
+                    </div>
+                </Paper>
+            )}
         </React.Fragment>
     )
 }

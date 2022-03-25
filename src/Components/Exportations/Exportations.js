@@ -22,6 +22,9 @@ import { useAddExportationsMutation , useGetExportationBycodeGRESAQuery } from "
 import "./Exportations.css";
 import { isExpired, decodeToken } from "react-jwt";
 import moment from 'moment';
+import { Link } from 'react-router-dom';
+
+
 
 
 
@@ -257,15 +260,14 @@ function ViewExportation({params}){
 
 export default function Exportation(){
     const auth = useSelector( state => state.auth.user );
-    const history = useHistory();
-    const dispatch = useDispatch();
     const [rows,setRows] = React.useState([]);
     const { data, isError, isLoading } = useGetExportationBycodeGRESAQuery(auth.codeGRESA); 
+    const dispatch = useDispatch();
+    const history = useHistory();
     useEffect(() => {
-        dispatch({ type : "checkLogin" , history : history , route : "/"});
+        dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
         if(data){
-            console.log(data);
-            setRows(data.emails);
+            setRows(data);
         }
     },[data]);
 
@@ -285,11 +287,13 @@ export default function Exportation(){
             <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
                 <DeleteExportation params={params.row}/>
-                <Tooltip title="FeedBack">
-                    <IconButton aria-label="delete" size="large"> 
-                        <Chat />
-                    </IconButton>
-                </Tooltip>
+                <Link to="/app/feedback">
+                    <Tooltip title="FeedBack">
+                        <IconButton aria-label="delete" size="large"> 
+                            <Chat />
+                        </IconButton>
+                    </Tooltip>
+                </Link>
             </Box>
         )},        
     ]
@@ -298,37 +302,37 @@ export default function Exportation(){
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
                 <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>La liste des exportations envoyés</Typography>
             </Box>
-                {   isLoading ? (
-                    <Box
-                        sx={{
-                            position : "absolute",
-                            top : "50%",
-                            right : "50%",
-                            background : "transparent"
-                        }}
-                    >
-                        <CircularProgress/>
-                    </Box>
-                ):(
-                    <Paper
-                        sx={{
-                            p: 2,
-                            display: 'flex',
-                            flexDirection: 'column',
-                        }}
-                    >
-                        <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
-                        <DataGrid
-                            rows={rows}
-                            columns={columns}
-                            pageSize={5}
-                            rowsPerPageOptions={[5]}
-                            checkboxSelection
-                            />
-                        </div>
-                        <AddExportation />
-                    </Paper>
-                )}
+            {   isLoading ? (
+                <Box
+                    sx={{
+                        position : "absolute",
+                        top : "50%",
+                        right : "50%",
+                        background : "transparent"
+                    }}
+                >
+                    <CircularProgress/>
+                </Box>
+            ):(
+                <Paper
+                    sx={{
+                        p: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pageSize={5}
+                        rowsPerPageOptions={[5]}
+                        checkboxSelection
+                        />
+                    </div>
+                    <AddExportation />
+                </Paper>
+            )}
         </React.Fragment>
     )
 }
