@@ -1,7 +1,7 @@
 import Login from './Components/Login/Login';
 import Home from "./Home";
 import './App.css';
-import { BrowserRouter as Router , Route , Switch } from "react-router-dom";
+import { BrowserRouter as Router , Route , Switch , Redirect } from "react-router-dom";
 import { store } from "./store";
 
 
@@ -13,10 +13,11 @@ function App() {
     <Router>
       <div className="App">
         <Switch>
-          <Route path="/login" >
+          <Redirect exact from="/" to="/app/"/>
+          <Route path="/auth" >
             <Login />
           </Route>
-          <Route path="*">
+          <Route path="/app/*">
             <Home />
           </Route>
         </Switch>

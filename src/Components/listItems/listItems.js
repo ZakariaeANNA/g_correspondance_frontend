@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 
 export const mainListItems = (
   <React.Fragment>
-    <Link to={'/exportations'} style={{textDecoration: 'none',color: 'black'}}>
+    <Link to={'/app/exportations'} style={{textDecoration: 'none',color: 'black'}}>
       <ListItemButton>
         <ListItemIcon>
           <ForwardToInboxIcon />
@@ -18,7 +18,7 @@ export const mainListItems = (
         <ListItemText primary="Exportations" />
       </ListItemButton>
     </Link>
-    <Link to={'/importations'} style={{textDecoration: 'none',color: 'black'}}>
+    <Link to={'/app/importations'} style={{textDecoration: 'none',color: 'black'}}>
       <ListItemButton>
         <ListItemIcon>
           <MoveToInboxIcon />
@@ -31,7 +31,7 @@ export const mainListItems = (
 
 export const secondaryListItems = (
   <React.Fragment>
-    <Link to={'/users'} style={{textDecoration: 'none',color: 'black'}}>
+    <Link to={'/app/users'} style={{textDecoration: 'none',color: 'black'}}>
       <ListItemButton>
         <ListItemIcon>
           <PeopleIcon />

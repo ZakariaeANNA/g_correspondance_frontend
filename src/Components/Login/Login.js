@@ -26,7 +26,7 @@ export default function Login() {
     if (isSuccess) {
       localStorage.setItem( "token" , data.token );
       enqueueSnackbar( "Authentification est effectué avec succes" ,  { variant: "success" });
-      history.push("/");
+      history.push("/app/");
     }
     if (isError) {
       enqueueSnackbar( "Error" ,  { variant: "error" });

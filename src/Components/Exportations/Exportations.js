@@ -7,12 +7,12 @@ import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
 import { Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { AccountCircle, Visibility } from '@mui/icons-material'; 
+import { Visibility } from '@mui/icons-material'; 
 import { Box } from '@mui/system';
 import {Delete} from "@mui/icons-material";
 import { Tooltip } from '@material-ui/core';
 import Paper from '@mui/material/Paper';
-import { Chat,Send,PictureAsPdf } from "@mui/icons-material";
+import { Chat,Send} from "@mui/icons-material";
 import SendIcon from '@mui/icons-material/Send';
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -41,6 +41,9 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
+import { Link } from 'react-router-dom';
+
+
 
 const style = {
     position: 'absolute',
@@ -52,7 +55,7 @@ const style = {
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
-    py:3
+    pt:3
 };
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -70,7 +73,8 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#f0f0f0'
     }
 }));
-function stringToColor(string) {
+
+function stringColor(string) {
     let hash = 0;
     let i;
   
@@ -86,14 +90,13 @@ function stringToColor(string) {
       color += `00${value.toString(16)}`.slice(-2);
     }
     /* eslint-enable no-bitwise */
-  
     return color;
 }
 
-function stringAvatar(name) {
+function stringToAvatar(name) {
     return {
       sx: {
-        bgcolor: stringToColor(name),
+        bgcolor: stringColor(name),
       },
       children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
     };
@@ -178,15 +181,12 @@ function AddExportation(){
         const token = localStorage.getItem("token");
         const user = decodeToken(token);
         const formData = new FormData(event.currentTarget);
-        console.log(tags);
-        console.log(event.target);
         formData.append('receiver', JSON.stringify(tags));
         formData.append('sender',user.codeGRESA);
         formData.append('file', files);
         formData.append("type",type);
         addExportations(formData);
     }
-  
     return (
       <div>
         <Box sx={{ justifyContent:"flex-end", display:"flex" ,paddingTop:2}} onClick={handleClickOpen}>
@@ -202,38 +202,38 @@ function AddExportation(){
           maxWidth="md" 
         >
             <form onSubmit={onAddExportations} encType="multipart/form-data">
-            <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                Envoyer une exportation
-            </BootstrapDialogTitle>
-            <DialogContent dividers>
-                <div className="tags-input">
-                    <ul id="tags">
-                        {tags.map((tag, index) => (
-                            <li key={index} className="tag">
-                                <span className='tag-title'>{tag.idReceiver}</span>
-                                <span className='tag-close-icon'
-                                    onClick={() => removeTags(index)}
-                                >
-                                    x
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                    <input
-                        type="text"
-                        onKeyDown={event => event.key === " " ? addTags(event) : null}
-                        placeholder="Code GRESA"
-                    />
-                </div>
-                <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label="Objet" variant="outlined" name="emailTitle" required/>
-                <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Message" variant="outlined" rows={4} name="message" required/>
-                <input type="file" name="ffff" onChange={changeFile}/>
-            </DialogContent>
-            <DialogActions>
-                <Button variant='contained' type="submit" startIcon={<Send />} autoFocus >
-                    Envoyer
-                </Button>
-            </DialogActions>
+                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+                    Envoyer une exportation
+                </BootstrapDialogTitle>
+                <DialogContent dividers>
+                    <div className="tags-input">
+                        <ul id="tags">
+                            {tags.map((tag, index) => (
+                                <li key={index} className="tag">
+                                    <span className='tag-title'>{tag.idReceiver}</span>
+                                    <span className='tag-close-icon'
+                                        onClick={() => removeTags(index)}
+                                    >
+                                        x
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                        <input
+                            type="text"
+                            onKeyDown={event => event.key === " " ? addTags(event) : null}
+                            placeholder="Code GRESA"
+                        />
+                    </div>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label="Objet" variant="outlined" name="emailTitle" required/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Message" variant="outlined" rows={4} name="message" required/>
+                    <input type="file" name="ffff" onChange={changeFile}/>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant='contained' type="submit" startIcon={<Send />} autoFocus >
+                        Envoyer
+                    </Button>
+                </DialogActions>
             </form>
         </BootstrapDialog>
       </div>
@@ -242,7 +242,6 @@ function AddExportation(){
 }
 
 function DeleteExportation({params}){
-  
     const [open, setOpen] = React.useState(false);
     const handleClickOpen = () => {
       setOpen(true);
@@ -305,31 +304,12 @@ function ViewUserDetails({params}){
             >
                 <Fade in={open}>
                     <Box sx={style}>
-                        <Box style={{display: 'flex',justifyContent: 'flex-start',flexDirection:'row',paddingLeft: 10}}>
-                            <Avatar {...stringAvatar(`${params.FirstName} ${params.LastName})`)}/><Typography variant='h5' style={{marginTop : 3,marginLeft: 15}}>{params.FirstName} {params.LastName}</Typography>
+                        <Box style={{display: 'flex',justifyContent: 'flex-start',flexDirection:'row',paddingLeft: '2em',marginBottom: 10}}>
+                            <Avatar {...stringToAvatar(`${params.FirstName} ${params.LastName}`)}/><Typography variant='h5' style={{marginTop : 3,marginLeft: 15}}>{params.FirstName} {params.LastName}</Typography>
                         </Box>
-                        <hr
-                            style={{
-                            color: 'black',
-                            backgroundColor: 'black',
-                            height: 2
-                            }}
-                        />
                         <TableContainer component={Paper} sx={{px:2}}>
                             <Table sx={{ minWidth: '60%' }} aria-label="simple table">
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell style={{ fontWeight : "bold" }}>Nom</TableCell>
-                                        <TableCell component="th" scope="row">
-                                            {params.LastName}
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell style={{ fontWeight : "bold" }}>Prénom</TableCell>
-                                        <TableCell component="th" scope="row">
-                                            {params.FirstName}
-                                        </TableCell>
-                                    </TableRow>
                                     <TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>Code GRESA</TableCell>
                                         <TableCell component="th" scope="row">
@@ -337,21 +317,33 @@ function ViewUserDetails({params}){
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Email</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.email}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Phone</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.phone}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>Nom Departement</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.nameDepartement}
+                                            {params.departement.nameDepartement}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>Type Departement</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.typeDepartement}
+                                            {params.departement.typeDepartement}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>Delegation</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.delegation}
+                                            {params.departement.Delegation}
                                         </TableCell>
                                     </TableRow>
                                 </TableBody>
@@ -376,7 +368,7 @@ function ViewExportation({params}){
     const [display,setDisplay] = React.useState(false);
     const handleClick = () => {
         setDisplay(!display);
-      };
+    };
     const classes = useStyles()
     return(
         <div>
@@ -416,31 +408,30 @@ function ViewExportation({params}){
                                     <List component="div" disablePadding>
                                         {
                                             params.incoming_email.map(email=>(
-                                                email.receiver.map(receiver=>{
-                                                    return(
-                                                        <ListItem> 
+                                                email.receiver.map(receive=>(
+                                                         <ListItem key={receive.codeGRESA}> 
                                                             <ListItemAvatar>
-                                                            <Avatar
-                                                                {...stringAvatar(`${receiver.FirstName} ${receiver.LastName})`)}
-                                                            />
+                                                                <Avatar
+                                                                    {...stringToAvatar(`${receive.FirstName} ${receive.LastName}`)}
+                                                                />
                                                             </ListItemAvatar>
                                                             <ListItemText
-                                                                primary={<Typography>{receiver.LastName} {receiver.FirstName}</Typography>}
+                                                                primary={<Typography>{receive.LastName} {receive.FirstName}</Typography>}
                                                             />
                                                             <ListItemSecondaryAction>
-                                                                <ViewUserDetails params={receiver}/>
+                                                                <ViewUserDetails params={receive}/>
                                                             </ListItemSecondaryAction>
                                                         </ListItem>
-                                                    )
-                                            })))
+                                                )
+                                            )))
                                         }
                                     </List>
-                                    </Collapse>
+                                </Collapse>
                             </List>
                         </div>
                     </Grid>
                     {/*end user content section*/}
-                    <a href={'http://localhost:8000/api/'+params.attachement} download="hello.pdf" style={{textDecoration: 'none'}}>
+                    <a href={'http://localhost:8000/api/'+params.attachement+'/'+params.fileName} style={{textDecoration: 'none'}}>
                         <Paper
                             sx={{
                                 p: 2,
@@ -450,9 +441,9 @@ function ViewExportation({params}){
                             }}
                         >
                             <div style={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center'}}>
-                                <FileIcon extension={params.type.split('/')[1]} {...defaultStyles[params.type.split('/')[1]]}/>
+                                <FileIcon extension={params.type} {...defaultStyles[params.type]}/>
                             </div>
-                            <Typography style={{marginTop: 10}}>{params.attachement}</Typography>
+                            <Typography style={{marginTop: 10}}>{params.fileName}</Typography>
                         </Paper>
                     </a>
                 </DialogContent>
@@ -463,18 +454,16 @@ function ViewExportation({params}){
 
 export default function Exportation(){
     const auth = useSelector( state => state.auth.user );
-    const history = useHistory();
-    const dispatch = useDispatch();
     const [rows,setRows] = React.useState([]);
     const { data, isError, isLoading } = useGetExportationBycodeGRESAQuery(auth.codeGRESA); 
+    const dispatch = useDispatch();
+    const history = useHistory();
     useEffect(() => {
-        dispatch({ type : "checkLogin" , history : history , route : "/"});
+        dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
         if(data){
-            console.log(data);
-            setRows(data.emails);
+            setRows(data);
         }
     },[data]);
-
     const columns = [
         {field: "sender",headerName: "Expéditeur", flex: 1 ,headerAlign : 'center',align:'center',fontWeight:"bold",renderCell : (params)=>{
             return(
@@ -488,18 +477,17 @@ export default function Exportation(){
                 <Box>{date}</Box>
             );
         }},
-        {field: "status",headerName: "Statut", flex: 1 ,headerAlign : 'center',align:'center' , renderCell : (params) =>{
-            if(params.row.status === 0) return <Box>Non Lu</Box>; else return <Box>Lu</Box>;
-        }},
         {field: "Actions",headerName: "Actions", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
             <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
                 <DeleteExportation params={params.row}/>
-                <Tooltip title="FeedBack">
-                    <IconButton aria-label="delete" size="large"> 
-                        <Chat />
-                    </IconButton>
-                </Tooltip>
+                <Link to="/app/feedback">
+                    <Tooltip title="FeedBack">
+                        <IconButton aria-label="delete" size="large"> 
+                            <Chat />
+                        </IconButton>
+                    </Tooltip>
+                </Link>
             </Box>
         )},        
     ]
@@ -508,37 +496,37 @@ export default function Exportation(){
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
                 <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>La liste des exportations envoyés</Typography>
             </Box>
-                {   isLoading ? (
-                    <Box
-                        sx={{
-                            position : "absolute",
-                            top : "50%",
-                            right : "50%",
-                            background : "transparent"
-                        }}
-                    >
-                        <CircularProgress/>
-                    </Box>
-                ):(
-                    <Paper
-                        sx={{
-                            p: 2,
-                            display: 'flex',
-                            flexDirection: 'column',
-                        }}
-                    >
-                        <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
-                        <DataGrid
-                            rows={rows}
-                            columns={columns}
-                            pageSize={5}
-                            rowsPerPageOptions={[5]}
-                            checkboxSelection
-                            />
-                        </div>
-                        <AddExportation />
-                    </Paper>
-                )}
+            {   isLoading ? (
+                <Box
+                    sx={{
+                        position : "absolute",
+                        top : "50%",
+                        right : "50%",
+                        background : "transparent"
+                    }}
+                >
+                    <CircularProgress/>
+                </Box>
+            ):(
+                <Paper
+                    sx={{
+                        p: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pageSize={5}
+                        rowsPerPageOptions={[5]}
+                        checkboxSelection
+                        />
+                    </div>
+                    <AddExportation />
+                </Paper>
+            )}
         </React.Fragment>
     )
 }

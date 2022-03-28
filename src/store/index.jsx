@@ -14,7 +14,9 @@ export const store = configureStore({
     [importationApi.reducerPath]: importationApi.reducer,
   },
   middleware: (getDefaultMiddleware) => 
-    getDefaultMiddleware().concat(authApi.middleware,exportationApi.middleware,importationApi.middleware),
+    getDefaultMiddleware({
+      serializableCheck: false
+    }).concat(authApi.middleware,exportationApi.middleware,importationApi.middleware),
 });
 
 setupListeners(store.dispatch);
