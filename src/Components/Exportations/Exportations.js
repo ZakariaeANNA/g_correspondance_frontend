@@ -287,7 +287,7 @@ export default function Exportation(){
             <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
                 <DeleteExportation params={params.row}/>
-                <Link to="/app/feedback">
+                <Link to={"/app/feedback/"+params.row.id} >
                     <Tooltip title="FeedBack">
                         <IconButton aria-label="delete" size="large"> 
                             <Chat />
