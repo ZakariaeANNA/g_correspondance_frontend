@@ -2,6 +2,8 @@ import React,{ useState,useEffect } from 'react'
 import Paper from '@mui/material/Paper';
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { Button } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -17,6 +19,17 @@ import { useGetFeedbackByidAndBysenderQuery,useGetFeedbackByidAndByreceiverMutat
 import { useParams } from 'react-router-dom';
 import { CircularProgress } from "@mui/material";
 import moment from 'moment';
+import { Tooltip } from '@material-ui/core';
+import { DialogContent, IconButton , TextField , Container, ListItemButton  } from "@mui/material";
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import Dialog from '@mui/material/Dialog';
+import {Delete} from "@mui/icons-material";
+import { Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import CloseIcon from '@mui/icons-material/Close';
+import MUIRichTextEditor from 'mui-rte'
 
 
 const columns = [
@@ -37,7 +50,83 @@ const columns = [
       renderCell : (value) => moment(value).format('DD-MM-YYYY')
     }
 ];
-  
+
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+    '& .MuiDialogContent-root': {
+        padding: theme.spacing(2),
+    },
+    '& .MuiDialogActions-root': {
+        padding: theme.spacing(1),
+    },
+  }));
+  const BootstrapDialogTitle = (props) => {
+    const { children, onClose, ...other } = props;
+    return (
+      <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+        {children}
+        {onClose ? (
+            <IconButton
+                aria-label="close"
+                onClick={onClose}
+                sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+            }}
+            >
+            <CloseIcon />
+          </IconButton>
+        ) : null}
+      </DialogTitle>
+    );
+  };
+  BootstrapDialogTitle.propTypes = {
+    children: PropTypes.node,
+    onClose: PropTypes.func.isRequired,
+};
+
+function SendFeedback({params}){
+    const [open, setOpen] = React.useState(false);
+    const handleClickOpen = () => {
+      setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+    return(
+        <>
+            <Tooltip title="Supprimer l'exportation">
+                <Box sx={{ alignSelf : "flex-end" }}>
+                    <Button variant="text" endIcon={<SendIcon />} onClick={handleClickOpen} >Envoyer un feedback</Button>
+                </Box>
+            </Tooltip>
+            <BootstrapDialog
+                onClose={handleClose}
+                aria-labelledby="customized-dialog-title"
+                open={open}
+                fullWidth
+                maxWidth="md" 
+            >
+                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+                    Envoyer un feedback
+                </BootstrapDialogTitle>
+                <DialogContent dividers>
+                    <>
+                        <TextField id="outlined-basic" fullWidth label="Code GRESA" variant="outlined" />
+                        <MUIRichTextEditor label="Start typing..." />
+                    </>
+                </DialogContent>
+                <DialogActions>
+                <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={handleClose}>
+                    Envoyer
+                </Button>
+                </DialogActions>
+            </BootstrapDialog>
+        </>
+    );
+}
+
   
 export default function Feedback(){
     const auth = useSelector( state => state.auth.user );
@@ -88,7 +177,7 @@ export default function Feedback(){
 
     const isToday = (someDate) => {
         const today = moment();
-        return today === someDate;
+        return today.isSame(someDate,'day');
     }
 
     return(
@@ -100,6 +189,7 @@ export default function Feedback(){
                     flexDirection: 'column',
                 }}
             >
+                <SendFeedback />
                 <TabContext value={value}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleChange} aria-label="lab API tabs example">
@@ -176,6 +266,7 @@ export default function Feedback(){
                                                                 <TableCell key={column.id} align={column.align}>
                                                                 {column.format && typeof value === 'number'
                                                                     ? column.format(value)
+                                                                    : !isNaN(Date.parse(value)) ? isToday(moment(value)) ? moment(value).format('HH:mm') : moment(value).format('DD-MM-YYYY') 
                                                                     : value}
                                                                 </TableCell>
                                                             );

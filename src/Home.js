@@ -52,12 +52,10 @@ function stringToColor(string) {
     color += `00${value.toString(16)}`.slice(-2);
   }
   /* eslint-enable no-bitwise */
-  console.log(color)
   return color;
 }
 
 function stringAvatar(name) {
-  console.log(`${name.split(' ')[0][0]}${name.split(' ')[1][0]}`)
   return {
     sx: {
       bgcolor: stringToColor(name),

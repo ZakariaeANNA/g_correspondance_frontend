@@ -187,7 +187,7 @@ function AddExportation(){
     return (
       <div>
         <Box sx={{ justifyContent:"flex-end", display:"flex" ,paddingTop:2}} onClick={handleClickOpen}>
-            <Button variant="contained" endIcon={<SendIcon />} >
+            <Button variant="outlined" endIcon={<SendIcon />} >
                 Envoyer une exportation
             </Button>
         </Box>
