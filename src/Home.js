@@ -131,7 +131,10 @@ export default function Home() {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (setting) => {
+    if(setting === "Logout"){
+      dispatch({ type : "logout" , history : history , route : "/auth/"});
+    }
     setAnchorElUser(null);
   };
   
@@ -226,8 +229,8 @@ export default function Home() {
                       onClose={handleCloseUserMenu}
                       >
                       {settings.map((setting) => (
-                          <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                          <Typography textAlign="center">{setting}</Typography>
+                          <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
+                            <Typography textAlign="center">{setting}</Typography>
                           </MenuItem>
                       ))}
                   </Menu>

@@ -139,7 +139,6 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 function AddExportation(){
     const [open, setOpen] = useState(false);
-    const [type, setType] = useState();
     const [files,setFiles] = useState();
     const [tags, setTags] = React.useState([]);
     const [addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation();
@@ -166,7 +165,6 @@ function AddExportation(){
 
     const changeFile = (event) => {
         setFiles(event.target.files[0]);
-        setType(event.target.files[0].type);
     }
 
     const addTags = event => {
@@ -184,7 +182,6 @@ function AddExportation(){
         formData.append('receiver', JSON.stringify(tags));
         formData.append('sender',user.codeGRESA);
         formData.append('file', files);
-        formData.append("type",type);
         addExportations(formData);
     }
     return (

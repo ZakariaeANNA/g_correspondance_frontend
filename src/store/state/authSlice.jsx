@@ -22,8 +22,14 @@ const authSlice = createSlice({
       }
       return state;
     });
+    builder.addCase("logout" , (state,action)=>{
+      localStorage.removeItem("token");
+      state.user = {};
+      action.history.push(action.route);
+      return state;
+    });
   }
 })
 
-export const { checkLogin } = authSlice.actions
+export const { checkLogin , logout } = authSlice.actions
 export default authSlice.reducer
