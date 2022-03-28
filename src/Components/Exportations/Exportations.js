@@ -137,14 +137,14 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     children: PropTypes.node,
     onClose: PropTypes.func.isRequired,
 };
-const { enqueueSnackbar } = useSnackbar();
 
 function AddExportation(){
     const [open, setOpen] = useState(false);
     const [files,setFiles] = useState();
     const [tags, setTags] = React.useState([]);
     const [addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation();
-  
+    const { enqueueSnackbar } = useSnackbar();
+
     const handleClickOpen = () => {
       setOpen(true);
     };
@@ -157,13 +157,13 @@ function AddExportation(){
 	};
 
     useEffect(()=>{
-        if (isSuccess) {
-          console.log(data);
+        if(isSuccess){
+            enqueueSnackbar( data.addExportation ,  { variant: "success" });
         }
-        if (isError) {
-          console.log(error);
+        if(isError){
+            enqueueSnackbar(error.data.addExportation ,  { variant: "error" });
         }
-    });
+    },[data,error]);
 
     const changeFile = (event) => {
         setFiles(event.target.files[0]);
@@ -185,6 +185,7 @@ function AddExportation(){
         formData.append('sender',user.codeGRESA);
         formData.append('file', files);
         addExportations(formData);
+       
     }
     return (
       <div>
@@ -457,19 +458,11 @@ export default function Exportation(){
     const { data, isError, isLoading } = useGetExportationBycodeGRESAQuery(auth.codeGRESA); 
     const dispatch = useDispatch();
     const history = useHistory();
-    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
         if(data){
             setRows(data);
-        }
-        if(isLoading){
-            enqueueSnackbar( "L'exportation a eté envoyer avec succé" ,  { variant: "success" });
-            setRows(data);
-        }
-        if(isError){
-            enqueueSnackbar( "Une probleme survenu l'ors de la 'insertion" ,  { variant: "error" });
         }
     },[data]);
     const columns = [
