@@ -6,7 +6,6 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Tab from '@mui/material/Tab';
@@ -14,54 +13,67 @@ import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import Box from '@mui/material/Box';
+import { useGetFeedbackByidAndBysenderQuery,useGetFeedbackByidAndByreceiverMutation } from "../../store/api/feedbackApi";
+import { useParams } from 'react-router-dom';
+import { CircularProgress } from "@mui/material";
+import moment from 'moment';
+
 
 const columns = [
-    { id: 'name', label: 'Name', minWidth: 170 },
+    { id: 'message', label: 'Message', minWidth: 170 },
     {
-      id: 'population',
-      label: 'Population',
+      id: 'idSender',
+      label: 'Sender',
       minWidth: 170,
       align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'size',
-      label: 'Size\u00a0(km\u00b2)',
+      id: 'created_at',
+      label: 'Date',
       minWidth: 170,
       align: 'right',
-      format: (value) => value.toLocaleString('en-US'),
-    },
-  ];
+      format: (value) => moment(value).format('DD-MM-YYYY'),
+      renderCell : (value) => moment(value).format('DD-MM-YYYY')
+    }
+];
   
-  function createData(name, code, population, size) {
-    const density = population / size;
-    return { name, code, population, size, density };
-  }
-  
-  const rows = [
-    createData('India', 'IN', 1324171354, 3287263),
-    createData('China', 'CN', 1403500365, 9596961),
-    createData('Italy', 'IT', 60483973, 301340),
-    createData('United States', 'US', 327167434, 9833520),
-    createData('Canada', 'CA', 37602103, 9984670),
-    createData('Australia', 'AU', 25475400, 7692024),
-    createData('Germany', 'DE', 83019200, 357578),
-    createData('Ireland', 'IE', 4857000, 70273),
-    createData('Mexico', 'MX', 126577691, 1972550),
-    createData('Japan', 'JP', 126317000, 377973),
-    createData('France', 'FR', 67022000, 640679),
-    createData('United Kingdom', 'GB', 67545757, 242495),
-    createData('Russia', 'RU', 146793744, 17098246),
-    createData('Nigeria', 'NG', 200962417, 923768),
-    createData('Brazil', 'BR', 210147125, 8515767),
-  ];
   
 export default function Feedback(){
+    const auth = useSelector( state => state.auth.user );
     const dispatch = useDispatch();
     const history = useHistory();
+    const { idemail } = useParams();
+    const { data : dataSender, 
+            isError , 
+            isLoading : isLoadingSender} = useGetFeedbackByidAndBysenderQuery({ id:idemail , user : auth.codeGRESA});
+    const [ getFeedbackByidAndByreceiver , 
+            { data : dataReceiver, 
+              isLoading : isLoadingReceiver,
+              isSuccess : isSuccessReceiver }] = useGetFeedbackByidAndByreceiverMutation(); 
+    const [ rowsSender,setRowsSender ] = useState([]);
+    const [ rowsReceiver,setRowsReceiver ] = useState([]);
+
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
-    },[]);
+        if(dataSender){
+            setRowsSender(dataSender);
+        }
+        if(isSuccessReceiver){
+            setRowsReceiver(dataReceiver);
+        }
+    },[dataReceiver,dataSender]);
+
+
+    const [value, setValue] = React.useState('1');
+
+    const handleChange = (event, newValue) => {
+        if(newValue == 2){
+            getFeedbackByidAndByreceiver({ id:idemail , user:auth.codeGRESA });
+        }
+        setValue(newValue);
+    };
+
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -73,6 +85,12 @@ export default function Feedback(){
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
+    const isToday = (someDate) => {
+        const today = moment();
+        return today === someDate;
+    }
+
     return(
         <React.Fragment>
             <Paper
@@ -82,51 +100,105 @@ export default function Feedback(){
                     flexDirection: 'column',
                 }}
             >
-                <TabContext value="1">
+                <TabContext value={value}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <TabList aria-label="lab API tabs example">
-                        <Tab label="Item One" value="1" />
+                    <TabList onChange={handleChange} aria-label="lab API tabs example">
+                        <Tab label="Envoyés" value="1" />
+                        <Tab label="Recus" value="2" />
                     </TabList>
                     </Box>
                     <TabPanel value="1" sx={{ p:0 }}>
-                        <TableContainer >
+                        <TableContainer>
                             <Table stickyHeader aria-label="sticky table">
-                                <TableHead>
-                                </TableHead>
                                 <TableBody>
-                                    {rows
-                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                        .map((row) => {
-                                            return (
-                                            <TableRow hover role="checkbox" tabIndex={-1} key={row.code} onClick={()=>console.log(row)}>
-                                                {columns.map((column) => {
-                                                    const value = row[column.id];
-                                                    return (
-                                                        <TableCell key={column.id} align={column.align}>
-                                                        {column.format && typeof value === 'number'
-                                                            ? column.format(value)
-                                                            : value}
-                                                        </TableCell>
+                                    { isLoadingSender ? (
+                                        <Box
+                                            sx={{
+                                                p:3
+                                            }}
+                                        >
+                                            <CircularProgress/>
+                                        </Box>
+                                    ) : (
+                                        rowsSender.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                            .map((row) => {
+                                                return (
+                                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={()=>console.log(row)}>
+                                                        {columns.map((column) => {
+                                                            const value = row[column.id];
+                                                            return (
+                                                                <TableCell key={column.id} align={column.align}>
+                                                                    {column.format && typeof value === 'number'
+                                                                        ? column.format(value)
+                                                                        : !isNaN(Date.parse(value)) ? isToday(moment(value)) ? moment(value).format('HH:mm') : moment(value).format('DD-MM-YYYY') 
+                                                                        : value}
+                                                                </TableCell>
+                                                            );
+                                                        })}
+                                                    </TableRow>
                                                     );
-                                                })}
-                                            </TableRow>
-                                            );
-                                        })}
+                                                }
+                                            )
+                                    )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
                         <TablePagination
                             rowsPerPageOptions={[10, 25, 100]}
                             component="div"
-                            count={rows.length}
+                            count={rowsSender.length}
                             rowsPerPage={rowsPerPage}
                             page={page}
                             onPageChange={handleChangePage}
                             onRowsPerPageChange={handleChangeRowsPerPage}
                         />  
                     </TabPanel>
-                </TabContext>
-                
+                    <TabPanel value="2" sx={{ p:0 }}>
+                        <TableContainer >
+                            <Table stickyHeader aria-label="sticky table">
+                            <TableBody>
+                                    { isLoadingReceiver ? (
+                                        <Box
+                                            sx={{
+                                                p:3
+                                            }}
+                                        >
+                                            <CircularProgress/>
+                                        </Box>
+                                    ) : (
+                                        rowsReceiver.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                            .map((row) => {
+                                                return (
+                                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={()=>console.log(row)}>
+                                                        {columns.map((column) => {
+                                                            const value = row[column.id];
+                                                            return (
+                                                                <TableCell key={column.id} align={column.align}>
+                                                                {column.format && typeof value === 'number'
+                                                                    ? column.format(value)
+                                                                    : value}
+                                                                </TableCell>
+                                                            );
+                                                        })}
+                                                    </TableRow>
+                                                    );
+                                                }
+                                            )
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 25, 100]}
+                            component="div"
+                            count={rowsReceiver.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />  
+                    </TabPanel>
+                </TabContext>               
             </Paper>
         </React.Fragment>
     )

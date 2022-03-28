@@ -17,13 +17,11 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { mainListItems, secondaryListItems } from './Components/listItems/listItems';
 import Chart from './Components/Chart/Chart';
-import Deposits from './Components/Deposits/Deposits';
-import Orders from './Components/Orders/Orders';
 import Menu from '@mui/material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { BrowserRouter as Router , Route , Switch ,Outlet, } from "react-router-dom";
+import { Route , Switch } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Users from '../src/Components/Users/Users';
@@ -78,7 +76,6 @@ const AppBar = styled(MuiAppBar, {
   }),
   ...(open && {
     marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -147,11 +144,10 @@ export default function Home() {
   };
 
   return (
-    <Router>
       <ThemeProvider theme={mdTheme}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
-          <AppBar position="absolute" open={open} sx={{ justifyItems : "center" }}>
+          <AppBar position="absolute" open={open} sx={{ justifyItems : "center" , zIndex : "2" }}>
             <Toolbar
               sx={{
                 pr: '24px', // keep right padding when drawer closed
@@ -164,7 +160,6 @@ export default function Home() {
                 onClick={toggleDrawer}
                 sx={{
                   marginRight: '36px',
-                  ...(open && { display: 'none' }),
                 }}
               >
                 <MenuIcon />
@@ -239,20 +234,16 @@ export default function Home() {
               </Box>
             </Toolbar>
           </AppBar>
-          <Drawer variant="permanent" open={open}>
+          <Drawer variant="permanent" open={open} sx={{ zIndex : "0" }}>
             <Toolbar
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                px: [1],
-              }}
-            >
-              <IconButton onClick={toggleDrawer}>
-                <ChevronLeftIcon />
-              </IconButton>
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  px: [1],
+                }}
+              >
             </Toolbar>
-            <Divider />
             <List component="nav">
               {mainListItems}
               <Divider sx={{ my: 1 }} />
@@ -285,16 +276,16 @@ export default function Home() {
                     <Chart />
                   </Paper>
                 </Route>
-                <Route exact path="/app/exportations">
+                <Route path="/app/exportations">
                     <Exportation />
                 </Route>
-                <Route exact path="/app/importations">
+                <Route path="/app/importations">
                     <Importations />
                 </Route>
-                <Route exact path="/app/feedback">
+                <Route path="/app/feedback/:idemail">
                     <Feedback />
                 </Route>
-                <Route exact path="/app/users">
+                <Route path="/app/users">
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                     <Users />
                   </Paper>
@@ -305,6 +296,5 @@ export default function Home() {
           </Box>
         </Box>
       </ThemeProvider>
-    </Router>
   );
 }
