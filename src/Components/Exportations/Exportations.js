@@ -42,6 +42,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { Link } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 
 
@@ -136,6 +137,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     children: PropTypes.node,
     onClose: PropTypes.func.isRequired,
 };
+const { enqueueSnackbar } = useSnackbar();
 
 function AddExportation(){
     const [open, setOpen] = useState(false);
@@ -458,10 +460,19 @@ export default function Exportation(){
     const { data, isError, isLoading } = useGetExportationBycodeGRESAQuery(auth.codeGRESA); 
     const dispatch = useDispatch();
     const history = useHistory();
+    const { enqueueSnackbar } = useSnackbar();
+
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
         if(data){
             setRows(data);
+        }
+        if(isLoading){
+            enqueueSnackbar( "L'exportation a eté envoyer avec succé" ,  { variant: "success" });
+            setRows(data);
+        }
+        if(isError){
+            enqueueSnackbar( "Une probleme survenu l'ors de la 'insertion" ,  { variant: "error" });
         }
     },[data]);
     const columns = [

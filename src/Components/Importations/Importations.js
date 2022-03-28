@@ -19,6 +19,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 import {FileIcon,defaultStyles} from 'react-file-icon';
+import { Link } from 'react-router-dom';
+import { Chat} from "@mui/icons-material";
+
 
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -231,7 +234,13 @@ export default function Importations(){
             <div style={{display: 'flex',flexDirection: 'row',alignContent:"center"}}>
                 <ViewImportation params={params.row}/>
                 <DeleteImportation params={params.row} />
-                <SendFeedback params={params.row}/>
+                <Link to={"/app/feedback/"+params.row.id} >
+                    <Tooltip title="FeedBack">
+                        <IconButton aria-label="delete" size="large"> 
+                            <Chat />
+                        </IconButton>
+                    </Tooltip>
+                </Link>
             </div>
         )},        
     ]
