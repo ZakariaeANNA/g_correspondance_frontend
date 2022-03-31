@@ -4,33 +4,42 @@ import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Button, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import Tab from '@mui/material/Tab';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import { decodeToken } from "react-jwt";
 import Box from '@mui/material/Box';
 import { useGetFeedbackByidAndBysenderQuery,useGetFeedbackByidAndByreceiverMutation,useAddFeedbackMutation } from "../../store/api/feedbackApi";
 import { useParams } from 'react-router-dom';
-import { CircularProgress } from "@mui/material";
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
 import { DialogContent, IconButton , TextField } from "@mui/material";
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
+import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import CloseIcon from '@mui/icons-material/Close';
 import MUIRichTextEditor from 'mui-rte';
-import { convertToRaw } from 'draft-js';
-import { useSnackbar } from 'notistack';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardMedia from '@mui/material/CardMedia';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Collapse from '@mui/material/Collapse';
+import Avatar from '@mui/material/Avatar';
+import { red } from '@mui/material/colors';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShareIcon from '@mui/icons-material/Share';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import { blue } from '@mui/material/colors';
+
+const colorBlue = blue[900];
 
 
 const columns = [
@@ -87,7 +96,9 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     onClose: PropTypes.func.isRequired,
 };
 
-function SendFeedback({id}){
+
+
+function SendFeedback({params}){
     const [open, setOpen] = React.useState(false);
     const handleClickOpen = () => {
       setOpen(true);
@@ -186,7 +197,12 @@ export default function Feedback(){
               isLoading : isLoadingReceiver,
               isSuccess : isSuccessReceiver }] = useGetFeedbackByidAndByreceiverMutation(); 
     const [ rowsSender,setRowsSender ] = useState([]);
-    const [ rowsReceiver,setRowsReceiver ] = useState([]);
+    const [ rowsReceiver,setRowsReceiver ] = useState([])
+    const [expanded, setExpanded] = React.useState(false);
+
+    const handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
 
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
@@ -234,107 +250,136 @@ export default function Feedback(){
                     flexDirection: 'column',
                 }}
             >
-                <SendFeedback id={idemail}/>
-                <TabContext value={value}>
-                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <TabList onChange={handleChange} aria-label="lab API tabs example">
-                        <Tab label="Envoyés" value="1" />
-                        <Tab label="Recus" value="2" />
-                    </TabList>
+                <SendFeedback />
+                <Box sx={{ display:"flex"}}>
+                    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                            </ListItemAvatar>
+                            <ListItemText
+                            primary="Brunch this weekend?"
+                            secondary={
+                                <React.Fragment>
+                                <Typography
+                                    sx={{ display: 'inline' }}
+                                    component="span"
+                                    variant="body2"
+                                    color="text.primary"
+                                >
+                                    Ali Connors
+                                </Typography>
+                                {" — I'll be in your neighborhood doing errands this…"}
+                                </React.Fragment>
+                            }
+                            />
+                        </ListItem>
+                        <Divider variant="inset" component="li" />
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                            <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
+                            </ListItemAvatar>
+                            <ListItemText
+                            primary="Summer BBQ"
+                            secondary={
+                                <React.Fragment>
+                                <Typography
+                                    sx={{ display: 'inline' }}
+                                    component="span"
+                                    variant="body2"
+                                    color="text.primary"
+                                >
+                                    to Scott, Alex, Jennifer
+                                </Typography>
+                                {" — Wish I could come, but I'm out of town this…"}
+                                </React.Fragment>
+                            }
+                            />
+                        </ListItem>
+                        <Divider variant="inset" component="li" />
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                            <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+                            </ListItemAvatar>
+                            <ListItemText
+                            primary="Oui Oui"
+                            secondary={
+                                <React.Fragment>
+                                <Typography
+                                    sx={{ display: 'inline' }}
+                                    component="span"
+                                    variant="body2"
+                                    color="text.primary"
+                                >
+                                    Sandra Adams
+                                </Typography>
+                                {' — Do you have Paris recommendations? Have you ever…'}
+                                </React.Fragment>
+                            }
+                            />
+                        </ListItem>
+                    </List>
+                    <Box sx={{ p : 2 }}>
+                        <Card fullWidth sx={{ textAlign:"left" , marginY : 2}}>
+                            <CardHeader
+                                avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
+                                action={
+                                    <Box>
+                                        <Chip label="Completed" sx={{ marginX : 1 }} />
+                                        <Chip label="Completed" sx={{ marginX : 1 }} />
+                                    </Box> 
+                                }
+                                title="Shrimp and Chorizo Paella"
+                                subheader="September 14, 2016"
+                            />
+                            <CardContent>
+                                <Typography variant="body2" color="text.secondary">
+                                    This impressive paella is a perfect party dish and a fun meal to cook
+                                    together with your guests. Add 1 cup of frozen peas along with the mussels,
+                                    if you like.
+                                </Typography>
+                            </CardContent>
+                            <Divider />
+                            <CardActions disableSpacing>
+                                <IconButton aria-label="add to favorites">
+                                    <FavoriteIcon />
+                                </IconButton>
+                                <IconButton aria-label="share">
+                                    <ShareIcon />
+                                </IconButton>
+                            </CardActions>
+                        </Card>
+                        <Card fullWidth sx={{ textAlign:"left" , bgcolor : blue[300] }}>
+                            <CardHeader
+                                avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
+                                action={
+                                    <Box>
+                                        <Chip label="Completed" sx={{ marginX : 1 }} />
+                                        <Chip label="Completed" sx={{ marginX : 1 }} />
+                                    </Box> 
+                                }
+                                title="Shrimp and Chorizo Paella"
+                                subheader="September 14, 2016"
+                            />
+                            <CardContent>
+                                <Typography variant="body2" color="text.secondary">
+                                    This impressive paella is a perfect party dish and a fun meal to cook
+                                    together with your guests. Add 1 cup of frozen peas along with the mussels,
+                                    if you like.
+                                </Typography>
+                            </CardContent>
+                            <Divider />
+                            <CardActions disableSpacing>
+                                <IconButton aria-label="add to favorites">
+                                    <FavoriteIcon />
+                                </IconButton>
+                                <IconButton aria-label="share">
+                                    <ShareIcon />
+                                </IconButton>
+                            </CardActions>
+                        </Card>
                     </Box>
-                    <TabPanel value="1" sx={{ p:0 }}>
-                        <TableContainer>
-                            <Table stickyHeader aria-label="sticky table">
-                                <TableBody>
-                                    { isLoadingSender ? (
-                                        <Box
-                                            sx={{
-                                                p:3
-                                            }}
-                                        >
-                                            <CircularProgress/>
-                                        </Box>
-                                    ) : (
-                                        rowsSender.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                            .map((row) => {
-                                                return (
-                                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={()=>console.log(row)}>
-                                                        {columns.map((column) => {
-                                                            const value = row[column.id];
-                                                            return (
-                                                                <TableCell key={column.id} align={column.align}>
-                                                                    {column.format && typeof value === 'number'
-                                                                        ? column.format(value)
-                                                                        : !isNaN(Date.parse(value)) ? isToday(moment(value)) ? moment(value).format('HH:mm') : moment(value).format('DD-MM-YYYY') 
-                                                                        : value}
-                                                                </TableCell>
-                                                            );
-                                                        })}
-                                                    </TableRow>
-                                                    );
-                                                }
-                                            )
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <TablePagination
-                            rowsPerPageOptions={[10, 25, 100]}
-                            component="div"
-                            count={rowsSender.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                        />  
-                    </TabPanel>
-                    <TabPanel value="2" sx={{ p:0 }}>
-                        <TableContainer >
-                            <Table stickyHeader aria-label="sticky table">
-                            <TableBody>
-                                    { isLoadingReceiver ? (
-                                        <Box
-                                            sx={{
-                                                p:3
-                                            }}
-                                        >
-                                            <CircularProgress/>
-                                        </Box>
-                                    ) : (
-                                        rowsReceiver.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                            .map((row) => {
-                                                return (
-                                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.id} onClick={()=>console.log(row)}>
-                                                        {columns.map((column) => {
-                                                            const value = row[column.id];
-                                                            return (
-                                                                <TableCell key={column.id} align={column.align}>
-                                                                {column.format && typeof value === 'number'
-                                                                    ? column.format(value)
-                                                                    : !isNaN(Date.parse(value)) ? isToday(moment(value)) ? moment(value).format('HH:mm') : moment(value).format('DD-MM-YYYY') 
-                                                                    : value}
-                                                                </TableCell>
-                                                            );
-                                                        })}
-                                                    </TableRow>
-                                                    );
-                                                }
-                                            )
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <TablePagination
-                            rowsPerPageOptions={[10, 25, 100]}
-                            component="div"
-                            count={rowsReceiver.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                        />  
-                    </TabPanel>
-                </TabContext>               
+                </Box>    
             </Paper>
         </React.Fragment>
     )

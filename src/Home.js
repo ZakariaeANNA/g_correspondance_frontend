@@ -13,9 +13,9 @@ import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import { Translate , Language } from '@mui/icons-material/';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './Components/listItems/listItems';
+import { MainListItems, SecondaryListItems } from './Components/listItems/listItems';
 import Chart from './Components/Chart/Chart';
 import Menu from '@mui/material/Menu';
 import Avatar from '@mui/material/Avatar';
@@ -28,12 +28,32 @@ import Users from '../src/Components/Users/Users';
 import Importations from './Components/Importations/Importations';
 import Exportation from './Components/Exportations/Exportations';
 import Feedback from './Components/Feedback/Feedback';
+import { useTranslation } from 'react-i18next';
+import i18next from 'i18next'
+import rtlPlugin from "stylis-plugin-rtl";
+import { CacheProvider } from "@emotion/react";
+import createCache from "@emotion/cache";
+import { prefixer } from "stylis";
+import fontTheme from "./Util/fontTheme";
 
 
+const cacheLtr = createCache({
+  key: "muiltr"
+});
+
+const cacheRtl = createCache({
+  key: "muirtl",
+  // prefixer is the only stylis plugin by default, so when
+  // overriding the plugins you need to include it explicitly
+  // if you want to retain the auto-prefixing behavior.
+  stylisPlugins: [prefixer, rtlPlugin]
+});
+
+const ltrTheme = createTheme({ direction: "ltr" });
+const rtlTheme = createTheme({ direction: "rtl" });
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const notificationsList = ['mohamed addhamed have sent this notification', 'account that one sent from that one', 'hello body how are you ?', 'there is too many notifications'];
-
 const drawerWidth = 240;
 
 function stringToColor(string) {
@@ -107,8 +127,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const mdTheme = createTheme();
-
 
 export default function Home() {
   const [open, setOpen] = React.useState(false);
@@ -117,14 +135,14 @@ export default function Home() {
     setOpen(!open);
   };
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorLanguage, setAnchorLanguage] = React.useState(null);
   const [notifications, setNotifications] = React.useState(null);
   const auth = useSelector( state => state.auth.user );
   const history = useHistory();
-
-  useEffect(() => {
+  const { t } = useTranslation();
+  useEffect(()=>{
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
   },[]);
-
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -134,6 +152,14 @@ export default function Home() {
       dispatch({ type : "logout" , history : history , route : "/auth/"});
     }
     setAnchorElUser(null);
+  };
+
+  const handleOpenLanguage = (event) => {
+    setAnchorLanguage(event.currentTarget);
+  };
+
+  const handleCloseLanguage = () => {
+    setAnchorLanguage(null);
   };
   
   const handleOpenNotification = (event) => {
@@ -145,7 +171,8 @@ export default function Home() {
   };
 
   return (
-      <ThemeProvider theme={mdTheme}>
+    <CacheProvider value={i18next.language === "ar" ? cacheRtl : cacheLtr}>
+      <ThemeProvider theme={i18next.language === "ar" ? { rtlTheme , fontTheme } : { ltrTheme , fontTheme }}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
           <AppBar position="absolute" open={open} sx={{ justifyItems : "center" , zIndex : "2" }}>
@@ -160,7 +187,7 @@ export default function Home() {
                 aria-label="open drawer"
                 onClick={toggleDrawer}
                 sx={{
-                  marginRight: '36px',
+                  marginRight:"36px"
                 }}
               >
                 <MenuIcon />
@@ -172,9 +199,37 @@ export default function Home() {
                 noWrap
                 sx={{ flexGrow: 1 , textAlign : "left" }}
               >
-                Système de Gestion de Correspondance
+                {t('project_title')}
               </Typography>
-              <Box sx={{ marginRight : 2 }}>
+              <Box sx={{ flexGrow: 0 }}>
+                  <Tooltip title="Translate">
+                    <Translate onClick={handleOpenLanguage} />
+                  </Tooltip>
+                  <Menu
+                      sx={{ mt: '45px' }}
+                      id="menu-appbar"
+                      anchorEl={anchorLanguage}
+                      anchorOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                      }}
+                      open={Boolean(anchorLanguage)}
+                      onClose={handleCloseLanguage}
+                  >
+                      <MenuItem key={t('fr')} onClick={() => { handleCloseLanguage(); i18next.changeLanguage("fr");}}>
+                        <Typography textAlign="center">{t('fr')}</Typography>
+                      </MenuItem>
+                      <MenuItem key={t('ar')} onClick={() => { handleCloseLanguage(); i18next.changeLanguage("ar");}}>
+                        <Typography textAlign="center">{t('ar')}</Typography>
+                      </MenuItem>
+                  </Menu>
+                </Box>
+              <Box sx={{ marginX : 2 }}>
                 <Tooltip title="notifications">
                   <IconButton color="inherit" onClick={handleOpenNotification}>
                       <Badge badgeContent={4} color="secondary">
@@ -200,15 +255,15 @@ export default function Home() {
                       >
                       {notificationsList.map((notification) => (
                           <MenuItem key={notification} onClick={handleCloseNotification}>
-                          <Typography textAlign="center">{notification}</Typography>
+                            <Typography textAlign="center">{notification}</Typography>
                           </MenuItem>
                       ))}
                   </Menu>
 
               </Box>
               <Box sx={{ flexGrow: 0 }}>
-                  <Tooltip title="Open settings">
-                  <Avatar {...stringAvatar(`${auth.FirstName} ${auth.LastName}`)} onClick={handleOpenUserMenu} />
+                  <Tooltip title={auth?.fullnamela || "Open Settings"}>
+                  <Avatar {...stringAvatar(`${auth?.fullnamela} ${auth?.fullnamear}`)} onClick={handleOpenUserMenu} />
                   </Tooltip>
                   <Menu
                       sx={{ mt: '45px' }}
@@ -239,16 +294,16 @@ export default function Home() {
             <Toolbar
                 sx={{
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   justifyContent: 'flex-end',
                   px: [1],
                 }}
               >
             </Toolbar>
-            <List component="nav">
-              {mainListItems}
+            <List component="nav" sx={{ paddingInlineStart: 1 }}>
+              <MainListItems />
               <Divider sx={{ my: 1 }} />
-              {secondaryListItems}
+              <SecondaryListItems/>
             </List>
           </Drawer>
           <Box
@@ -297,5 +352,6 @@ export default function Home() {
           </Box>
         </Box>
       </ThemeProvider>
+    </CacheProvider>
   );
 }
