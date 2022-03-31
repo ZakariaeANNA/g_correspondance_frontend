@@ -24,7 +24,7 @@ export const exportationApi = createApi({
       },
     }),
     getExportationBycodeGRESA: builder.query({
-      query: (codeGRESA) => `api/exportations/${codeGRESA}`,
+      query: ({codeGRESA , page : pageDefault = 1}) => `api/exportations/${codeGRESA}?page=${pageDefault}`,
     }),
   }),
 });
@@ -33,5 +33,6 @@ export const exportationApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useAddExportationsMutation,
-  useGetExportationBycodeGRESAQuery
+  useGetExportationBycodeGRESAQuery,
+  useGetExportationByidAndByreceiverMutation
 } = exportationApi;

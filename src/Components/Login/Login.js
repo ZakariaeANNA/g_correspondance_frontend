@@ -13,23 +13,48 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { useHistory } from 'react-router-dom';
 import { useSigninUserMutation } from "../../store/api/authApi";
+import { useTranslation } from 'react-i18next';
+import i18next from 'i18next'
+import rtlPlugin from "stylis-plugin-rtl";
+import { CacheProvider } from "@emotion/react";
+import createCache from "@emotion/cache";
+import { prefixer } from "stylis";
+import fontTheme from "../../Util/fontTheme";
 
-const theme = createTheme();
+const cacheLtr = createCache({
+  key: "muiltr"
+});
+
+const cacheRtl = createCache({
+  key: "muirtl",
+  // prefixer is the only stylis plugin by default, so when
+  // overriding the plugins you need to include it explicitly
+  // if you want to retain the auto-prefixing behavior.
+  stylisPlugins: [prefixer, rtlPlugin]
+});
+
+
+const ltrTheme = createTheme({ direction: "ltr" });
+const rtlTheme = createTheme({ direction: "rtl" });
 
 export default function Login() {
-
   const { enqueueSnackbar } = useSnackbar();
   const [signinUser, { data, isLoading, error, isError, isSuccess }] = useSigninUserMutation();
   const history = useHistory();
+  const { t } = useTranslation();
 
   useEffect(()=>{
     if (isSuccess) {
-      localStorage.setItem( "token" , data.token );
-      enqueueSnackbar( "Authentification est effectué avec succes" ,  { variant: "success" });
+      localStorage.setItem( "token" , data );
+      enqueueSnackbar( t('credentials_success') ,  { variant: "success" });
       history.push("/app/");
     }
     if (isError) {
-      enqueueSnackbar( "Error" ,  { variant: "error" });
+      if( error.data === "credentials/false"){
+        enqueueSnackbar( t('credentials_invalid') ,  { variant: "error" });
+      }else if(error.data === "credentials/empty"){
+        enqueueSnackbar( t('credentials_empty') ,  { variant: "error" });
+      }
     }
   });
   
@@ -37,91 +62,113 @@ export default function Login() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const auth = new FormData(event.currentTarget);
-    signinUser({ codeGRESA: auth.get('codeGRESA'), password: auth.get('password') });
+    signinUser({ doti: auth.get('doti'), password: auth.get('password') });
   };
 
 
   return (
-    <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: '100vh' }}>
-        <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            backgroundImage: 'url(../Assets/login.png)',
-            backgroundRepeat: 'no-repeat',
-            backgroundColor: (t) =>
-              t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-          <Box
+    <CacheProvider value={i18next.language === "ar" ? cacheRtl: cacheLtr}>
+      <ThemeProvider theme={i18next.language === "ar" ? { rtlTheme , fontTheme } : { ltrTheme , fontTheme }}>
+        <Grid container component="main" sx={{ height: '100vh' }}>
+          <CssBaseline />
+          <Grid
+            item
+            xs={false}
+            sm={4}
+            md={7}
             sx={{
-              my: 8,
-              mx: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              backgroundImage: 'url(../Assets/login.png)',
+              backgroundRepeat: 'no-repeat',
+              backgroundColor: (t) =>
+                t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
             }}
-          >
-            <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-              <Email />
-            </Avatar>
-            <Typography component="h1" variant="h5" sx={{ fontSize : 35 , fontWeight : "bold" , color : "primary.main" }}>
-                Direction Provinciale Tétouan
-            </Typography>
-            <Typography component="h3" variant="h5" sx={{ fontSize : 25 , fontWeight : "bold" }}>
-                Système de Gestion de Correspondance
-            </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="codeGRESA"
-                label="Code GRESA"
-                name="codeGRESA"
-                autoComplete="codeGRESA"
-                autoFocus
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
-              { isLoading ? (
-                <LoadingButton 
+          />
+          <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+            <Box
+              sx={{
+                my: 8,
+                mx: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+                <Email />
+              </Avatar>
+              <Typography component="h1" variant="h5" sx={{ fontSize : 35 , fontWeight : "bold" , color : "primary.main" }}>
+                  {t('name_company')}
+              </Typography>
+              <Typography component="h3" variant="h5" sx={{ fontSize : 25 , fontWeight : "bold" }}>
+                  {t('project_title')}
+              </Typography>
+              <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                <TextField
+                  margin="normal"
+                  required
                   fullWidth
-                  loading 
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Submit
-                </LoadingButton>
-              ) : (
+                  id="doti"
+                  label={t('doti')}
+                  name="doti"
+                  autoComplete="doti"
+                  autoFocus
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label={t('password')}
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                />
+                { isLoading ? (
+                  <LoadingButton 
+                    fullWidth
+                    loading 
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Submit
+                  </LoadingButton>
+                ) : (
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    {t('login')}
+                  </Button>
+                )}
+              </Box>
+              <Box sx={{ display : "flex" , flexDirection : "row" }}>
                 <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
+                  variant="text"
                   sx={{ mt: 3, mb: 2 }}
+                  onClick={() => {
+                    i18next.changeLanguage("fr");
+                  }}
                 >
-                  Se Connecter
+                  {t('fr')}
                 </Button>
-              )}
+                <Button
+                  variant="text"
+                  sx={{ mt: 3, mb: 2 }}
+                  onClick={() => {
+                    i18next.changeLanguage("ar");
+                  }}
+                >
+                  {t('ar')}
+                </Button>
+              </Box>
             </Box>
-          </Box>
+          </Grid>
         </Grid>
-      </Grid>
-    </ThemeProvider>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }

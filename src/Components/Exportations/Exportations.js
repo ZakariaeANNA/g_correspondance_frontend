@@ -16,7 +16,7 @@ import { Chat,Send} from "@mui/icons-material";
 import SendIcon from '@mui/icons-material/Send';
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { useAddExportationsMutation , useGetExportationBycodeGRESAQuery } from "../../store/api/exportationApi";
+import { useAddExportationsMutation , useGetExportationBycodeGRESAQuery , useGetExportationByidAndByreceiverMutation } from "../../store/api/exportationApi";
 import "./Exportations.css";
 import { decodeToken } from "react-jwt";
 import moment from 'moment';
@@ -43,6 +43,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { Link } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
+import i18next from 'i18next'
 
 
 
@@ -102,7 +104,8 @@ function stringToAvatar(name) {
       children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
     };
   }
-    
+
+
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -139,6 +142,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 };
 
 function AddExportation(){
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [files,setFiles] = useState();
     const [tags, setTags] = React.useState([]);
@@ -190,8 +194,8 @@ function AddExportation(){
     return (
       <div>
         <Box sx={{ justifyContent:"flex-end", display:"flex" ,paddingTop:2}} onClick={handleClickOpen}>
-            <Button variant="outlined" endIcon={<SendIcon />} >
-                Envoyer une exportation
+            <Button variant="outlined" endIcon={<SendIcon />}>
+                {t('sendExportation')}
             </Button>
         </Box>
         <BootstrapDialog
@@ -454,31 +458,43 @@ function ViewExportation({params}){
 
 export default function Exportation(){
     const auth = useSelector( state => state.auth.user );
+    const [ page , setPage ] = useState(1);
+    const [ loading , setLoading ] = useState(false);
     const [rows,setRows] = React.useState([]);
-    const { data, isError, isLoading } = useGetExportationBycodeGRESAQuery(auth.codeGRESA); 
+    const { refetch , data, isError, isLoading } = useGetExportationBycodeGRESAQuery({codeGRESA : auth.codeGRESA , page : page});  
     const dispatch = useDispatch();
     const history = useHistory();
+    const { t } = useTranslation();
 
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
         if(data){
-            setRows(data);
+            setPage(data.current_page);
+            setLoading(false);
+            setRows(data.data);
         }
     },[data]);
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage + 1);
+        setLoading(true);
+        refetch();
+    }
+
     const columns = [
-        {field: "sender",headerName: "Expéditeur", flex: 1 ,headerAlign : 'center',align:'center',fontWeight:"bold",renderCell : (params)=>{
+        {field: "sender",headerName: t('sender') , flex: 1 ,headerAlign : 'center',align:'center',fontWeight:"bold",renderCell : (params)=>{
             return(
                 <Typography>{params.row.sender.LastName} {params.row.sender.FirstName}</Typography>
             )
         }},
-        {field: "emailTitle",headerName: "L'objet de l'email", flex: 3 ,headerAlign : 'center',align:'center'},
-        {field: "created_at",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
+        {field: "emailTitle",headerName: t('subject_message') , flex: 3 ,headerAlign : 'center',align:'center'},
+        {field: "created_at",headerName: t('sending_date'), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
             const date = moment(params.row.created_at).format('DD-MM-YYYY');
             return(
                 <Box>{date}</Box>
             );
         }},
-        {field: "Actions",headerName: "Actions", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
+        {field: "Actions",headerName: t('actions'), flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
             <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
                 <DeleteExportation params={params.row}/>
@@ -495,7 +511,7 @@ export default function Exportation(){
     return(
         <React.Fragment>
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
-                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>La liste des exportations envoyés</Typography>
+                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>{t('listExportations')}</Typography>
             </Box>
             {   isLoading ? (
                 <Box
@@ -520,10 +536,15 @@ export default function Exportation(){
                     <DataGrid
                         rows={rows}
                         columns={columns}
-                        pageSize={5}
+                        pagination
+                        pageSize={data.per_page}
                         rowsPerPageOptions={[5]}
-                        checkboxSelection
-                        />
+                        rowCount={data.total}
+                        paginationMode="server"
+                        onPageChange={handlePageChange}
+                        page={(page - 1)}
+                        loading={loading}
+                    />
                     </div>
                     <AddExportation />
                 </Paper>
