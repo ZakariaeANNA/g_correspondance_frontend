@@ -227,6 +227,9 @@ function AddExportation(){
                     </div>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label="Objet" variant="outlined" name="emailTitle" required/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Message" variant="outlined" rows={4} name="message" required/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="References" variant="outlined" rows={4} name="message" required/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Concernants" variant="outlined" rows={4} name="message" required/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Notes" variant="outlined" rows={4} name="message" required/>
                     <input type="file" name="ffff" onChange={changeFile}/>
                 </DialogContent>
                 <DialogActions>
@@ -311,7 +314,7 @@ function ViewUserDetails({params}){
                             <Table sx={{ minWidth: '60%' }} aria-label="simple table">
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell style={{ fontWeight : "bold" }}>Code GRESA</TableCell>
+                                        <TableCell style={{ fontWeight : "bold" }}>Doti</TableCell>
                                         <TableCell component="th" scope="row">
                                             {params.codeGRESA}
                                         </TableCell>

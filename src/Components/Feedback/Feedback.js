@@ -2,7 +2,7 @@ import React,{ useState,useEffect } from 'react'
 import Paper from '@mui/material/Paper';
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Button } from '@mui/material';
+import { Button, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -14,22 +14,23 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import { decodeToken } from "react-jwt";
 import Box from '@mui/material/Box';
-import { useGetFeedbackByidAndBysenderQuery,useGetFeedbackByidAndByreceiverMutation } from "../../store/api/feedbackApi";
+import { useGetFeedbackByidAndBysenderQuery,useGetFeedbackByidAndByreceiverMutation,useAddFeedbackMutation } from "../../store/api/feedbackApi";
 import { useParams } from 'react-router-dom';
 import { CircularProgress } from "@mui/material";
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
-import { DialogContent, IconButton , TextField , Container, ListItemButton  } from "@mui/material";
+import { DialogContent, IconButton , TextField } from "@mui/material";
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
-import {Delete} from "@mui/icons-material";
-import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import CloseIcon from '@mui/icons-material/Close';
-import MUIRichTextEditor from 'mui-rte'
+import MUIRichTextEditor from 'mui-rte';
+import { convertToRaw } from 'draft-js';
+import { useSnackbar } from 'notistack';
 
 
 const columns = [
@@ -86,7 +87,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     onClose: PropTypes.func.isRequired,
 };
 
-function SendFeedback({params}){
+function SendFeedback({id}){
     const [open, setOpen] = React.useState(false);
     const handleClickOpen = () => {
       setOpen(true);
@@ -94,9 +95,42 @@ function SendFeedback({params}){
     const handleClose = () => {
         setOpen(false);
     };
+    const [value,setValue] = React.useState('')
+    const handleDataChange = (event)=>{
+        const plainText = event.getCurrentContent().getPlainText() // for plain text
+        const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
+        rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
+    }
+    const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
+    const [files,setFiles] = useState();
+    const changeFile = (event) => {
+        setFiles(event.target.files[0]);
+    }
+    const [receiver,setReceiver] = React.useState()
+    const onAddFeedback = (event) => {
+        event.preventDefault();
+        const token = localStorage.getItem("token");
+        const user = decodeToken(token);
+        const formData = new FormData(event.currentTarget);
+        formData.append('receiver', receiver);
+        formData.append('sender',user.codeGRESA);
+        formData.append('message',value);
+        formData.append('emailId',id);
+        formData.append('file', files);
+        addFeedback(formData);
+    }
+    const { enqueueSnackbar } = useSnackbar();
+    useEffect(()=>{
+        if(isSuccess){
+            enqueueSnackbar( data.addFeedback, { variant: "success" });
+        }
+        if(isError){
+            enqueueSnackbar(error.data.addFeedback, { variant: "error" });
+        }
+    },[data,error]);
     return(
         <>
-            <Tooltip title="Supprimer l'exportation">
+            <Tooltip title="Envoyer un feedback">
                 <Box sx={{ alignSelf : "flex-end" }}>
                     <Button variant="text" endIcon={<SendIcon />} onClick={handleClickOpen} >Envoyer un feedback</Button>
                 </Box>
@@ -108,20 +142,31 @@ function SendFeedback({params}){
                 fullWidth
                 maxWidth="md" 
             >
-                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    Envoyer un feedback
-                </BootstrapDialogTitle>
-                <DialogContent dividers>
-                    <>
-                        <TextField id="outlined-basic" fullWidth label="Code GRESA" variant="outlined" />
-                        <MUIRichTextEditor label="Start typing..." />
-                    </>
-                </DialogContent>
-                <DialogActions>
-                <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={handleClose}>
-                    Envoyer
-                </Button>
-                </DialogActions>
+                <form onSubmit={onAddFeedback} encType="multipart/form-data">
+                    <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+                        Envoyer un feedback
+                    </BootstrapDialogTitle>
+                    <DialogContent dividers>
+                            <MUIRichTextEditor
+                                value={value} 
+                                label="Start typing..." 
+                                onChange={handleDataChange}
+                                readOnly
+                                toolbar={false}
+                                />
+                            <TextField id="outlined-basic"  sx={{mt:4}} required fullWidth label="Code GRESA" onChange={(value)=>setReceiver(value.target.value)} variant="outlined" />
+                            <MUIRichTextEditor 
+                                label="Start typing..." 
+                                onChange={handleDataChange}
+                            />
+                            <input type="file" name="ffff" style={{marginTop: '4em'}} onChange={changeFile}/>
+                    </DialogContent>
+                    <DialogActions>
+                    <Button variant="outlined" endIcon={<SendIcon />} autoFocus type="submit">
+                        Envoyer
+                    </Button>
+                    </DialogActions>
+                </form>
             </BootstrapDialog>
         </>
     );
@@ -189,7 +234,7 @@ export default function Feedback(){
                     flexDirection: 'column',
                 }}
             >
-                <SendFeedback />
+                <SendFeedback id={idemail}/>
                 <TabContext value={value}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleChange} aria-label="lab API tabs example">

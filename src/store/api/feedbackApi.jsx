@@ -14,6 +14,15 @@ export const feedbackApi = createApi({
     },
   }),
   endpoints: (builder) => ({
+    addFeedback: builder.mutation({
+      query: (body) => {
+        return {
+          url: "/sendfeedback",
+          method: "post",
+          body,
+        };
+      },
+    }),
     getFeedbackByidAndBysender: builder.query({
       query: (data) => `feedbacks/sent/${data.id}/${data.user}`,
     }),
@@ -31,6 +40,7 @@ export const feedbackApi = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
+  useAddFeedbackMutation,
   useGetFeedbackByidAndByreceiverMutation,
   useGetFeedbackByidAndBysenderQuery
 } = feedbackApi;
