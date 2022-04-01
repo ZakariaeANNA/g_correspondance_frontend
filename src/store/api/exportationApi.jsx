@@ -24,7 +24,7 @@ export const exportationApi = createApi({
       },
     }),
     getExportationBycodeGRESA: builder.query({
-      query: ({codeGRESA , page : pageDefault = 1}) => `api/exportations/${codeGRESA}?page=${pageDefault}`,
+        query: ({doti , page : pageDefault = 1}) => `api/exportations/${doti}?page=${pageDefault}`,
     }),
   }),
 });
