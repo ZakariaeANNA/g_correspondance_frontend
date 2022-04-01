@@ -16,7 +16,7 @@ import { Chat,Send} from "@mui/icons-material";
 import SendIcon from '@mui/icons-material/Send';
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { useAddExportationsMutation , useGetExportationBycodeGRESAQuery , useGetExportationByidAndByreceiverMutation } from "../../store/api/exportationApi";
+import { useAddExportationsMutation , useGetExportationBycodeGRESAQuery } from "../../store/api/exportationApi";
 import "./Exportations.css";
 import { decodeToken } from "react-jwt";
 import moment from 'moment';
@@ -43,8 +43,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { Link } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { useTranslation } from 'react-i18next';
-import i18next from 'i18next'
 
 
 
@@ -104,8 +102,7 @@ function stringToAvatar(name) {
       children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
     };
   }
-
-
+    
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -142,7 +139,6 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 };
 
 function AddExportation(){
-    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [files,setFiles] = useState();
     const [tags, setTags] = React.useState([]);
@@ -186,7 +182,7 @@ function AddExportation(){
         const user = decodeToken(token);
         const formData = new FormData(event.currentTarget);
         formData.append('receiver', JSON.stringify(tags));
-        formData.append('sender',user.codeGRESA);
+        formData.append('sender',user.doti);
         formData.append('file', files);
         addExportations(formData);
        
@@ -194,8 +190,8 @@ function AddExportation(){
     return (
       <div>
         <Box sx={{ justifyContent:"flex-end", display:"flex" ,paddingTop:2}} onClick={handleClickOpen}>
-            <Button variant="outlined" endIcon={<SendIcon />}>
-                {t('sendExportation')}
+            <Button variant="outlined" endIcon={<SendIcon />} >
+                Envoyer une exportation
             </Button>
         </Box>
         <BootstrapDialog
@@ -226,14 +222,14 @@ function AddExportation(){
                         <input
                             type="text"
                             onKeyDown={event => event.key === " " ? addTags(event) : null}
-                            placeholder="Code GRESA"
+                            placeholder="Code Doti"
                         />
                     </div>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label="Objet" variant="outlined" name="emailTitle" required/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label="Objet" variant="outlined" name="title" required/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label="References" variant="outlined" rows={4} name="references"/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label="Concernants" variant="outlined" rows={4} name="concerned" required/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth  className='inputField' label="Observations" variant="outlined" rows={4} name="notes"/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Message" variant="outlined" rows={4} name="message" required/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="References" variant="outlined" rows={4} name="message" required/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Concernants" variant="outlined" rows={4} name="message" required/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label="Notes" variant="outlined" rows={4} name="message" required/>
                     <input type="file" name="ffff" onChange={changeFile}/>
                 </DialogContent>
                 <DialogActions>
@@ -292,7 +288,6 @@ function ViewUserDetails({params}){
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-  
     return (
         <div>
             <IconButton onClick={handleOpen}>
@@ -312,15 +307,15 @@ function ViewUserDetails({params}){
                 <Fade in={open}>
                     <Box sx={style}>
                         <Box style={{display: 'flex',justifyContent: 'flex-start',flexDirection:'row',paddingLeft: '2em',marginBottom: 10}}>
-                            <Avatar {...stringToAvatar(`${params.FirstName} ${params.LastName}`)}/><Typography variant='h5' style={{marginTop : 3,marginLeft: 15}}>{params.FirstName} {params.LastName}</Typography>
+                            <Avatar {...stringToAvatar(`${params.fullnamela} ${params.fullnamear}`)}/><Typography variant='h5' style={{marginTop : 3,marginLeft: 15}}>{params.fullnamela} {params.fullnamear}</Typography>
                         </Box>
                         <TableContainer component={Paper} sx={{px:2}}>
                             <Table sx={{ minWidth: '60%' }} aria-label="simple table">
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell style={{ fontWeight : "bold" }}>Doti</TableCell>
+                                        <TableCell style={{ fontWeight : "bold" }}>Code Doti</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.codeGRESA}
+                                            {params.doti}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
@@ -335,24 +330,45 @@ function ViewUserDetails({params}){
                                             {params.phone}
                                         </TableCell>
                                     </TableRow>
-                                    <TableRow>
+                                    {params.etablissement==null ? (<><TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>Nom Departement</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.departement.nameDepartement}
+                                            {params.departement.nomLa}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>Type Departement</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.departement.typeDepartement}
+                                            {params.departement.type}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>Delegation</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.departement.Delegation}
+                                            {params.departement.delegation}
                                         </TableCell>
                                     </TableRow>
+                                    </>):(
+                                        <>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Nom Etablissement</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.etablissement.nomla}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Type Etablissement</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.etablissement.type}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ fontWeight : "bold" }}>Delegation</TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {params.etablissement.delegation}
+                                        </TableCell>
+                                    </TableRow>
+                                    </>)}
                                 </TableBody>
                             </Table>
                         </TableContainer>
@@ -395,10 +411,14 @@ function ViewExportation({params}){
                     Voir Mon Exportation
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Expéditeur" variant="filled" value={params.sender.FirstName+' '+params.sender.LastName} inputProps={{ readOnly: true }}/>                                      
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label="Numero" variant="filled" rows={4} value={params.number} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Expéditeur" variant="filled" value={params.sender.fullnamela} inputProps={{ readOnly: true }}/>                                      
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Date d'Envoi" variant="filled" value={date} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Objet de l'exportation" variant="filled" value={params.emailTitle} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Objet de l'exportation" variant="filled" value={params.title} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label="Message" variant="filled" rows={4} value={params.message} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label="Les concernants" variant="filled" rows={4} value={params.concerned} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label="Les observations" variant="filled" rows={4} value={params.notes} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label="Les references" variant="filled" rows={4} value={params.references} inputProps={{ readOnly: true }}/>
                     {/*show users content*/}
                     <Grid item variant='filled' id='outlined-basic'>
                         <div>
@@ -406,7 +426,6 @@ function ViewExportation({params}){
                                 component="nav"
                                 aria-labelledby="nested-list-subheader"
                             >
-                                
                                 <ListItemButton onClick={handleClick} className={classes.color}>
                                     <ListItemText primary="Récepteurs" />
                                     {display ? <ExpandLessIcon /> : <ExpandMoreIcon />} 
@@ -416,19 +435,19 @@ function ViewExportation({params}){
                                         {
                                             params.incoming_email.map(email=>(
                                                 email.receiver.map(receive=>(
-                                                         <ListItem key={receive.codeGRESA}> 
-                                                            <ListItemAvatar>
-                                                                <Avatar
-                                                                    {...stringToAvatar(`${receive.FirstName} ${receive.LastName}`)}
-                                                                />
-                                                            </ListItemAvatar>
-                                                            <ListItemText
-                                                                primary={<Typography>{receive.LastName} {receive.FirstName}</Typography>}
+                                                    <ListItem key={receive.doti}> 
+                                                        <ListItemAvatar>
+                                                            <Avatar
+                                                                {...stringToAvatar(`${receive.fullnamela} ${receive.fullnamear}`)}
                                                             />
-                                                            <ListItemSecondaryAction>
-                                                                <ViewUserDetails params={receive}/>
-                                                            </ListItemSecondaryAction>
-                                                        </ListItem>
+                                                        </ListItemAvatar>
+                                                        <ListItemText
+                                                            primary={<Typography>{receive.fullnamela}</Typography>}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <ViewUserDetails params={receive}/>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
                                                 )
                                             )))
                                         }
@@ -461,43 +480,32 @@ function ViewExportation({params}){
 
 export default function Exportation(){
     const auth = useSelector( state => state.auth.user );
-    const [ page , setPage ] = useState(1);
-    const [ loading , setLoading ] = useState(false);
+    const doti = auth.doti
     const [rows,setRows] = React.useState([]);
-    const { refetch , data, isError, isLoading } = useGetExportationBycodeGRESAQuery({codeGRESA : auth.codeGRESA , page : page});  
+    const { data, isError, isLoading } = useGetExportationBycodeGRESAQuery({doti});
     const dispatch = useDispatch();
     const history = useHistory();
-    const { t } = useTranslation();
 
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
         if(data){
-            setPage(data.current_page);
-            setLoading(false);
             setRows(data.data);
         }
     },[data]);
-
-    const handlePageChange = (newPage) => {
-        setPage(newPage + 1);
-        setLoading(true);
-        refetch();
-    }
-
     const columns = [
-        {field: "sender",headerName: t('sender') , flex: 1 ,headerAlign : 'center',align:'center',fontWeight:"bold",renderCell : (params)=>{
+        {field: "sender",headerName: "Expéditeur", flex: 1 ,headerAlign : 'center',align:'center',fontWeight:"bold",renderCell : (params)=>{
             return(
-                <Typography>{params.row.sender.LastName} {params.row.sender.FirstName}</Typography>
+                <Typography>{params.row.sender.fullnamela}</Typography>
             )
         }},
-        {field: "emailTitle",headerName: t('subject_message') , flex: 3 ,headerAlign : 'center',align:'center'},
-        {field: "created_at",headerName: t('sending_date'), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
+        {field: "title",headerName: "L'objet de l'email", flex: 3 ,headerAlign : 'center',align:'center'},
+        {field: "created_at",headerName: "Date d'Envoi", flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
             const date = moment(params.row.created_at).format('DD-MM-YYYY');
             return(
                 <Box>{date}</Box>
             );
         }},
-        {field: "Actions",headerName: t('actions'), flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
+        {field: "Actions",headerName: "Actions", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
             <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
                 <DeleteExportation params={params.row}/>
@@ -514,7 +522,7 @@ export default function Exportation(){
     return(
         <React.Fragment>
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
-                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>{t('listExportations')}</Typography>
+                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>La liste des exportations envoyés</Typography>
             </Box>
             {   isLoading ? (
                 <Box
@@ -539,15 +547,10 @@ export default function Exportation(){
                     <DataGrid
                         rows={rows}
                         columns={columns}
-                        pagination
-                        pageSize={data.per_page}
+                        pageSize={5}
                         rowsPerPageOptions={[5]}
-                        rowCount={data.total}
-                        paginationMode="server"
-                        onPageChange={handlePageChange}
-                        page={(page - 1)}
-                        loading={loading}
-                    />
+                        checkboxSelection
+                        />
                     </div>
                     <AddExportation />
                 </Paper>

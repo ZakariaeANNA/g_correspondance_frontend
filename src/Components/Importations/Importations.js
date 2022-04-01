@@ -82,7 +82,7 @@ function DeleteImportation({params}){
                 maxWidth="md" 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                Suprimer Un Importation
+                    Suprimer Un Importation
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                 <Typography>
