@@ -21,5 +21,6 @@
   "doti" : "Doti",
   "credentials_invalid" : "Identifiant inconnu ou mot de passe incorrect",
   "credentials_empty" : "Veuillez renseigner les champs obligatoires",
-  "credentials_success" : "Vous êtes connecté avec succès"
+  "credentials_success" : "Vous êtes connecté avec succès",
+  "session_terminated" : "Votre session est terminée, essayez de vous reconnecter"
 }

@@ -25,7 +25,7 @@ const authSlice = createSlice({
     builder.addCase("logout" , (state,action)=>{
       localStorage.removeItem("token");
       state.user = {};
-      action.history.push(action.route);
+      action.history.push({pathname: action.route , appState: { session : true } });
       return state;
     });
   }

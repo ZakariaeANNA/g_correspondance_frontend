@@ -15,6 +15,15 @@ export const authApi = createApi({
         };
       },
     }),
+    logout: builder.mutation({
+      query: (body) => {
+        return {
+          url: "/api/logout",
+          method: "post",
+          body,
+        };
+      },
+    }),
   }),
 });
 
@@ -22,4 +31,5 @@ export const authApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useSigninUserMutation,
+  useLogoutMutation
 } = authApi;

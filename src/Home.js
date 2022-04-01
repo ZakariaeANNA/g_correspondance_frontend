@@ -35,6 +35,7 @@ import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import { prefixer } from "stylis";
 import fontTheme from "./Util/fontTheme";
+import { useLogoutMutation } from "./store/api/authApi";
 
 
 const cacheLtr = createCache({
@@ -137,19 +138,24 @@ export default function Home() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [anchorLanguage, setAnchorLanguage] = React.useState(null);
   const [notifications, setNotifications] = React.useState(null);
+  const [logout , { isLoading : isLoadingLogout , isSuccess : isSuccessLogout }] = useLogoutMutation();
   const auth = useSelector( state => state.auth.user );
   const history = useHistory();
   const { t } = useTranslation();
+
   useEffect(()=>{
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
-  },[]);
+    if(isSuccessLogout)
+      dispatch({ type : "logout" , history : history , route : "/auth/"});
+  },[isSuccessLogout]);
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseUserMenu = (setting) => {
     if(setting === "Logout"){
-      dispatch({ type : "logout" , history : history , route : "/auth/"});
+      logout({token : `${localStorage.getItem("token")}` });
     }
     setAnchorElUser(null);
   };

@@ -20,7 +20,8 @@ import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import { prefixer } from "stylis";
 import fontTheme from "../../Util/fontTheme";
-
+import Alert from '@mui/material/Alert';
+import { useLocation } from "react-router-dom";
 const cacheLtr = createCache({
   key: "muiltr"
 });
@@ -42,7 +43,7 @@ export default function Login() {
   const [signinUser, { data, isLoading, error, isError, isSuccess }] = useSigninUserMutation();
   const history = useHistory();
   const { t } = useTranslation();
-
+  const { appState } = useLocation();
   useEffect(()=>{
     if (isSuccess) {
       localStorage.setItem( "token" , data );
@@ -88,16 +89,16 @@ export default function Login() {
           <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
             <Box
               sx={{
-                my: 8,
+                my: 4,
                 mx: 4,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
               }}
             >
-              <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-                <Email />
-              </Avatar>
+              <Box sx={{paddingY : 2}}>
+                <img src={require("../../ministry-logo-ar.png")} style={{ display: "block", height: "auto", maxWidth: "23.47rem" , width: "100%" }} />
+              </Box> 
               <Typography component="h1" variant="h5" sx={{ fontSize : 35 , fontWeight : "bold" , color : "primary.main" }}>
                   {t('name_company')}
               </Typography>
@@ -105,6 +106,7 @@ export default function Login() {
                   {t('project_title')}
               </Typography>
               <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                { appState ? <Alert severity="warning">{t('session_terminated')}</Alert> : null }
                 <TextField
                   margin="normal"
                   required
@@ -114,6 +116,7 @@ export default function Login() {
                   name="doti"
                   autoComplete="doti"
                   autoFocus
+                  disabled={isLoading}
                 />
                 <TextField
                   margin="normal"
@@ -124,6 +127,7 @@ export default function Login() {
                   type="password"
                   id="password"
                   autoComplete="current-password"
+                  disabled={isLoading}
                 />
                 { isLoading ? (
                   <LoadingButton 

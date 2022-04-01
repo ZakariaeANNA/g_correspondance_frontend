@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material/styles';
 const fontTheme = createTheme({
     typography: {
       allVariants: {
-        fontFamily: `"Cairo", sans-serif`,
+        fontFamily: `'Tajawal', sans-serif;`,
         fontWeightLight: 300,
         fontWeightRegular: 400,
         fontWeightMedium: 500
@@ -14,7 +14,7 @@ const fontTheme = createTheme({
       MuiCssBaseline: {
         styleOverrides: `
           @font-face {
-            font-family: 'Cairo', sans-serif;
+            font-family: 'Tajawal', sans-serif;;
             font-style: normal;
           }
         `,

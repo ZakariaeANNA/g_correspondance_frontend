@@ -21,5 +21,6 @@
   "doti" : "رقم تأجير",
   "credentials_invalid" : "اسم المستخدم أو كلمة المرور غير صالحة",
   "credentials_empty" : "يرجى ملء الخانات المطلوبة",
-  "credentials_success" : "تم تسجيل الدخول  بنجاح"
+  "credentials_success" : "تم تسجيل الدخول  بنجاح",
+  "session_terminated" : "انتهت جلستك ، حاول تسجيل الدخول مرة أخرى"
 }
