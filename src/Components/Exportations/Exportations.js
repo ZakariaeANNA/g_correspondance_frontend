@@ -11,7 +11,7 @@ import { Box } from '@mui/system';
 import {Delete} from "@mui/icons-material";
 import { Tooltip } from '@material-ui/core';
 import Paper from '@mui/material/Paper';
-import { Chat} from "@mui/icons-material";
+import { Chat , Style } from "@mui/icons-material";
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {useGetExportationBycodeGRESAQuery } from "../../store/api/exportationApi";
@@ -132,28 +132,24 @@ export default function Exportation(){
         {field: "created_at",headerName: t('sending_date'), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
             const date = moment(params.row.created_at).format('DD-MM-YYYY');
             return(
-                <Box>{date}</Box>
+                <Typography>{date}</Typography>
             );
         }},
         {field: "title",headerName: t('subject_message'), flex: 3 ,headerAlign : 'center',align:'center'},
         {field: "achevementdate",headerName: t('achevement_date'), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
             const date = moment(params.row.achevementdate).format('DD-MM-YYYY');
             return(
-                <Box>{date}</Box>
+                <Typography>{date}</Typography>
             );
         }},
-        {field: "Actions",headerName: t('actions'), flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
+        {field: "Actions1",headerName: t('actions'), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
             <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
                 <DeleteExportation params={params.row}/>
-                <Link to={"/app/feedback/"+params.row.id} >
-                    <Tooltip title="FeedBack">
-                        <IconButton aria-label="delete" size="large"> 
-                            <Chat />
-                        </IconButton>
-                    </Tooltip>
-                </Link>
             </Box>
+        )}, 
+        {field: "Actions",headerName: "", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
+            <Button variant="text" startIcon={<Style />} sx={{ mt: 3, mb: 2 }} onClick={() => history.push("/app/feedback/"+params.row.id)}>{t('correspondence_follow')}</Button>
         )},        
     ]
     return(
@@ -194,7 +190,7 @@ export default function Exportation(){
                          loading={loading}
                         />
                     </div>
-                    <AddExportation />
+                    <AddExportation refresh={handlePageChange} />
                 </Paper>
             )}
         </React.Fragment>

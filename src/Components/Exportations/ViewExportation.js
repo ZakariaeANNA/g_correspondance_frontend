@@ -31,6 +31,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { Box } from '@mui/system';
 import i18next from 'i18next'
+import stringAvatar from "../../Util/stringToAvatar";
 
 const style = {
     position: 'absolute',
@@ -60,33 +61,6 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#f0f0f0'
     }
 }));
-function stringColor(string) {
-    let hash = 0;
-    let i;
-  
-    /* eslint-disable no-bitwise */
-    for (i = 0; i < string.length; i += 1) {
-      hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-  
-    let color = '#';
-  
-    for (i = 0; i < 3; i += 1) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += `00${value.toString(16)}`.slice(-2);
-    }
-    /* eslint-enable no-bitwise */
-    return color;
-}
-
-function stringToAvatar(name) {
-    return {
-      sx: {
-        bgcolor: stringColor(name),
-      },
-      children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
-    };
-  }
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -145,7 +119,8 @@ function ViewUserDetails({params}){
                 <Fade in={open}>
                     <Box sx={style}>
                         <Box style={{display: 'flex',justifyContent: 'flex-start',flexDirection:'row',paddingLeft: '2em',paddingRight: '2em',marginBottom: 10}}>
-                            <Avatar {...stringToAvatar(`${params.fullnamela} ${params.fullnamear}`)}/><Typography variant='h5' style={{marginTop : 3,marginLeft: 15,marginRight: 15}}>{params.fullnamela}</Typography>
+                            <Avatar {...stringAvatar(params.fullnamela)}></Avatar>
+                            <Typography variant='h5' style={{marginTop : 3,marginLeft: 15,marginRight: 15}}>{params.fullnamela}</Typography>
                         </Box>
                         <TableContainer component={Paper} sx={{px:2}}>
                             <Table sx={{ minWidth: '60%' }} aria-label="simple table">
@@ -277,11 +252,6 @@ export default function ViewExportation({params}){
                                                 email.receiver.map(receive=>(
                                                     <ListItem key={receive.doti}> 
                                                         <ListItem>
-                                                            <ListItemAvatar>
-                                                                <Avatar
-                                                                    {...stringToAvatar(`${receive.fullnamela} ${receive.fullnamear}`)}
-                                                                />
-                                                            </ListItemAvatar>
                                                             <ListItemText
                                                                 primary={<Typography>{receive.fullnamela}</Typography>}
                                                             />

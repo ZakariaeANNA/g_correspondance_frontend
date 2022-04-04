@@ -39,5 +39,10 @@
   "phone": "Phone",
   "departementName": "Nom Département",
   "departementType": "Type Département",
-  "delegation": "Délegation"
+  "delegation": "Délegation",
+  "correspondence_follow" : "Suivre de progrès",
+  "correspondence_success_send" : "La correspondance est envoyé avec succès",
+  "correspondence_send_user_not_found" : "Le nom d'utilisateur est introuvable",
+  "correspondence_informations_incorrects" : "Les informations saisies sont incorrects",
+  "drag&drop" : "Glisser & Déposer les fichiers"
 }
