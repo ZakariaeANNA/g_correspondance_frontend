@@ -30,38 +30,16 @@ import Avatar from '@mui/material/Avatar';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
-
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import { blue } from '@mui/material/colors';
-
-const colorBlue = blue[900];
-
-
-const columns = [
-    { id: 'message', label: 'Message', minWidth: 170 },
-    {
-      id: 'idSender',
-      label: 'Sender',
-      minWidth: 170,
-      align: 'right',
-      format: (value) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'created_at',
-      label: 'Date',
-      minWidth: 170,
-      align: 'right',
-      format: (value) => moment(value).format('DD-MM-YYYY'),
-      renderCell : (value) => moment(value).format('DD-MM-YYYY')
-    }
-];
+import { convertToRaw } from 'draft-js';
+import { decodeToken } from "react-jwt";
+import { useSnackbar } from 'notistack';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -108,6 +86,39 @@ function SendFeedback({params}){
     const handleClose = () => {
         setOpen(false);
     };
+    const [value,setValue] = React.useState('')
+    const handleDataChange = (event)=>{
+        const plainText = event.getCurrentContent().getPlainText() // for plain text
+        const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
+        rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
+    }
+    const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useGetFeedbackByidAndByreceiverMutation();
+    const [files,setFiles] = useState();
+    const changeFile = (event) => {
+        setFiles(event.target.files[0]);
+    }
+    const [receiver,setReceiver] = React.useState()
+    const onAddFeedback = (event) => {
+        event.preventDefault();
+        const token = localStorage.getItem("token");
+        const user = decodeToken(token);
+        const formData = new FormData(event.currentTarget);
+        formData.append('receiver', receiver);
+        formData.append('sender',user.codeGRESA);
+        formData.append('message',value);
+        formData.append('emailId',params.id);
+        formData.append('file', files);
+        addFeedback(formData);
+    }
+    const { enqueueSnackbar } = useSnackbar();
+    useEffect(()=>{
+        if(isSuccess){
+            enqueueSnackbar( data.addFeedback, { variant: "success" });
+        }
+        if(isError){
+            enqueueSnackbar(error.data.addFeedback, { variant: "error" });
+        }
+    },[data,error]);
     return(
         <>
             <Tooltip title="Supprimer l'exportation">

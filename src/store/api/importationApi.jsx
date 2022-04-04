@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const importationApi = createApi({
   reducerPath: "importationApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:8000",
+    baseUrl: "http://127.0.0.1:8000/api/correspondences",
     prepareHeaders: (headers) => {
         const token = localStorage.getItem("token");
         if (token)
@@ -14,14 +14,13 @@ export const importationApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getImportationBycodeGRESA: builder.query({
-      query: (codeGRESA) => `api/importations/${codeGRESA}`,
+    getImportationByCodeDoti: builder.query({
+      query: ({doti , page : pageDefault = 1}) => `receiver/${doti}?page=${pageDefault}`,
     }),
   }),
 });
-
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
-  useGetImportationBycodeGRESAQuery
+  useGetImportationByCodeDotiQuery
 } = importationApi;
