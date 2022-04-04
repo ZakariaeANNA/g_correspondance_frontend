@@ -41,5 +41,6 @@
   "departementType": "نوع المصلحة",
   "delegation": "الوفد",
   "establishementName": "إسم المؤسسة",
-  "establishementType": "نوع المؤسسة"
+  "establishementType": "نوع المؤسسة",
+  "notification": "الإشعارات"
 }

@@ -30,7 +30,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { Box } from '@mui/system';
-import i18next from 'i18next'
+import i18next from 'i18next';
 
 const style = {
     position: 'absolute',
@@ -145,7 +145,7 @@ function ViewUserDetails({params}){
                 <Fade in={open}>
                     <Box sx={style}>
                         <Box style={{display: 'flex',justifyContent: 'flex-start',flexDirection:'row',paddingLeft: '2em',paddingRight: '2em',marginBottom: 10}}>
-                            <Avatar {...stringToAvatar(`${params.fullnamela} ${params.fullnamear}`)}/><Typography variant='h5' style={{marginTop : 3,marginLeft: 15,marginRight: 15}}>{params.fullnamela}</Typography>
+                            <Avatar {...stringToAvatar(`${params.fullnamela} ${params.fullnamear}`)}/><Typography variant='h5' style={{marginTop : 3,marginLeft: 15,marginRight: 15}}>{i18next.language ==='fr' ? (params.fullnamela) : (params.fullnamear)}</Typography>
                         </Box>
                         <TableContainer component={Paper} sx={{px:2}}>
                             <Table sx={{ minWidth: '60%' }} aria-label="simple table">
@@ -171,7 +171,7 @@ function ViewUserDetails({params}){
                                     {params.etablissement==null ? (<><TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>{t("departementName")}</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.departement.nomLa}
+                                            {i18next.language === "fr" ? (params.departement.nomLa) : (params.departement.nomAr)}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
@@ -191,7 +191,7 @@ function ViewUserDetails({params}){
                                     <TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>{t("establishementName")}</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.etablissement.nomla}
+                                            {i18next.language === "fr" ? (params.etablissement.nomla) : (params.etablissement.nomar)} 
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
@@ -283,7 +283,7 @@ export default function ViewExportation({params}){
                                                                 />
                                                             </ListItemAvatar>
                                                             <ListItemText
-                                                                primary={<Typography>{receive.fullnamela}</Typography>}
+                                                                primary={<Typography>{i18next.language === "fr" ? (receive.fullnamela) : (receive.fullnamear)}</Typography>}
                                                             />
                                                         </ListItem>
                                                         <ListItemSecondaryAction>
@@ -299,7 +299,7 @@ export default function ViewExportation({params}){
                         </div>
                     </Grid>
                     {/*end user content section*/}
-                    <a href={'http://localhost:8000/api/'+params.attachement+'/'+params.fileName} style={{textDecoration: 'none'}}>
+                    <a href={'http://localhost:8000/api/'+params.attachement+'/'+params.filename} style={{textDecoration: 'none'}}>
                         <Paper
                             sx={{
                                 p: 2,
@@ -311,7 +311,7 @@ export default function ViewExportation({params}){
                             <div style={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center'}}>
                                 <FileIcon extension={params.type} {...defaultStyles[params.type]}/>
                             </div>
-                            <Typography style={{marginTop: 10}}>{params.fileName}</Typography>
+                            <Typography style={{marginTop: 10}}>{params.filename}</Typography>
                         </Paper>
                     </a>
                 </DialogContent>

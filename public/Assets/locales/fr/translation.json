@@ -39,5 +39,6 @@
   "phone": "Phone",
   "departementName": "Nom Département",
   "departementType": "Type Département",
-  "delegation": "Délegation"
+  "delegation": "Délegation",
+  "notification" : "notifications"
 }

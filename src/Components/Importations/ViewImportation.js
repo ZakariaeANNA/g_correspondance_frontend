@@ -77,7 +77,7 @@ export default function ViewImportation({params}){
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("correspondance_number")} variant="filled" rows={4} value={params.mail.number} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("sender")} variant="filled" value={i18next.language === "ar" ? ( params.mail.sender.fullnamela ) : ( params.sender.fullnamear )} inputProps={{ readOnly: true }}/>                                      
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("sender")} variant="filled" value={i18next.language === "fr" ? (params.mail.sender.fullnamela) : (params.mail.sender.fullnamear)} inputProps={{ readOnly: true }}/>                                      
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("sending_date")} variant="filled" value={date} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("achevement_date")} variant="filled" value={achevelentDate} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("subject_message")} variant="filled" value={params.mail.title} inputProps={{ readOnly: true }}/>
