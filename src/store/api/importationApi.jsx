@@ -14,14 +14,13 @@ export const importationApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getImportationBycodeGRESA: builder.query({
-      query: (codeGRESA) => `api/importations/${codeGRESA}`,
+    getImportationByCodeDoti: builder.query({
+      query: ({doti , page : pageDefault = 1}) => `api/importations/${doti}?page=${pageDefault}`,
     }),
   }),
 });
-
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
-  useGetImportationBycodeGRESAQuery
+  useGetImportationByCodeDotiQuery
 } = importationApi;
