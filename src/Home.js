@@ -184,7 +184,7 @@ export default function Home() {
                 {t('project_title')}
               </Typography>
               <Box sx={{ flexGrow: 0 }}>
-                  <Tooltip title="Translate">
+                  <Tooltip title={t("language")}>
                     <Translate onClick={handleOpenLanguage} />
                   </Tooltip>
                   <Menu
@@ -212,7 +212,7 @@ export default function Home() {
                   </Menu>
                 </Box>
               <Box sx={{ marginX : 2 }}>
-                <Tooltip title="notifications">
+                <Tooltip title={t("notification")}>
                   <IconButton color="inherit" onClick={handleOpenNotification}>
                       <Badge badgeContent={4} color="secondary">
                           <NotificationsIcon />

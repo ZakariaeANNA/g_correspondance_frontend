@@ -64,10 +64,6 @@ export default function AddExportation({refresh}){
     const handleClose = () => {
       setOpen(false);
     };
-    const [AchevementDate,setAchevementDate] = React.useState(new Date())
-    const handleDateChange = (newAchevementDate)=>{
-        setAchevementDate(newAchevementDate);
-    }
     const removeTags = indexToRemove => {
 		setTags([...tags.filter((_, index) => index !== indexToRemove)]);
 	};

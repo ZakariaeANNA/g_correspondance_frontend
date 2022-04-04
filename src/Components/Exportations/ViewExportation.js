@@ -146,7 +146,7 @@ function ViewUserDetails({params}){
                                     {params.etablissement==null ? (<><TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>{t("departementName")}</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.departement.nomLa}
+                                            {i18next.language === "fr" ? (params.departement.nomLa) : (params.departement.nomAr)}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
@@ -166,7 +166,7 @@ function ViewUserDetails({params}){
                                     <TableRow>
                                         <TableCell style={{ fontWeight : "bold" }}>{t("establishementName")}</TableCell>
                                         <TableCell component="th" scope="row">
-                                            {params.etablissement.nomla}
+                                            {i18next.language === "fr" ? (params.etablissement.nomla) : (params.etablissement.nomar)} 
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
@@ -253,7 +253,7 @@ export default function ViewExportation({params}){
                                                     <ListItem key={receive.doti}> 
                                                         <ListItem>
                                                             <ListItemText
-                                                                primary={<Typography>{receive.fullnamela}</Typography>}
+                                                                primary={<Typography>{i18next.language === "fr" ? (receive.fullnamela) : (receive.fullnamear)}</Typography>}
                                                             />
                                                         </ListItem>
                                                         <ListItemSecondaryAction>
@@ -269,7 +269,7 @@ export default function ViewExportation({params}){
                         </div>
                     </Grid>
                     {/*end user content section*/}
-                    <a href={'http://localhost:8000/api/'+params.attachement+'/'+params.fileName} style={{textDecoration: 'none'}}>
+                    <a href={'http://localhost:8000/api/'+params.attachement+'/'+params.filename} style={{textDecoration: 'none'}}>
                         <Paper
                             sx={{
                                 p: 2,
@@ -281,7 +281,7 @@ export default function ViewExportation({params}){
                             <div style={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center'}}>
                                 <FileIcon extension={params.type} {...defaultStyles[params.type]}/>
                             </div>
-                            <Typography style={{marginTop: 10}}>{params.fileName}</Typography>
+                            <Typography style={{marginTop: 10}}>{params.filename}</Typography>
                         </Paper>
                     </a>
                 </DialogContent>
