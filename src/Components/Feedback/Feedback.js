@@ -2,14 +2,14 @@ import React,{ useState,useEffect } from 'react'
 import Paper from '@mui/material/Paper';
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Button, InputLabel } from '@mui/material';
+import { Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useGetFeedbackByidAndBysenderQuery,useGetFeedbackByidAndByreceiverMutation,useAddFeedbackMutation } from "../../store/api/feedbackApi";
+import { useGetFeedbackByidAndBysenderQuery,useGetFeedbackByidAndByreceiverMutation } from "../../store/api/feedbackApi";
 import { useParams } from 'react-router-dom';
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
-import { DialogContent, IconButton , TextField } from "@mui/material";
+import { DialogContent, IconButton , TextField , Container, ListItemButton  } from "@mui/material";
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
@@ -18,6 +18,8 @@ import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import CloseIcon from '@mui/icons-material/Close';
 import MUIRichTextEditor from 'mui-rte';
+
+
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -106,42 +108,9 @@ function SendFeedback({params}){
     const handleClose = () => {
         setOpen(false);
     };
-    const [value,setValue] = React.useState('')
-    const handleDataChange = (event)=>{
-        const plainText = event.getCurrentContent().getPlainText() // for plain text
-        const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
-        rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
-    }
-    const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
-    const [files,setFiles] = useState();
-    const changeFile = (event) => {
-        setFiles(event.target.files[0]);
-    }
-    const [receiver,setReceiver] = React.useState()
-    const onAddFeedback = (event) => {
-        event.preventDefault();
-        const token = localStorage.getItem("token");
-        const user = decodeToken(token);
-        const formData = new FormData(event.currentTarget);
-        formData.append('receiver', receiver);
-        formData.append('sender',user.codeGRESA);
-        formData.append('message',value);
-        formData.append('emailId',id);
-        formData.append('file', files);
-        addFeedback(formData);
-    }
-    const { enqueueSnackbar } = useSnackbar();
-    useEffect(()=>{
-        if(isSuccess){
-            enqueueSnackbar( data.addFeedback, { variant: "success" });
-        }
-        if(isError){
-            enqueueSnackbar(error.data.addFeedback, { variant: "error" });
-        }
-    },[data,error]);
     return(
         <>
-            <Tooltip title="Envoyer un feedback">
+            <Tooltip title="Supprimer l'exportation">
                 <Box sx={{ alignSelf : "flex-end" }}>
                     <Button variant="text" endIcon={<SendIcon />} onClick={handleClickOpen} >Envoyer un feedback</Button>
                 </Box>
@@ -153,31 +122,20 @@ function SendFeedback({params}){
                 fullWidth
                 maxWidth="md" 
             >
-                <form onSubmit={onAddFeedback} encType="multipart/form-data">
-                    <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                        Envoyer un feedback
-                    </BootstrapDialogTitle>
-                    <DialogContent dividers>
-                            <MUIRichTextEditor
-                                value={value} 
-                                label="Start typing..." 
-                                onChange={handleDataChange}
-                                readOnly
-                                toolbar={false}
-                                />
-                            <TextField id="outlined-basic"  sx={{mt:4}} required fullWidth label="Code GRESA" onChange={(value)=>setReceiver(value.target.value)} variant="outlined" />
-                            <MUIRichTextEditor 
-                                label="Start typing..." 
-                                onChange={handleDataChange}
-                            />
-                            <input type="file" name="ffff" style={{marginTop: '4em'}} onChange={changeFile}/>
-                    </DialogContent>
-                    <DialogActions>
-                    <Button variant="outlined" endIcon={<SendIcon />} autoFocus type="submit">
-                        Envoyer
-                    </Button>
-                    </DialogActions>
-                </form>
+                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+                    Envoyer un feedback
+                </BootstrapDialogTitle>
+                <DialogContent dividers>
+                    <>
+                        <TextField id="outlined-basic" fullWidth label="Code GRESA" variant="outlined" />
+                        <MUIRichTextEditor label="Start typing..." />
+                    </>
+                </DialogContent>
+                <DialogActions>
+                <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={handleClose}>
+                    Envoyer
+                </Button>
+                </DialogActions>
             </BootstrapDialog>
         </>
     );

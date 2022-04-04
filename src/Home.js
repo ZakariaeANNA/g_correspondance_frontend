@@ -143,6 +143,7 @@ export default function Home() {
   const history = useHistory();
   const { t } = useTranslation();
 
+
   useEffect(()=>{
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     if(isSuccessLogout)
