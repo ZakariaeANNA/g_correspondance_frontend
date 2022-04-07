@@ -87,7 +87,6 @@ export default function AddExportation(){
     }
 
     const onAddExportations = (event) => {
-        console.log(event.currentTarget)
         event.preventDefault();
         const token = localStorage.getItem("token");
         const user = decodeToken(token);
@@ -96,7 +95,6 @@ export default function AddExportation(){
         formData.append('sender',user.doti);
         formData.append('file', files);
         addExportations(formData);
-       
     }
     return (
       <div>

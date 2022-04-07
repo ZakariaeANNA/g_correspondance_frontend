@@ -36,6 +36,7 @@ import createCache from "@emotion/cache";
 import { prefixer } from "stylis";
 import fontTheme from "./Util/fontTheme";
 import { useLogoutMutation } from "./store/api/authApi";
+import Adduser from './Components/Users/AddUser';
 
 
 const cacheLtr = createCache({
@@ -349,9 +350,10 @@ export default function Home() {
                     <Feedback />
                 </Route>
                 <Route path="/app/users">
-                  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                     <Users />
-                  </Paper>
+                </Route>
+                <Route path="/app/adduser">
+                    <Adduser />
                 </Route>
               </Switch>
               {/* Content */}

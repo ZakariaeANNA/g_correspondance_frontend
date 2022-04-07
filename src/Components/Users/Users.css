@@ -1,12 +1,10 @@
-.SerchBar{
+.searchBar{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-top: 2em;
 }
 .addUserSection{
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-top: 0.5em;
 }

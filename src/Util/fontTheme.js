@@ -14,7 +14,7 @@ const fontTheme = createTheme({
       MuiCssBaseline: {
         styleOverrides: `
           @font-face {
-            font-family: 'Tajawal', sans-serif;;
+            font-family: 'Tajawal', sans-serif;
             font-style: normal;
           }
         `,
