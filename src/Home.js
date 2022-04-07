@@ -36,8 +36,8 @@ import createCache from "@emotion/cache";
 import { prefixer } from "stylis";
 import fontTheme from "./Util/fontTheme";
 import { useLogoutMutation } from "./store/api/authApi";
+import { stringAvatar } from "./Util/stringToAvatar";
 import Adduser from './Components/Users/AddUser';
-import stringAvatar from "./Util/stringToAvatar";
 
 
 const cacheLtr = createCache({

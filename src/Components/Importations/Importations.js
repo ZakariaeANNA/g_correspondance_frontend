@@ -112,6 +112,7 @@ export default function Importations(){
             setPage(data.meta.current_page);
             setLoading(false);
             setRows(data.data);
+            console.log(data);
             refetch();
         }
     },[data]);

@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const feedbackApi = createApi({
   reducerPath: "feedbackApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:8000/api/",
+    baseUrl: "http://127.0.0.1:8000/api/feedbacks",
     prepareHeaders: (headers) => {
         const token = localStorage.getItem("token");
         if (token)
@@ -17,7 +17,7 @@ export const feedbackApi = createApi({
     addFeedback: builder.mutation({
       query: (body) => {
         return {
-          url: "/sendfeedback",
+          url: "",
           method: "post",
           body,
         };
@@ -34,6 +34,14 @@ export const feedbackApi = createApi({
           };
         },
     }),
+    getFeedbackBymailAndBysenderAndByreceiver: builder.mutation({
+      query: (data) => {
+        return {
+          url: `/${data.mail}/${data.sender}/${data.receiver}`,
+          method: "get"
+        };
+      },
+  }),
   }),
 });
 
@@ -42,5 +50,6 @@ export const feedbackApi = createApi({
 export const {
   useAddFeedbackMutation,
   useGetFeedbackByidAndByreceiverMutation,
-  useGetFeedbackByidAndBysenderQuery
+  useGetFeedbackByidAndBysenderQuery,
+  useGetFeedbackBymailAndBysenderAndByreceiverMutation
 } = feedbackApi;

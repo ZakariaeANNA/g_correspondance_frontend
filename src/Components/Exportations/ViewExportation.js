@@ -31,7 +31,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { Box } from '@mui/system';
 import i18next from 'i18next'
-import stringAvatar from "../../Util/stringToAvatar";
+import { stringAvatar,stringToColor } from "../../Util/stringToAvatar";
 
 const style = {
     position: 'absolute',
@@ -119,7 +119,7 @@ function ViewUserDetails({params}){
                 <Fade in={open}>
                     <Box sx={style}>
                         <Box style={{display: 'flex',justifyContent: 'flex-start',flexDirection:'row',paddingLeft: '2em',paddingRight: '2em',marginBottom: 10}}>
-                            <Avatar {...stringAvatar(params.fullnamela)}></Avatar>
+                            <Avatar alt={params.fullnamela} sx={{ bgcolor : "white" }} src="/static/images/avatar/1.jpg" />
                             <Typography variant='h5' style={{marginTop : 3,marginLeft: 15,marginRight: 15}}>{params.fullnamela}</Typography>
                         </Box>
                         <TableContainer component={Paper} sx={{px:2}}>
