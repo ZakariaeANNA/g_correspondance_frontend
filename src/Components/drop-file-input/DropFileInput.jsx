@@ -19,12 +19,17 @@ const DropFileInput = props => {
     const onDrop = () => wrapperRef.current.classList.remove('dragover');
 
     const onFileDrop = (e) => {
-        const newFile = e.target.files[0];
-        if (newFile && props.multiple === true) {
-            const updatedList = [...fileList, newFile];
+        if (props.multiple === true) {
+            var updatedList = [...fileList];
+            for( var i = 0 ; i < e.target.files.length ; i++ ){
+                console.log(i);
+                updatedList = [...updatedList, e.target.files[i]];
+            }
+            console.log(updatedList);
             setFileList(updatedList);
             props.onFileChange(updatedList);
         }else{
+            const newFile = e.target.files[0];
             setFileList([newFile]);
             props.onFileChange(newFile);
         }
@@ -58,7 +63,7 @@ const DropFileInput = props => {
                     <img src={uploadImg} alt="" />
                     <p>{t('drag&drop')}</p>
                 </div>
-                <input type="file" value="" onChange={onFileDrop}/>
+                <input type="file" value="" onChange={onFileDrop} multiple={props.multiple} />
             </div>
             {
                 fileList.length > 0 ? (

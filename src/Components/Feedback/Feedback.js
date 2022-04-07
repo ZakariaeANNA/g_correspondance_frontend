@@ -5,8 +5,8 @@ import { useHistory } from 'react-router-dom';
 import { Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useGetFeedbackByidAndBysenderQuery,useGetFeedbackByidAndByreceiverMutation } from "../../store/api/feedbackApi";
-import { useParams } from 'react-router-dom';
+import { useAddFeedbackMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation } from "../../store/api/feedbackApi";
+import { useParams , useLocation } from 'react-router-dom';
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
 import { DialogContent, IconButton , TextField , Container, ListItemButton  } from "@mui/material";
@@ -40,6 +40,21 @@ import { blue } from '@mui/material/colors';
 import { convertToRaw } from 'draft-js';
 import { decodeToken } from "react-jwt";
 import { useSnackbar } from 'notistack';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import i18next from 'i18next'
+import { t } from 'i18next';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
+import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
+import FormatBoldIcon from '@mui/icons-material/FormatBold';
+import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+import AddComment from '@mui/icons-material/AddComment';
+import DropFileInput from '../drop-file-input/DropFileInput';
+import Link from '@mui/material/Link';
+import { stringToColor } from "../../Util/stringToAvatar";
+import "./Feedback.css";
+import 'moment/locale/ar-ma' 
+import 'moment/locale/fr' 
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -76,41 +91,61 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     onClose: PropTypes.func.isRequired,
 };
 
+const defaultTheme = createTheme({
+    overrides: {
+        MUIRichTextEditor: {
+            root: {
+            },
+            editor: {
+            },
+            container: { 
+            },
+        }
+    }
+})
 
 
-function SendFeedback({params}){
+
+function SendFeedback(props){
     const [open, setOpen] = React.useState(false);
+    
     const handleClickOpen = () => {
       setOpen(true);
     };
+    
     const handleClose = () => {
         setOpen(false);
     };
+    
     const [value,setValue] = React.useState('')
+    
     const handleDataChange = (event)=>{
         const plainText = event.getCurrentContent().getPlainText() // for plain text
         const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
         rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
     }
-    const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useGetFeedbackByidAndByreceiverMutation();
-    const [files,setFiles] = useState();
-    const changeFile = (event) => {
-        setFiles(event.target.files[0]);
-    }
-    const [receiver,setReceiver] = React.useState()
-    const onAddFeedback = (event) => {
-        event.preventDefault();
-        const token = localStorage.getItem("token");
-        const user = decodeToken(token);
-        const formData = new FormData(event.currentTarget);
-        formData.append('receiver', receiver);
-        formData.append('sender',user.codeGRESA);
-        formData.append('message',value);
-        formData.append('emailId',params.id);
+    
+    const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
+    
+    const [files,setFiles] = useState([]);
+
+    const onAddFeedback = () => {
+        const formData = new FormData();
+        var index = 0;
+        formData.append('mail_id', props.mailID);
+        formData.append('idSender',props.sender);
+        formData.append('idReceiver',props.receiver);
         formData.append('file', files);
+        formData.append('message',value);
+        files.map( file => {
+            formData.append('file['+index+']', file);        
+            index++;    
+        });
         addFeedback(formData);
     }
+
     const { enqueueSnackbar } = useSnackbar();
+
     useEffect(()=>{
         if(isSuccess){
             enqueueSnackbar( data.addFeedback, { variant: "success" });
@@ -119,12 +154,17 @@ function SendFeedback({params}){
             enqueueSnackbar(error.data.addFeedback, { variant: "error" });
         }
     },[data,error]);
+
+    const onFileChange = (files) => {
+        setFiles(files);
+    }
+
     return(
         <>
             <Tooltip title="Supprimer l'exportation">
-                <Box sx={{ alignSelf : "flex-end" }}>
-                    <Button variant="text" endIcon={<SendIcon />} onClick={handleClickOpen} >Envoyer un feedback</Button>
-                </Box>
+                <IconButton color="secondary" aria-label="add an alarm" onClick={handleClickOpen}>
+                    <AddComment />
+                </IconButton>
             </Tooltip>
             <BootstrapDialog
                 onClose={handleClose}
@@ -137,13 +177,16 @@ function SendFeedback({params}){
                     Envoyer un feedback
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    <>
-                        <TextField id="outlined-basic" fullWidth label="Code GRESA" variant="outlined" />
-                        <MUIRichTextEditor label="Start typing..." />
-                    </>
+                    <Box sx={{ padding: 1 , border : 1 , borderRadius : "6px" , borderColor : "#d6d8da" ,paddingBottom: 6 , marginBottom : 2}}>
+                        <MUIRichTextEditor label="Start typing..." inlineStyle={{ marginY : 2 }} onChange={handleDataChange} />
+                    </Box>
+                    <DropFileInput
+                        onFileChange={(files) => onFileChange(files)}
+                        multiple={true}
+                    />
                 </DialogContent>
                 <DialogActions>
-                <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={handleClose}>
+                <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={onAddFeedback}>
                     Envoyer
                 </Button>
                 </DialogActions>
@@ -158,56 +201,28 @@ export default function Feedback(){
     const dispatch = useDispatch();
     const history = useHistory();
     const { idemail } = useParams();
-    const { data : dataSender, 
-            isError , 
-            isLoading : isLoadingSender} = useGetFeedbackByidAndBysenderQuery({ id:idemail , user : auth.codeGRESA});
-    const [ getFeedbackByidAndByreceiver , 
-            { data : dataReceiver, 
-              isLoading : isLoadingReceiver,
-              isSuccess : isSuccessReceiver }] = useGetFeedbackByidAndByreceiverMutation(); 
-    const [ rowsSender,setRowsSender ] = useState([]);
-    const [ rowsReceiver,setRowsReceiver ] = useState([])
+    const { appState } = useLocation();
     const [expanded, setExpanded] = React.useState(false);
-
+    const [ message , setMessage ] = useState([]);
+    const [getFeedbackBymailAndBysenderAndByreceiver,
+            { data , isLoading , 
+              isError , isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
+    
+    moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
 
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
-        if(dataSender){
-            setRowsSender(dataSender);
+        if(isSuccess){
+            console.log(data);
+            setMessage(data);
         }
-        if(isSuccessReceiver){
-            setRowsReceiver(dataReceiver);
-        }
-    },[dataReceiver,dataSender]);
+    },[isSuccess]);
 
-
-    const [value, setValue] = React.useState('1');
-
-    const handleChange = (event, newValue) => {
-        if(newValue == 2){
-            getFeedbackByidAndByreceiver({ id:idemail , user:auth.codeGRESA });
-        }
-        setValue(newValue);
-    };
-
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
-
-    const isToday = (someDate) => {
-        const today = moment();
-        return today.isSame(someDate,'day');
+    const handleConversation = (doti) => {
+        getFeedbackBymailAndBysenderAndByreceiver({ mail : idemail , receiver : auth.doti , sender : doti })
     }
 
     return(
@@ -219,134 +234,143 @@ export default function Feedback(){
                     flexDirection: 'column',
                 }}
             >
-                <SendFeedback />
                 <Box sx={{ display:"flex"}}>
-                    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                        <ListItem alignItems="flex-start">
-                            <ListItemAvatar>
-                            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                            </ListItemAvatar>
-                            <ListItemText
-                            primary="Brunch this weekend?"
-                            secondary={
-                                <React.Fragment>
-                                <Typography
-                                    sx={{ display: 'inline' }}
-                                    component="span"
-                                    variant="body2"
-                                    color="text.primary"
-                                >
-                                    Ali Connors
-                                </Typography>
-                                {" — I'll be in your neighborhood doing errands this…"}
-                                </React.Fragment>
-                            }
-                            />
-                        </ListItem>
-                        <Divider variant="inset" component="li" />
-                        <ListItem alignItems="flex-start">
-                            <ListItemAvatar>
-                            <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-                            </ListItemAvatar>
-                            <ListItemText
-                            primary="Summer BBQ"
-                            secondary={
-                                <React.Fragment>
-                                <Typography
-                                    sx={{ display: 'inline' }}
-                                    component="span"
-                                    variant="body2"
-                                    color="text.primary"
-                                >
-                                    to Scott, Alex, Jennifer
-                                </Typography>
-                                {" — Wish I could come, but I'm out of town this…"}
-                                </React.Fragment>
-                            }
-                            />
-                        </ListItem>
-                        <Divider variant="inset" component="li" />
-                        <ListItem alignItems="flex-start">
-                            <ListItemAvatar>
-                            <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-                            </ListItemAvatar>
-                            <ListItemText
-                            primary="Oui Oui"
-                            secondary={
-                                <React.Fragment>
-                                <Typography
-                                    sx={{ display: 'inline' }}
-                                    component="span"
-                                    variant="body2"
-                                    color="text.primary"
-                                >
-                                    Sandra Adams
-                                </Typography>
-                                {' — Do you have Paris recommendations? Have you ever…'}
-                                </React.Fragment>
-                            }
-                            />
-                        </ListItem>
+                    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
+                        { appState.receivers.map( receiver =>(
+                            <ListItem  
+                                secondaryAction={
+                                    receiver.receiverConfirmation === "pending" ? (
+                                        <Chip label={t('pending')} />
+                                    ):(
+                                        <Chip label={receiver.receiverConfirmation} />
+                                    )
+                                } 
+                                key={receiver.id} 
+                                onClick={()=>handleConversation(receiver.receiver[0].doti)}
+                                disablePadding
+                            >
+                                <ListItemButton role={undefined} dense>   
+                                    <ListItemAvatar>
+                                        <Avatar alt={receiver.receiver[0].fullnamela} sx={{ bgcolor : stringToColor(receiver.receiver[0].fullnamela) }} src="/static/images/avatar/1.jpg" />
+                                    </ListItemAvatar>
+                                    <ListItemText primary={ i18next.language === "fr" ? (receiver.receiver[0].fullnamela) : (receiver.receiver[0].fullnamear) }/>
+                                    <Divider variant="inset" component="li" />
+                                </ListItemButton>
+                            </ListItem>
+                        ))}
                     </List>
-                    <Box sx={{ p : 2 }}>
-                        <Card fullWidth sx={{ textAlign:"left" , marginY : 2}}>
-                            <CardHeader
-                                avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
-                                action={
-                                    <Box>
-                                        <Chip label="Completed" sx={{ marginX : 1 }} />
-                                        <Chip label="Completed" sx={{ marginX : 1 }} />
-                                    </Box> 
-                                }
-                                title="Shrimp and Chorizo Paella"
-                                subheader="September 14, 2016"
-                            />
-                            <CardContent>
-                                <Typography variant="body2" color="text.secondary">
-                                    This impressive paella is a perfect party dish and a fun meal to cook
-                                    together with your guests. Add 1 cup of frozen peas along with the mussels,
-                                    if you like.
-                                </Typography>
-                            </CardContent>
-                            <Divider />
-                            <CardActions disableSpacing>
-                                <IconButton aria-label="add to favorites">
-                                    <FavoriteIcon />
-                                </IconButton>
-                                <IconButton aria-label="share">
-                                    <ShareIcon />
-                                </IconButton>
-                            </CardActions>
-                        </Card>
-                        <Card fullWidth sx={{ textAlign:"left" , bgcolor : blue[300] }}>
-                            <CardHeader
-                                avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
-                                action={
-                                    <Box>
-                                        <Chip label="Completed" sx={{ marginX : 1 }} />
-                                        <Chip label="Completed" sx={{ marginX : 1 }} />
-                                    </Box> 
-                                }
-                                title="Shrimp and Chorizo Paella"
-                                subheader="September 14, 2016"
-                            />
-                            <CardContent>
-                                <Typography variant="body2" color="text.secondary">
-                                    This impressive paella is a perfect party dish and a fun meal to cook
-                                    together with your guests. Add 1 cup of frozen peas along with the mussels,
-                                    if you like.
-                                </Typography>
-                            </CardContent>
-                            <Divider />
-                            <CardActions disableSpacing>
-                                <IconButton aria-label="add to favorites">
-                                    <FavoriteIcon />
-                                </IconButton>
-                                <IconButton aria-label="share">
-                                    <ShareIcon />
-                                </IconButton>
-                            </CardActions>
-                        </Card>
+                    <Box sx={{ paddingX : 2 }}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                width: 'fit-content',
+                                border: (theme) => `1px solid ${theme.palette.divider}`,
+                                borderRadius: 1,
+                                bgcolor: 'background.paper',
+                                color: 'text.secondary',
+                                '& svg': {
+                                    m: 1.5,
+                                },
+                                '& hr': {
+                                    mx: 0.5,
+                                },
+                            }}
+                        >
+                            <SendFeedback mailID={idemail} sender={auth.doti} receiver={"7584338"} />
+                            <FormatAlignCenterIcon />
+                            <FormatAlignRightIcon />
+                            <Divider orientation="vertical" flexItem />
+                            <FormatBoldIcon />
+                            <FormatItalicIcon />
+                        </Box>
+                        <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
+                            { data && data.map( message => (
+                                <Card sx={{ textAlign:"left" , marginY : 1}} key={message.id} >
+                                    <CardHeader
+                                        avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
+                                        action={
+                                            <Box>
+                                                <Chip label="Completed" sx={{ marginX : 1 }} />
+                                                <Chip label="Completed" sx={{ marginX : 1 }} />
+                                            </Box> 
+                                        }
+                                        title="Shrimp and Chorizo Paella"
+                                        subheader={moment(message.created_at).format('MMMM Do YYYY, hh:mm')}
+                                    />
+                                    <CardContent>
+                                        <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                    </CardContent>
+                                    <Divider />
+                                    <CardActions disableSpacing>
+                                        <IconButton aria-label="add to favorites">
+                                            <FavoriteIcon />
+                                        </IconButton>
+                                        <IconButton aria-label="share">
+                                            <ShareIcon />
+                                        </IconButton>
+                                    </CardActions>
+                                </Card>
+                            ))}
+                            <Card sx={{ textAlign:"left" , bgcolor : blue[300], marginY : 1 }}>
+                                <CardHeader
+                                    avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
+                                    action={
+                                        <Box>
+                                            <Chip label="Completed" sx={{ marginX : 1 }} />
+                                            <Chip label="Completed" sx={{ marginX : 1 }} />
+                                        </Box> 
+                                    }
+                                    title="Shrimp and Chorizo Paella"
+                                    subheader="September 14, 2016"
+                                />
+                                <CardContent>
+                                    <Typography variant="body2" color="text.secondary">
+                                        This impressive paella is a perfect party dish and a fun meal to cook
+                                        together with your guests. Add 1 cup of frozen peas along with the mussels,
+                                        if you like.
+                                    </Typography>
+                                </CardContent>
+                                <Divider />
+                                <CardActions disableSpacing>
+                                    <IconButton aria-label="add to favorites">
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                    <IconButton aria-label="share">
+                                        <ShareIcon />
+                                    </IconButton>
+                                </CardActions>
+                            </Card>
+                            <Card sx={{ textAlign:"left" , bgcolor : blue[300] , marginY : 1 }}>
+                                <CardHeader
+                                    avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
+                                    action={
+                                        <Box>
+                                            <Chip label="Completed" sx={{ marginX : 1 }} />
+                                            <Chip label="Completed" sx={{ marginX : 1 }} />
+                                        </Box> 
+                                    }
+                                    title="Shrimp and Chorizo Paella"
+                                    subheader="September 14, 2016"
+                                />
+                                <CardContent>
+                                    <Typography variant="body2" color="text.secondary">
+                                        This impressive paella is a perfect party dish and a fun meal to cook
+                                        together with your guests. Add 1 cup of frozen peas along with the mussels,
+                                        if you like.
+                                    </Typography>
+                                </CardContent>
+                                <Divider />
+                                <CardActions disableSpacing>
+                                    <IconButton aria-label="add to favorites">
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                    <IconButton aria-label="share">
+                                        <ShareIcon />
+                                    </IconButton>
+                                </CardActions>
+                            </Card>
+                        </Box>
                     </Box>
                 </Box>    
             </Paper>

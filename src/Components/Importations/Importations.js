@@ -112,6 +112,7 @@ export default function Importations(){
             setPage(data.meta.current_page);
             setLoading(false);
             setRows(data.data);
+            console.log(data);
             refetch();
         }
     },[data]);
@@ -140,7 +141,7 @@ export default function Importations(){
         )},
         {field: "departement",headerName: t("departement"), flex: 1 ,headerAlign : 'center',align : "center",renderCell: (params)=>{
             return(
-            <Box>{i18next.language==="fr" ? (params.row.mail.sender.departement?.nomla):(params.row.mail.sender.departement?.nomar)}{i18next.language==="fr" ? (params.row.mail.sender.etablissement?.nomla) : (params.row.mail.sender.etablissement?.nomar)}</Box>
+            <Box>{i18next.language==="fr" ? (params.row.mail.sender.departement?.nomLa):(params.row.mail.sender.departement?.nomAr)}{i18next.language==="fr" ? (params.row.mail.sender.etablissement?.nomla) : (params.row.mail.sender.etablissement?.nomar)}</Box>
             )
         }},
         {field: "achevementdate",headerName: t("achevement_date"), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
