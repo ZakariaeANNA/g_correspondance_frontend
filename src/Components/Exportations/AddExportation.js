@@ -94,7 +94,6 @@ export default function AddExportation({refresh}){
     }
 
     const onAddExportations = (event) => {
-        console.log(event.currentTarget)
         event.preventDefault();
         const token = localStorage.getItem("token");
         const user = decodeToken(token);
