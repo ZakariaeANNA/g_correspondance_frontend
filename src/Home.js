@@ -37,6 +37,7 @@ import { prefixer } from "stylis";
 import fontTheme from "./Util/fontTheme";
 import { useLogoutMutation } from "./store/api/authApi";
 import Adduser from './Components/Users/AddUser';
+import stringAvatar from "./Util/stringToAvatar";
 
 
 const cacheLtr = createCache({
@@ -58,33 +59,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const notificationsList = ['mohamed addhamed have sent this notification', 'account that one sent from that one', 'hello body how are you ?', 'there is too many notifications'];
 const drawerWidth = 240;
 
-function stringToColor(string) {
-  let hash = 0;
-  let i;
 
-  /* eslint-disable no-bitwise */
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  let color = '#';
-
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  /* eslint-enable no-bitwise */
-  return color;
-}
-
-function stringAvatar(name) {
-  return {
-    sx: {
-      bgcolor: stringToColor(name),
-    },
-    children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
-  };
-}
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',

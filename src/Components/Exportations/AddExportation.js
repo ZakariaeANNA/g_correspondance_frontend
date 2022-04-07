@@ -13,6 +13,7 @@ import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
+import DropFileInput from '../drop-file-input/DropFileInput';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -48,7 +49,9 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     children: PropTypes.node,
     onClose: PropTypes.func.isRequired,
 };
-export default function AddExportation(){
+
+
+export default function AddExportation({refresh}){
     const [open, setOpen] = useState(false);
     const [files,setFiles] = useState();
     const [tags, setTags] = React.useState([]);
@@ -67,11 +70,15 @@ export default function AddExportation(){
 
     useEffect(()=>{
         if(isSuccess){
-            enqueueSnackbar( data.addExportation ,  { variant: "success" });
+            enqueueSnackbar( t('correspondence_success_send') ,  { variant: "success" });
+            refresh(0);
         }
         if(isError){
-            console.log(error)
-            enqueueSnackbar(error.data.addExportation ,  { variant: "error" });
+            if(error.data === "correspondence_add/user_not_found"){
+                enqueueSnackbar( t('correspondence_send_user_not_found') ,  { variant: "error" });
+            }else if(error.data === "correspondence_add/informations_incorrects"){
+                enqueueSnackbar( t('correspondence_informations_incorrects') ,  { variant: "error" });
+            }
         }
     },[data,error]);
 
@@ -95,6 +102,9 @@ export default function AddExportation(){
         formData.append('sender',user.doti);
         formData.append('file', files);
         addExportations(formData);
+    }
+    const onFileChange = (files) => {
+        setFiles(files);
     }
     return (
       <div>
@@ -132,6 +142,7 @@ export default function AddExportation(){
                             type="text"
                             onKeyDown={event => event.key === " " ? addTags(event) : null}
                             placeholder={t("doti")}
+                            style={{ fontSize : "1rem" , paddingTop : 2 , paddingBottom : 2}}
                         />
                     </div>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("subject_message")} variant="outlined" name="title" required/>
@@ -140,7 +151,10 @@ export default function AddExportation(){
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth  className='inputField' label={t("notes")} variant="outlined" rows={4} name="notes"/>
                     <TextField id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label={t("message")} variant="outlined" rows={4} name="message" required/>
-                    <input type="file" name="ffff" onChange={changeFile} required/>
+                    <DropFileInput
+                        onFileChange={(files) => onFileChange(files)}
+                        mutiple={false}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button variant='contained' type="submit" startIcon={<Send />} autoFocus >
