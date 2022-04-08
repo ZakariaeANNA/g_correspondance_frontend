@@ -334,16 +334,18 @@ export default function FeedbackExport(props){
                                         </ThemeProvider>
                                     </CardContent>
                                     <Divider />
-                                    <CardActions disableSpacing>
+                                    <CardActions sx={{ p:2 }}>
                                     {
                                         message.attachement.map(attach=>(
-                                            <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
-                                                <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
-                                                    <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
-                                                </Box>
-                                            </a>
+                                            <Tooltip title={attach.filename} arrow>
+                                                <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
+                                                        <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
+                                                                <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
+                                                        </Box>
+                                                </a>
+                                            </Tooltip>
                                         ))
-                                        }
+                                    }
                                     </CardActions>
                                 </Card>
                             ))}

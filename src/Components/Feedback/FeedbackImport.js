@@ -202,6 +202,7 @@ export default function FeedbackImport(props){
         onUpdateConfirmationByReceiver({idReceiver: props.auth.doti,mail_id: props.idemail,state: event.target.value});
     };
     useEffect(()=>{
+        console.log(receivers);
         if(isSuccess){
             console.log(data);
             setMessage(data);
