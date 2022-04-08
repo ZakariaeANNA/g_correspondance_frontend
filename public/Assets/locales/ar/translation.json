@@ -70,5 +70,7 @@
   "notcomplet": "غير مكتمل",
   "approved": "مصادق عليه",
   "unfinished": "غير منجز",
-  "finished": "منجز"
+  "finished": "منجز",
+  "achevement_state": "وضعية الانجاز"
+
 }

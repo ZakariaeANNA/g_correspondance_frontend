@@ -3,10 +3,10 @@ import Paper from '@mui/material/Paper';
 import { Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useAddFeedbackMutation,useGetFeedbackBymailAndBysenderAndByreceivercloneQuery } from "../../store/api/feedbackApi";
+import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useGetFeedbackBymailAndBysenderAndByreceivercloneQuery } from "../../store/api/feedbackApi";
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
-import { DialogContent, IconButton , TextField , Container, ListItemButton  } from "@mui/material";
+import { DialogContent, IconButton} from "@mui/material";
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
@@ -14,21 +14,24 @@ import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import CloseIcon from '@mui/icons-material/Close';
 import MUIRichTextEditor from 'mui-rte';
-
-
+import {FileIcon,defaultStyles} from 'react-file-icon';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import { red } from '@mui/material/colors';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ShareIcon from '@mui/icons-material/Share';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import { convertToRaw } from 'draft-js';
 import { useSnackbar } from 'notistack';
 import { createTheme } from '@mui/material/styles';
+import { t } from 'i18next';
 import i18next from 'i18next'
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
@@ -142,7 +145,7 @@ function SendFeedback(props){
     const onFileChange = (files) => {
         setFiles(files);
     }
-
+    
     return(
         <>
             <Tooltip title="Supprimer l'exportation">
@@ -185,14 +188,19 @@ export default function FeedbackImport(props){
     const [expanded, setExpanded] = React.useState(false);
     const [ message , setMessage ] = useState([]);
     const { data , isLoading , 
-              isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : receivers.mail.sender.doti });
+            isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : receivers.mail.sender.doti });
+    const [onUpdateConfirmationByReceiver,{}] = useConfirmMailByReceiverMutation();
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
     const previousRoute = localStorage.getItem("path");
     
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
-
+    const [value, setValue] = React.useState("pending");
+    const handleChange = (event) => {
+        setValue(event.target.value)
+        onUpdateConfirmationByReceiver({idReceiver: props.auth.doti,mail_id: props.idemail,state: event.target.value});
+    };
     useEffect(()=>{
         if(isSuccess){
             console.log(data);
@@ -212,29 +220,63 @@ export default function FeedbackImport(props){
             >
                 <Box sx={{ display:"flex"}}>    
                     <Box sx={{ paddingX : 2 , width : "100%" }}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                width: 'fit-content',
-                                border: (theme) => `1px solid ${theme.palette.divider}`,
-                                borderRadius: 1,
-                                bgcolor: 'background.paper',
-                                color: 'text.secondary',
-                                '& svg': {
-                                    m: 1.5,
-                                },
-                                '& hr': {
-                                    mx: 0.5,
-                                },
-                            }}
-                        >
-                            <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receivers.mail.sender} />
-                            <FormatAlignCenterIcon />
-                            <FormatAlignRightIcon />
-                            <Divider orientation="vertical" flexItem />
-                            <FormatBoldIcon />
-                            <FormatItalicIcon />
+                        <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    width: 'fit-content',
+                                    border: (theme) => `1px solid ${theme.palette.divider}`,
+                                    borderRadius: 1,
+                                    bgcolor: 'background.paper',
+                                    color: 'text.secondary',
+                                    '& svg': {
+                                        m: 1.5,
+                                    },
+                                    '& hr': {
+                                        mx: 0.5,
+                                    },
+                                }}
+                            >
+                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receivers.mail.sender} />
+                                <FormatAlignCenterIcon />
+                                <FormatAlignRightIcon />
+                                <Divider orientation="vertical" flexItem />
+                                <FormatBoldIcon />
+                                <FormatItalicIcon />
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    width: 'fit-content',
+                                    border: (theme) => `1px solid ${theme.palette.divider}`,
+                                    borderRadius: 1,
+                                    bgcolor: 'background.paper',
+                                    color: 'text.secondary',
+                                    '& svg': {
+                                        m: 1.5,
+                                    },
+                                    '& hr': {
+                                        mx: 0.5,
+                                    },
+                                }}
+                            >
+                                <FormControl>
+                                    <FormLabel id="demo-row-radio-buttons-group-label">{t("achevement_state")}</FormLabel>
+                                    <RadioGroup
+                                        row
+                                        aria-labelledby="demo-row-radio-buttons-group-label"
+                                        name="row-radio-buttons-group"
+                                        value={value}
+                                        onChange={handleChange}
+                                    >
+                                        <FormControlLabel value={"pending"} control={<Radio />} label="pending" sx={{display: 'none'}}/>
+                                        <FormControlLabel value={"finished"} control={<Radio />} label={t("finished")} />
+                                        <FormControlLabel value={"unfinished"} control={<Radio />} label={t("unfinished")} />
+                                    </RadioGroup>
+                                </FormControl>
+                            </Box>
                         </Box>
                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
                             { data && data.map( message => (
@@ -258,12 +300,15 @@ export default function FeedbackImport(props){
                                     </CardContent>
                                     <Divider />
                                     <CardActions disableSpacing>
-                                        <IconButton aria-label="add to favorites">
-                                            <FavoriteIcon />
-                                        </IconButton>
-                                        <IconButton aria-label="share">
-                                            <ShareIcon />
-                                        </IconButton>
+                                    {
+                                        message.attachement.map(attach=>(
+                                            <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
+                                                <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
+                                                    <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
+                                                </Box>
+                                            </a>
+                                        ))
+                                    }
                                     </CardActions>
                                 </Card>
                             ))}

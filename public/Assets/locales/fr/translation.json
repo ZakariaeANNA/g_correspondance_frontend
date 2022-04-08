@@ -70,5 +70,7 @@
   "notcomplet": "Incomplet",
   "approved": "Agréé",
   "unfinished": "Inachevé",
-  "finished": "Fait"
+  "finished": "Fait",
+  "achevement_state": "Poste de réalisation"
+
 }
