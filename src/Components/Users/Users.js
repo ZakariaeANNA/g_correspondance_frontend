@@ -112,6 +112,7 @@ export default function Users(){
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     if(data){
         setRows(data.data);
+        console.log(data.data)
     }
   },[data]);
   const columns = [

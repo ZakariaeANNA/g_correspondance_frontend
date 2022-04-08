@@ -112,7 +112,6 @@ export default function Importations(){
             setPage(data.meta.current_page);
             setLoading(false);
             setRows(data.data);
-            console.log(data);
             refetch();
         }
     },[data]);
@@ -183,9 +182,9 @@ export default function Importations(){
                                 rows={rows}
                                 columns={columns}
                                 pagination
-                                pageSize={data.meta.per_page}
+                                pageSize={data?.meta.per_page}
                                 rowsPerPageOptions={[5]}
-                                rowCount={data.meta.total}
+                                rowCount={data?.meta.total}
                                 paginationMode="server"
                                 onPageChange={handlePageChange}
                                 page={(page - 1)}

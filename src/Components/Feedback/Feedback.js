@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useAddFeedbackMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation } from "../../store/api/feedbackApi";
+import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useConfirmMailBySenderMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation } from "../../store/api/feedbackApi";
 import { useParams , useLocation } from 'react-router-dom';
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
@@ -18,14 +18,11 @@ import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import CloseIcon from '@mui/icons-material/Close';
 import MUIRichTextEditor from 'mui-rte';
-
-
+import {FileIcon,defaultStyles} from 'react-file-icon';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
-import Collapse from '@mui/material/Collapse';
 import Avatar from '@mui/material/Avatar';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -38,19 +35,21 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import { blue } from '@mui/material/colors';
 import { convertToRaw } from 'draft-js';
-import { decodeToken } from "react-jwt";
 import { useSnackbar } from 'notistack';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme} from '@mui/material/styles';
 import i18next from 'i18next'
 import { t } from 'i18next';
-import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import AddComment from '@mui/icons-material/AddComment';
 import DropFileInput from '../drop-file-input/DropFileInput';
-import Link from '@mui/material/Link';
 import { stringToColor } from "../../Util/stringToAvatar";
 import "./Feedback.css";
 import 'moment/locale/ar-ma' 
@@ -207,21 +206,31 @@ export default function Feedback(){
     const [getFeedbackBymailAndBysenderAndByreceiver,
             { data , isLoading , 
               isError , isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
+    const [onUpdateConfirmationBySender,{}] = useConfirmMailBySenderMutation();
+    const [onUpdateConfirmationByReceiver,{}] = useConfirmMailByReceiverMutation();
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
-    
+    const [value, setValue] = React.useState("pending");
+
+    const handleChange = (event) => {
+        setValue(event.target.value);
+        if(event.target.value==='notcomplet')
+            onUpdateConfirmationByReceiver({idReceiver:"976454",mail_id: idemail,state: "unfinished"});
+        onUpdateConfirmationBySender({idReceiver:"787688",mail_id: idemail,state: event.target.value});
+    };
+
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
 
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
         if(isSuccess){
-            console.log(data);
             setMessage(data);
         }
     },[isSuccess]);
 
-    const handleConversation = (doti) => {
+    const handleConversation = (doti,confirmation) => {
+        setValue(confirmation)
         getFeedbackBymailAndBysenderAndByreceiver({ mail : idemail , receiver : auth.doti , sender : doti })
     }
 
@@ -236,17 +245,17 @@ export default function Feedback(){
             >
                 <Box sx={{ display:"flex"}}>
                     <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
-                        { appState.receivers.map( receiver =>(
+                        { appState?.receivers.map( receiver =>(
                             <ListItem  
                                 secondaryAction={
                                     receiver.receiverConfirmation === "pending" ? (
                                         <Chip label={t('pending')} />
                                     ):(
-                                        <Chip label={receiver.receiverConfirmation} />
+                                        <Chip label={t(receiver.receiverConfirmation)} />
                                     )
                                 } 
                                 key={receiver.id} 
-                                onClick={()=>handleConversation(receiver.receiver[0].doti)}
+                                onClick={()=>handleConversation(receiver.receiver[0].doti,receiver.senderConfirmation)}
                                 disablePadding
                             >
                                 <ListItemButton role={undefined} dense>   
@@ -260,29 +269,63 @@ export default function Feedback(){
                         ))}
                     </List>
                     <Box sx={{ paddingX : 2 }}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                width: 'fit-content',
-                                border: (theme) => `1px solid ${theme.palette.divider}`,
-                                borderRadius: 1,
-                                bgcolor: 'background.paper',
-                                color: 'text.secondary',
-                                '& svg': {
-                                    m: 1.5,
-                                },
-                                '& hr': {
-                                    mx: 0.5,
-                                },
-                            }}
-                        >
-                            <SendFeedback mailID={idemail} sender={auth.doti} receiver={"7584338"} />
-                            <FormatAlignCenterIcon />
-                            <FormatAlignRightIcon />
-                            <Divider orientation="vertical" flexItem />
-                            <FormatBoldIcon />
-                            <FormatItalicIcon />
+                        <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    width: 'fit-content',
+                                    border: (theme) => `1px solid ${theme.palette.divider}`,
+                                    borderRadius: 1,
+                                    bgcolor: 'background.paper',
+                                    color: 'text.secondary',
+                                    '& svg': {
+                                        m: 1.5,
+                                    },
+                                    '& hr': {
+                                        mx: 0.5,
+                                    },
+                                }}
+                            >
+                                <SendFeedback mailID={idemail} sender={auth.doti} receiver={"787688"} />
+                                <FormatAlignCenterIcon />
+                                <FormatAlignRightIcon />
+                                <Divider orientation="vertical" flexItem />
+                                <FormatBoldIcon />
+                                <FormatItalicIcon />
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    width: 'fit-content',
+                                    border: (theme) => `1px solid ${theme.palette.divider}`,
+                                    borderRadius: 1,
+                                    bgcolor: 'background.paper',
+                                    color: 'text.secondary',
+                                    '& svg': {
+                                        m: 1.5,
+                                    },
+                                    '& hr': {
+                                        mx: 0.5,
+                                    },
+                                }}
+                            >
+                                <FormControl>
+                                    <FormLabel id="demo-row-radio-buttons-group-label">{t("approval_achevement")}</FormLabel>
+                                    <RadioGroup
+                                        row
+                                        aria-labelledby="demo-row-radio-buttons-group-label"
+                                        name="row-radio-buttons-group"
+                                        value={value}
+                                        onChange={handleChange}
+                                    >
+                                        <FormControlLabel value={"pending"} control={<Radio />} label="pending" sx={{display: 'none'}}/>
+                                        <FormControlLabel value={"notcomplet"} control={<Radio />} label={t("notcomplet")} />
+                                        <FormControlLabel value={"approved"} control={<Radio />} label={t("approved")} />
+                                    </RadioGroup>
+                                </FormControl>
+                            </Box>
                         </Box>
                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
                             { data && data.map( message => (
@@ -299,16 +342,19 @@ export default function Feedback(){
                                         subheader={moment(message.created_at).format('MMMM Do YYYY, hh:mm')}
                                     />
                                     <CardContent>
-                                        <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                        <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false}/>
                                     </CardContent>
                                     <Divider />
                                     <CardActions disableSpacing>
-                                        <IconButton aria-label="add to favorites">
-                                            <FavoriteIcon />
-                                        </IconButton>
-                                        <IconButton aria-label="share">
-                                            <ShareIcon />
-                                        </IconButton>
+                                        {
+                                            message.attachement.map(attach=>(
+                                                <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
+                                                    <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
+                                                        <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
+                                                    </Box>
+                                                </a>
+                                            ))
+                                        }
                                     </CardActions>
                                 </Card>
                             ))}
