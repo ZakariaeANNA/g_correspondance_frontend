@@ -293,7 +293,7 @@ export default function FeedbackExport(props){
                                             : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
                                             : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
                                             : (receiverDisplay.fullnamear) }
-                                        subheader={moment(message.created_at).format('MMMM Do YYYY, hh:mm')}
+                                        subheader={moment(message.created_at).format('MMMM Do YYYY, HH:mm')}
                                     />
                                     <CardContent>
                                         <ThemeProvider theme={defaultTheme}>
