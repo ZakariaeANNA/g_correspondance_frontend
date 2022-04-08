@@ -1,6 +1,6 @@
 import React,{ useState,useEffect} from 'react'
 import Paper from '@mui/material/Paper';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
 import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useConfirmMailBySenderMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation } from "../../store/api/feedbackApi";
@@ -31,11 +31,6 @@ import { useSnackbar } from 'notistack';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import i18next from 'i18next'
 import { t } from 'i18next';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 import {FileIcon,defaultStyles} from 'react-file-icon';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
@@ -205,15 +200,11 @@ export default function FeedbackExport(props){
             setMessage(data);
         }
     },[isSuccess]);
-    const [value, setValue] = React.useState("pending");
-    const handleChange = (event) => {
-        setValue(event.target.value)
-        if(event.target.value==='notcomplet')
-            onUpdateConfirmationByReceiver({idReceiver:receiverDisplay.doti,mail_id: props.idemail,state: "unfinished"});
-        onUpdateConfirmationBySender({idReceiver:receiverDisplay.doti,mail_id: props.idemail,state: event.target.value});
-    };
-    const handleConversation = (receiver,confirmation) => {
-        setValue(confirmation);
+    const [confirmSender,setConfirmSender] = React.useState('pending');
+    const [confirmReceiver,setConfirmReceiver] = React.useState('pending');
+    const handleConversation = (receiver,confirmationSender,confirmationReceiver) => {
+        setConfirmSender(confirmationSender)
+        setConfirmReceiver(confirmationReceiver)
         getFeedbackBymailAndBysenderAndByreceiver({ mail : props.idemail , receiver : props.auth.doti , sender : receiver.doti });
         setReceiverDisplay(receiver);
     }
@@ -239,7 +230,7 @@ export default function FeedbackExport(props){
                                     )
                                 } 
                                 key={receiver.id} 
-                                onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation)}
+                                onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation,receiver.receiverConfirmation)}
                                 disablePadding
                             >
                                 <ListItemButton role={undefined} dense>   
@@ -295,33 +286,23 @@ export default function FeedbackExport(props){
                                     },
                                 }}
                             >
-                                <FormControl>
-                                    <FormLabel id="demo-row-radio-buttons-group-label">{t("approval_achevement")}</FormLabel>
-                                    <RadioGroup
-                                        row
-                                        aria-labelledby="demo-row-radio-buttons-group-label"
-                                        name="row-radio-buttons-group"
-                                        value={value}
-                                        onChange={handleChange}
-                                    >
-                                        <FormControlLabel value={"pending"} control={<Radio />} label="pending" sx={{display: 'none'}}/>
-                                        <FormControlLabel value={"notcomplet"} control={<Radio />} label={t("notcomplet")} />
-                                        <FormControlLabel value={"approved"} control={<Radio />} label={t("approved")} />
-                                    </RadioGroup>
-                                </FormControl>
+                                <Box sx={{dislpay: 'flex',flexDirection: 'column',justifyContent: 'space-between'}}>
+                                    <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1}}>
+                                        <Typography>{t("approval_achevement")}</Typography>
+                                        <Chip label={t(confirmSender)} sx={{marginX: 1} } />
+                                    </Box>
+                                    <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1}}>
+                                        <Typography>{t("achevement_state")}</Typography>
+                                        <Chip label={t(confirmReceiver)} sx={{marginX: 1} } />                                   
+                                    </Box> 
+                                </Box>
+                                </Box>
                             </Box>
-                        </Box>
                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
                             { data && data.map( message => (
                                 <Card sx={{ textAlign:"left" , marginY : 1}} key={message.id} >
                                     <CardHeader
                                         avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
-                                        action={
-                                            <Box>
-                                                <Chip label="Completed" sx={{ marginX : 1 }} />
-                                                <Chip label="Completed" sx={{ marginX : 1 }} />
-                                            </Box> 
-                                        }
                                         title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
                                             : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
                                             : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
