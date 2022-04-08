@@ -41,7 +41,10 @@ export const feedbackApi = createApi({
           method: "get"
         };
       },
-  }),
+    }),
+    getFeedbackBymailAndBysenderAndByreceiverclone: builder.query({
+      query: (data) => `/${data.mail}/${data.sender}/${data.receiver}`,
+    }),
   }),
 });
 
@@ -51,5 +54,6 @@ export const {
   useAddFeedbackMutation,
   useGetFeedbackByidAndByreceiverMutation,
   useGetFeedbackByidAndBysenderQuery,
-  useGetFeedbackBymailAndBysenderAndByreceiverMutation
+  useGetFeedbackBymailAndBysenderAndByreceiverMutation,
+  useGetFeedbackBymailAndBysenderAndByreceivercloneQuery
 } = feedbackApi;
