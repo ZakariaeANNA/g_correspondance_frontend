@@ -65,5 +65,12 @@
   "correspondence_send_user_not_found" : "لم يتم العثور على اسم المستخدم",
   "correspondence_informations_incorrects" : "المعلومات التي تم إدخالها غير صحيحة" ,
   "drag&drop" : "سحب وإسقاط الملفات",
-  "pending" : "في الانتظار"
+  "pending" : "في الانتظار",
+  "approval_achevement": "المصادقة على الإنجاز",
+  "notcomplet": "غير مكتمل",
+  "approved": "مصادق عليه",
+  "unfinished": "غير منجز",
+  "finished": "منجز",
+  "achevement_state": "وضعية الانجاز"
+
 }

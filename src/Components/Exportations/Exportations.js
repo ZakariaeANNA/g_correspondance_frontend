@@ -181,9 +181,9 @@ export default function Exportation(){
                          rows={rows}
                          columns={columns}
                          pagination
-                         pageSize={data.meta.per_page}
+                         pageSize={data?.meta.per_page}
                          rowsPerPageOptions={[5]}
-                         rowCount={data.meta.total}
+                         rowCount={data?.meta.total}
                          paginationMode="server"
                          onPageChange={handlePageChange}
                          page={(page - 1)}

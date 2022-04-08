@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const feedbackApi = createApi({
   reducerPath: "feedbackApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:8000/api/feedbacks",
+    baseUrl: "http://127.0.0.1:8000/api",
     prepareHeaders: (headers) => {
         const token = localStorage.getItem("token");
         if (token)
@@ -17,14 +17,30 @@ export const feedbackApi = createApi({
     addFeedback: builder.mutation({
       query: (body) => {
         return {
-          url: "",
+          url: "/feedbacks",
           method: "post",
           body,
         };
       },
     }),
+    confirmMailBySender: builder.mutation({
+      query: (data) => {
+        return {
+          url: `/correspondences/confirm/sender/${data.idReceiver}/${data.mail_id}/${data.state}`,
+          method: "put",
+        };
+      },
+    }),
+    confirmMailByReceiver: builder.mutation({
+      query: (data) => {
+        return {
+          url: `/correspondences/confirm/receiver/${data.idReceiver}/${data.mail_id}/${data.state}`,
+          method: "put",
+        };
+      },
+    }),
     getFeedbackByidAndBysender: builder.query({
-      query: (data) => `feedbacks/sent/${data.id}/${data.user}`,
+      query: (data) => `/feedbacks/sent/${data.id}/${data.user}`,
     }),
     getFeedbackByidAndByreceiver: builder.mutation({
         query: (data) => {
@@ -37,13 +53,13 @@ export const feedbackApi = createApi({
     getFeedbackBymailAndBysenderAndByreceiver: builder.mutation({
       query: (data) => {
         return {
-          url: `/${data.mail}/${data.sender}/${data.receiver}`,
+          url: `/feedbacks/${data.mail}/${data.sender}/${data.receiver}`,
           method: "get"
         };
       },
     }),
     getFeedbackBymailAndBysenderAndByreceiverclone: builder.query({
-      query: (data) => `/${data.mail}/${data.sender}/${data.receiver}`,
+      query: (data) => `/feedbacks/${data.mail}/${data.sender}/${data.receiver}`,
     }),
   }),
 });
@@ -55,5 +71,7 @@ export const {
   useGetFeedbackByidAndByreceiverMutation,
   useGetFeedbackByidAndBysenderQuery,
   useGetFeedbackBymailAndBysenderAndByreceiverMutation,
-  useGetFeedbackBymailAndBysenderAndByreceivercloneQuery
+  useGetFeedbackBymailAndBysenderAndByreceivercloneQuery,
+  useConfirmMailByReceiverMutation,
+  useConfirmMailBySenderMutation
 } = feedbackApi;
