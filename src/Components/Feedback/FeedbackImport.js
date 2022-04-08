@@ -1,6 +1,6 @@
 import React,{ useState,useEffect } from 'react'
 import Paper from '@mui/material/Paper';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
 import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useGetFeedbackBymailAndBysenderAndByreceivercloneQuery } from "../../store/api/feedbackApi";
@@ -15,11 +15,6 @@ import PropTypes from 'prop-types';
 import CloseIcon from '@mui/icons-material/Close';
 import MUIRichTextEditor from 'mui-rte';
 import {FileIcon,defaultStyles} from 'react-file-icon';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -197,14 +192,10 @@ export default function FeedbackImport(props){
     
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
     const [value, setValue] = React.useState("pending");
-    const handleChange = (event) => {
-        setValue(event.target.value)
-        onUpdateConfirmationByReceiver({idReceiver: props.auth.doti,mail_id: props.idemail,state: event.target.value});
-    };
+
     useEffect(()=>{
         console.log(receivers);
         if(isSuccess){
-            console.log(data);
             setMessage(data);
         }
     },[isSuccess]);
@@ -263,20 +254,16 @@ export default function FeedbackImport(props){
                                     },
                                 }}
                             >
-                                <FormControl>
-                                    <FormLabel id="demo-row-radio-buttons-group-label">{t("achevement_state")}</FormLabel>
-                                    <RadioGroup
-                                        row
-                                        aria-labelledby="demo-row-radio-buttons-group-label"
-                                        name="row-radio-buttons-group"
-                                        value={value}
-                                        onChange={handleChange}
-                                    >
-                                        <FormControlLabel value={"pending"} control={<Radio />} label="pending" sx={{display: 'none'}}/>
-                                        <FormControlLabel value={"finished"} control={<Radio />} label={t("finished")} />
-                                        <FormControlLabel value={"unfinished"} control={<Radio />} label={t("unfinished")} />
-                                    </RadioGroup>
-                                </FormControl>
+                                <Box sx={{dislpay: 'flex',flexDirection: 'column',justifyContent: 'space-between'}}>
+                                    <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1}}>
+                                        <Typography>{t("approval_achevement")}</Typography>
+                                        <Chip label={t(receivers.senderConfirmation)} sx={{marginX: 1} } />
+                                    </Box>
+                                    <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1}}>
+                                        <Typography>{t("achevement_state")}</Typography>
+                                        <Chip label={t(receivers.receiverConfirmation)} sx={{marginX: 1} } />                                   
+                                    </Box> 
+                                </Box>
                             </Box>
                         </Box>
                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
@@ -284,12 +271,6 @@ export default function FeedbackImport(props){
                                 <Card sx={{ textAlign:"left" , marginY : 1}} key={message.id} >
                                     <CardHeader
                                         avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
-                                        action={
-                                            <Box>
-                                                <Chip label="Completed" sx={{ marginX : 1 }} />
-                                                <Chip label="Completed" sx={{ marginX : 1 }} />
-                                            </Box> 
-                                        }
                                         title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
                                             : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
                                             : receivers.mail.sender.doti === message.idSender && i18next.language === "fr" ? (receivers.mail.sender.fullnamela) 
