@@ -28,10 +28,11 @@ import { useSnackbar } from 'notistack';
 import { createTheme } from '@mui/material/styles';
 import { t } from 'i18next';
 import i18next from 'i18next'
-import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
-import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
-import FormatBoldIcon from '@mui/icons-material/FormatBold';
-import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import AddComment from '@mui/icons-material/AddComment';
 import DropFileInput from '../drop-file-input/DropFileInput';
 import "./Feedback.css";
@@ -110,7 +111,11 @@ function SendFeedback(props){
     const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
     
     const [files,setFiles] = useState([]);
-
+    const [radioValue,setRadioValue] = useState('');
+    const handleRadioChange = (event) =>{
+        setRadioValue(event.target.value);
+    }
+    const [onUpdateConfirmationByReceiver,{}] = useConfirmMailByReceiverMutation();
     const onAddFeedback = () => {
         const formData = new FormData();
         var index = 0;
@@ -130,6 +135,10 @@ function SendFeedback(props){
 
     useEffect(()=>{
         if(isSuccess){
+            if(radioValue !=null || radioValue !=undefined){
+                onUpdateConfirmationByReceiver({idReceiver: props.sender,mail_id: props.mailID,state: radioValue});
+                setRadioValue('')
+            }
             enqueueSnackbar( data.addFeedback, { variant: "success" });
         }
         if(isError){
@@ -140,7 +149,7 @@ function SendFeedback(props){
     const onFileChange = (files) => {
         setFiles(files);
     }
-    
+  
     return(
         <>
             <Tooltip title="Supprimer l'exportation">
@@ -159,6 +168,22 @@ function SendFeedback(props){
                     Envoyer un feedback
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
+                   {(props.senderConfirm!=="approved" && props.receiverConfirm!=="finished") &&    
+                        <Box sx={{marginY: 1}}>
+                            <FormControl variant='outlined' fullWidth sx={{border: "1px solid #d6d8da",padding: "4px 14px 4px 14px",borderRadius: "6px"}}>
+                                <FormLabel id="demo-row-radio-buttons-group-label">{t("achevement_state")}</FormLabel>
+                                <RadioGroup
+                                    row
+                                    aria-labelledby="demo-row-radio-buttons-group-label"
+                                    name="row-radio-buttons-group"
+                                    onChange={handleRadioChange}
+                                >
+                                    <FormControlLabel value="finished" control={<Radio />} label={t("finished")} />
+                                    <FormControlLabel value="unfinished" control={<Radio />} label={t("unfinished")} />
+                                </RadioGroup>
+                            </FormControl>
+                        </Box>
+                    }
                     <Box sx={{ padding: 1 , border : 1 , borderRadius : "6px" , borderColor : "#d6d8da" ,paddingBottom: 6 , marginBottom : 2}}>
                         <MUIRichTextEditor label="Start typing..." inlineStyle={{ marginY : 2 }} onChange={handleDataChange} />
                     </Box>
@@ -184,7 +209,6 @@ export default function FeedbackImport(props){
     const [ message , setMessage ] = useState([]);
     const { data , isLoading , 
             isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : receivers.mail.sender.doti });
-    const [onUpdateConfirmationByReceiver,{}] = useConfirmMailByReceiverMutation();
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
@@ -229,40 +253,17 @@ export default function FeedbackImport(props){
                                     },
                                 }}
                             >
-                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receivers.mail.sender} />
-                                <FormatAlignCenterIcon />
-                                <FormatAlignRightIcon />
+                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receivers.mail.sender} senderConfirm={receivers.senderConfirmation} receiverConfirm={receivers.receiverConfirmation}/>
                                 <Divider orientation="vertical" flexItem />
-                                <FormatBoldIcon />
-                                <FormatItalicIcon />
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    width: 'fit-content',
-                                    border: (theme) => `1px solid ${theme.palette.divider}`,
-                                    borderRadius: 1,
-                                    bgcolor: 'background.paper',
-                                    color: 'text.secondary',
-                                    '& svg': {
-                                        m: 1.5,
-                                    },
-                                    '& hr': {
-                                        mx: 0.5,
-                                    },
-                                }}
-                            >
-                                <Box sx={{dislpay: 'flex',flexDirection: 'column',justifyContent: 'space-between'}}>
-                                    <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1}}>
-                                        <Typography>{t("approval_achevement")}</Typography>
-                                        <Chip label={t(receivers.senderConfirmation)} sx={{marginX: 1} } />
-                                    </Box>
-                                    <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1}}>
-                                        <Typography>{t("achevement_state")}</Typography>
-                                        <Chip label={t(receivers.receiverConfirmation)} sx={{marginX: 1} } />                                   
-                                    </Box> 
+                                <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
+                                    <Typography>{t("approval_achevement")}</Typography>
+                                    <Chip label={t(receivers.senderConfirmation)} sx={{marginX: 1} } />
                                 </Box>
+                                <Divider orientation="vertical" flexItem />
+                                <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
+                                    <Typography>{t("achevement_state")}</Typography>
+                                    <Chip label={t(receivers.receiverConfirmation)} sx={{marginX: 1} } />                                   
+                                </Box> 
                             </Box>
                         </Box>
                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
