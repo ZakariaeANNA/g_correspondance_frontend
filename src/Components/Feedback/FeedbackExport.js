@@ -172,7 +172,7 @@ function SendFeedback(props){
                     Envoyer un feedback
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    {   props.confirmReceiver === "pending" ? (
+                    {   ["pending","unfinished"].includes(props.confirmReceiver) ? (
                         null
                     ):(
                         <FormControl sx={{ border : "1px solid #d6d8da" , padding : "4px 14px 4px 14px" , borderRadius : "6px"}} fullWidth>
