@@ -82,10 +82,6 @@ export default function AddExportation({refresh}){
         }
     },[data,error]);
 
-    const changeFile = (event) => {
-        setFiles(event.target.files[0]);
-    }
-
     const addTags = event => {
         if (event.key === " " && event.target.value !== "") {
             setTags([...tags, { idReceiver : event.target.value.replace(/\s+/g, '') } ]);
@@ -145,6 +141,7 @@ export default function AddExportation({refresh}){
                             style={{ fontSize : "1rem" , paddingTop : 2 , paddingBottom : 2}}
                         />
                     </div>
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("correspondance_number")} variant="outlined" name="number" required/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("subject_message")} variant="outlined" name="title" required/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("references")} variant="outlined" rows={4} name="references"/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("concerned")} variant="outlined" rows={4} name="concerned" required/>

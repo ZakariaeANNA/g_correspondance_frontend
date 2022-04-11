@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useConfirmMailBySenderMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation } from "../../store/api/feedbackApi";
+import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useConfirmMailBySenderMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation, useUpdateFeedbackStatusMutation } from "../../store/api/feedbackApi";
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
 import { DialogContent, IconButton , ListItemButton  } from "@mui/material";
@@ -172,7 +172,7 @@ function SendFeedback(props){
                     Envoyer un feedback
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    {   props.confirmReceiver === "pending" ? (
+                    {  ["pending","unfinished"].includes(props.confirmReceiver) ? (
                         null
                     ):(
                         <FormControl sx={{ border : "1px solid #d6d8da" , padding : "4px 14px 4px 14px" , borderRadius : "6px"}} fullWidth>
@@ -198,7 +198,7 @@ function SendFeedback(props){
                 </DialogContent>
                 <DialogActions>
                 <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={onAddFeedback}>
-                    Envoyer
+                    {t("send")}
                 </Button>
                 </DialogActions>
             </BootstrapDialog>
@@ -212,13 +212,10 @@ export default function FeedbackExport(props){
     const [ message , setMessage ] = useState([]);
     const [ receiverDisplay , setReceiverDisplay ] = useState();
     const [getFeedbackBymailAndBysenderAndByreceiver,
-            { data , isLoading , 
+            {data , isLoading , 
               isError , isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
-    const [onUpdateConfirmationBySender,{}] = useConfirmMailBySenderMutation();
-    const [onUpdateConfirmationByReceiver,{}] = useConfirmMailByReceiverMutation();
-
     moment.locale(i18next.language === "ar" ? ("ar-ma"):("fr"));
-
+    const [onUpdateStatus,{}]= useUpdateFeedbackStatusMutation();
     useEffect(()=>{
         if(isSuccess){
             setMessage(data);
@@ -227,12 +224,12 @@ export default function FeedbackExport(props){
     const [confirmSender,setConfirmSender] = React.useState('pending');
     const [confirmReceiver,setConfirmReceiver] = React.useState('pending');
     const handleConversation = (receiver,confirmationSender,confirmationReceiver) => {
+        onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail})
         setConfirmSender(confirmationSender)
         setConfirmReceiver(confirmationReceiver)
         getFeedbackBymailAndBysenderAndByreceiver({ mail : props.idemail , receiver : props.auth.doti , sender : receiver.doti });
         setReceiverDisplay(receiver);
     }
-
     return(
         <React.Fragment>
             <Paper
@@ -246,6 +243,7 @@ export default function FeedbackExport(props){
                    <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
                         { receivers.map( receiver =>(
                             <ListItem  
+                                key={receiver.receiver[0].doti}
                                 secondaryAction={
                                     receiver.receiverConfirmation === "pending" ? (
                                         <Chip label={t('pending')} />
@@ -253,7 +251,6 @@ export default function FeedbackExport(props){
                                         <Chip label={t(receiver.receiverConfirmation)} />
                                     )
                                 } 
-                                key={receiver.id} 
                                 onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation,receiver.receiverConfirmation)}
                                 disablePadding
                             >
@@ -301,7 +298,7 @@ export default function FeedbackExport(props){
                         </Box>
                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
                             { data && data.map( message => (
-                                <Card sx={{ textAlign:"left" , marginY : 1}} key={message.id} >
+                                <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6'}:{ textAlign:"left" , marginY : 1}} key={message.id} >
                                     <CardHeader
                                         avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
                                         title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
@@ -309,6 +306,10 @@ export default function FeedbackExport(props){
                                             : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
                                             : (receiverDisplay.fullnamear) }
                                         subheader={moment(message.created_at).format('MMMM Do YYYY, HH:mm')}
+                                        action={
+                                            <Box>
+                                                <Chip label={message.status ? "lue" : "non lue"} sx={{ marginX : 1 }} />
+                                            </Box> }
                                     />
                                     <CardContent>
                                         <ThemeProvider theme={defaultTheme}>
