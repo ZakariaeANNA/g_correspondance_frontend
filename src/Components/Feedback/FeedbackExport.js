@@ -224,6 +224,7 @@ export default function FeedbackExport(props){
     const [onUpdateStatus,{}]= useUpdateFeedbackStatusMutation();
     useEffect(()=>{
         if(isSuccess){
+            console.log(data)
             setMessage(data);
             if(data.filter(item=>item.message.status===0 && item.message.idSender===props.auth.doti).length > 0){
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail})
@@ -328,9 +329,10 @@ export default function FeedbackExport(props){
                                                             : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
                                                             : (receiverDisplay.fullnamear) }
                                                         subheader={moment(message.created_at).format('MMMM Do YYYY, HH:mm')}
-                                            action={
-                                                message.idSender===props.auth.doti &&
-                                                <Chip label={message.status ? "lue" : "non lue"} sx={{ marginX : 1 }} />}
+                                                        action={
+                                                            (message.idSender===props.auth.doti && message.status) ?
+                                                            (<Chip label={`${t("seen")} : ${moment(message.update_at).format('DD-MM-YYYY HH:mm')}`} sx={{ marginX : 1 }} />): (null)
+                                                        }
                                                     />
                                                     <CardContent>
                                                         <ThemeProvider theme={defaultTheme}>

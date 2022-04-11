@@ -156,7 +156,7 @@ export default function Importations(){
             </div>
         )},  
         {field: "Aions",headerName: "", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
-            <Button variant="text" startIcon={<Style />} sx={{ mt: 3, mb: 2 }} onClick={() => { localStorage.setItem("receivers",JSON.stringify(params.row)); localStorage.setItem("path","import"); history.push("/app/feedback/"+params.row.id);}}>{t('correspondence_follow')}</Button>
+            <Button variant="text" startIcon={<Style />} sx={{ mt: 3, mb: 2 }} onClick={() => { localStorage.setItem("receivers",JSON.stringify(params.row)); localStorage.setItem("path","import"); history.push("/app/feedback/"+params.row.mail.id);}}>{t('correspondence_follow')}</Button>
         )},      
     ]
     return(

@@ -74,6 +74,6 @@
   "achevement_state": "وضعية الانجاز",
   "empty_message":"لم يتم إرسال أي رسالة في هذه المحادثة.",
   "add_feedback_succes" : "تمت إضافة التعليق بنجاح" ,
-  "add_feedback" : "أضف ملاحظاتك"
-
+  "add_feedback" : "أضف ملاحظاتك",
+  "seen": "قرئت في"
 }
