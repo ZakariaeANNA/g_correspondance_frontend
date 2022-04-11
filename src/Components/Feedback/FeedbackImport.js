@@ -218,7 +218,6 @@ export default function FeedbackImport(props){
         if(isSuccess){
             onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});
             setMessage(data);
-            refetch()
         }
     },[isSuccess]);
 
@@ -276,6 +275,7 @@ export default function FeedbackImport(props){
                                             : (receivers.mail.sender.fullnamear) }
                                         subheader={moment(message.created_at).format('MMMM Do YYYY, hh:mm')}
                                         action={
+                                            message.idReceiver===props.auth.doti &&
                                             <Box>
                                                 <Chip label={message.status ? "lue": "non lue"} sx={{ marginX : 1 }} />
                                             </Box> }
