@@ -323,6 +323,7 @@ export default function FeedbackExport(props){
                                                             : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
                                                             : (receiverDisplay.fullnamear) }
                                                         subheader={moment(message.created_at).format('MMMM Do YYYY, HH:mm')}
+                                                        action={<Chip label={message.status ? "lue" : "non lue"} sx={{ marginX : 1 }} />}
                                                     />
                                                     <CardContent>
                                                         <ThemeProvider theme={defaultTheme}>
