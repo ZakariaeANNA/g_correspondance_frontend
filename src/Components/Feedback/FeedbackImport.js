@@ -216,7 +216,9 @@ export default function FeedbackImport(props){
 
     useEffect(()=>{
         if(isSuccess){
-            if(data.filter(item=>item.message.status===0 && item.message.idSender===props.auth.doti).length > 0){
+            console.log(data)
+            if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
+                console.log('hhhhidid')
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});                    
             }
             setMessage(data);
@@ -288,11 +290,13 @@ export default function FeedbackImport(props){
                                     <CardActions disableSpacing>
                                     {
                                         message.attachement.map(attach=>(
-                                            <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
-                                                <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
-                                                    <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
-                                                </Box>
-                                            </a>
+                                            <Tooltip title={attach.filename} arrow key={attach.id}>
+                                                <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
+                                                    <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
+                                                        <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
+                                                    </Box>
+                                                </a>
+                                            </Tooltip>
                                         ))
                                     }
                                     </CardActions>

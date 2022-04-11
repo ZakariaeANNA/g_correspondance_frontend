@@ -223,9 +223,9 @@ export default function FeedbackExport(props){
     const [onUpdateStatus,{}]= useUpdateFeedbackStatusMutation();
     useEffect(()=>{
         if(isSuccess){
-            console.log(data)
             setMessage(data);
-            if(data.filter(item=>item.message.status===0 && item.message.idSender===props.auth.doti).length > 0){
+            if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
+                console.log("reader message")
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail})
                 
             }
