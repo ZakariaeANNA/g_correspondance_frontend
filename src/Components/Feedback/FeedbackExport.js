@@ -37,7 +37,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import AddComment from '@mui/icons-material/AddComment';
+import Email from '@mui/icons-material/Email';
 import DropFileInput from '../drop-file-input/DropFileInput';
 import { stringToColor } from "../../Util/stringToAvatar";
 import "./Feedback.css";
@@ -162,9 +162,9 @@ function SendFeedback(props){
     return(
         <>
             <Tooltip title="Supprimer l'exportation">
-                <IconButton color="secondary" aria-label="add an alarm" onClick={handleClickOpen}>
-                    <AddComment />
-                </IconButton>
+                <Button variant="text" onClick={handleClickOpen} startIcon={<Email />}>
+                    {t("add_feedback")}
+                </Button>
             </Tooltip>
             <BootstrapDialog
                 onClose={handleClose}
@@ -216,6 +216,7 @@ export default function FeedbackExport(props){
     const receivers = JSON.parse(localStorage.getItem("receivers"));
     const [ message , setMessage ] = useState([]);
     const [ receiverDisplay , setReceiverDisplay ] = useState();
+    const [ selected , setSelected ] = useState();
     const [getFeedbackBymailAndBysenderAndByreceiver,
             {data , isLoading , 
               isError , isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
@@ -233,6 +234,7 @@ export default function FeedbackExport(props){
     const [confirmSender,setConfirmSender] = React.useState('pending');
     const [confirmReceiver,setConfirmReceiver] = React.useState('pending');
     const handleConversation = (receiver,confirmationSender,confirmationReceiver) => {
+        setSelected(receiver.doti);
         setConfirmSender(confirmationSender)
         setConfirmReceiver(confirmationReceiver)
         getFeedbackBymailAndBysenderAndByreceiver({ mail : props.idemail , receiver : props.auth.doti , sender : receiver.doti });
@@ -262,7 +264,7 @@ export default function FeedbackExport(props){
                                 onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation,receiver.receiverConfirmation)}
                                 disablePadding
                             >
-                                <ListItemButton role={undefined} dense>   
+                                <ListItemButton role={undefined} dense selected={selected === receiver.receiver[0].doti}>   
                                     <ListItemAvatar>
                                         <Avatar alt={receiver.receiver[0].fullnamela} sx={{ bgcolor : stringToColor(receiver.receiver[0].fullnamela) }} src="/static/images/avatar/1.jpg" />
                                     </ListItemAvatar>
