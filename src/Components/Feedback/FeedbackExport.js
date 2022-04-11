@@ -161,11 +161,9 @@ function SendFeedback(props){
 
     return(
         <>
-            <Tooltip title="Supprimer l'exportation">
-                <Button variant="text" onClick={handleClickOpen} startIcon={<Email />}>
-                    {t("add_feedback")}
-                </Button>
-            </Tooltip>
+            <Button variant="text" onClick={handleClickOpen} startIcon={<Email />}>
+                {t("add_feedback")}
+            </Button>
             <BootstrapDialog
                 onClose={handleClose}
                 aria-labelledby="customized-dialog-title"
@@ -174,7 +172,7 @@ function SendFeedback(props){
                 maxWidth="md" 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    Envoyer un feedback
+                    {t("add_feedback")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                     {  ["pending","unfinished"].includes(props.confirmReceiver) ? (

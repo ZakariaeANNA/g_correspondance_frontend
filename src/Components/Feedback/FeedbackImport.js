@@ -33,7 +33,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import AddComment from '@mui/icons-material/AddComment';
+import Email from '@mui/icons-material/Email';
 import DropFileInput from '../drop-file-input/DropFileInput';
 import "./Feedback.css";
 import 'moment/locale/ar-ma' 
@@ -152,11 +152,9 @@ function SendFeedback(props){
   
     return(
         <>
-            <Tooltip title="Supprimer l'exportation">
-                <IconButton color="secondary" aria-label="add an alarm" onClick={handleClickOpen}>
-                    <AddComment />
-                </IconButton>
-            </Tooltip>
+            <Button variant="text" onClick={handleClickOpen} startIcon={<Email />}>
+                {t("add_feedback")}
+            </Button>
             <BootstrapDialog
                 onClose={handleClose}
                 aria-labelledby="customized-dialog-title"
@@ -165,7 +163,7 @@ function SendFeedback(props){
                 maxWidth="md" 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    Envoyer un feedback
+                    {t("add_feedback")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                    {(props.senderConfirm!=="approved" && props.receiverConfirm!=="finished") &&    
