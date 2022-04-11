@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useGetFeedbackBymailAndBysenderAndByreceivercloneQuery } from "../../store/api/feedbackApi";
+import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useGetFeedbackBymailAndBysenderAndByreceivercloneQuery, useUpdateFeedbackStatusMutation } from "../../store/api/feedbackApi";
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
 import { DialogContent, IconButton} from "@mui/material";
@@ -194,7 +194,7 @@ function SendFeedback(props){
                 </DialogContent>
                 <DialogActions>
                 <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={onAddFeedback}>
-                    Envoyer
+                    {t('send')}
                 </Button>
                 </DialogActions>
             </BootstrapDialog>
@@ -207,20 +207,18 @@ export default function FeedbackImport(props){
     const receivers = JSON.parse(localStorage.getItem("receivers"));
     const [expanded, setExpanded] = React.useState(false);
     const [ message , setMessage ] = useState([]);
-    const { data , isLoading , 
+    const { refetch,data , isLoading , 
             isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : receivers.mail.sender.doti });
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
+    const [onUpdateStatus,{}] = useUpdateFeedbackStatusMutation();
     const previousRoute = localStorage.getItem("path");
     
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
-    const [value, setValue] = React.useState("pending");
 
     useEffect(()=>{
-        console.log(receivers);
         if(isSuccess){
+            onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});
             setMessage(data);
+            refetch()
         }
     },[isSuccess]);
 
@@ -269,7 +267,7 @@ export default function FeedbackImport(props){
                         </Box>
                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
                             { data && data.map( message => (
-                                <Card sx={{ textAlign:"left" , marginY : 1}} key={message.id} >
+                                <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6'}:{ textAlign:"left" , marginY : 1}} key={message.id} >
                                     <CardHeader
                                         avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
                                         title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
@@ -277,6 +275,10 @@ export default function FeedbackImport(props){
                                             : receivers.mail.sender.doti === message.idSender && i18next.language === "fr" ? (receivers.mail.sender.fullnamela) 
                                             : (receivers.mail.sender.fullnamear) }
                                         subheader={moment(message.created_at).format('MMMM Do YYYY, hh:mm')}
+                                        action={
+                                            <Box>
+                                                <Chip label={message.status ? "lue": "non lue"} sx={{ marginX : 1 }} />
+                                            </Box> }
                                     />
                                     <CardContent>
                                         <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
