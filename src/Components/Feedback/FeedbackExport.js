@@ -224,12 +224,15 @@ export default function FeedbackExport(props){
     useEffect(()=>{
         if(isSuccess){
             setMessage(data);
+            if(data.filter(item=>item.message.status===0 && item.message.idSender===props.auth.doti).length > 0){
+                onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail})
+                
+            }
         }
     },[isSuccess]);
     const [confirmSender,setConfirmSender] = React.useState('pending');
     const [confirmReceiver,setConfirmReceiver] = React.useState('pending');
     const handleConversation = (receiver,confirmationSender,confirmationReceiver) => {
-        onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail})
         setConfirmSender(confirmationSender)
         setConfirmReceiver(confirmationReceiver)
         getFeedbackBymailAndBysenderAndByreceiver({ mail : props.idemail , receiver : props.auth.doti , sender : receiver.doti });
@@ -308,7 +311,7 @@ export default function FeedbackExport(props){
                                 </Box>
                             ):(
                                 <React.Fragment>
-                                    {   data.length > 0 ? (
+                                    {   data?.length > 0 ? (
                                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
                                             { data.map( message => (
                                                 <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6' , color : "white"}:{ textAlign:"left" , marginY : 1}} key={message.id} >
@@ -323,7 +326,9 @@ export default function FeedbackExport(props){
                                                             : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
                                                             : (receiverDisplay.fullnamear) }
                                                         subheader={moment(message.created_at).format('MMMM Do YYYY, HH:mm')}
-                                                        action={<Chip label={message.status ? "lue" : "non lue"} sx={{ marginX : 1 }} />}
+                                            action={
+                                                message.idSender===props.auth.doti &&
+                                                <Chip label={message.status ? "lue" : "non lue"} sx={{ marginX : 1 }} />}
                                                     />
                                                     <CardContent>
                                                         <ThemeProvider theme={defaultTheme}>
