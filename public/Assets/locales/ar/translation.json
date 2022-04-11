@@ -71,6 +71,7 @@
   "approved": "مصادق عليه",
   "unfinished": "غير منجز",
   "finished": "منجز",
-  "achevement_state": "وضعية الانجاز"
-
+  "achevement_state": "وضعية الانجاز",
+  "empty_message":"لم يتم إرسال أي رسالة في هذه المحادثة.",
+  "add_feedback_succes" : "تمت إضافة التعليق بنجاح" 
 }

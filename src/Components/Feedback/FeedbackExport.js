@@ -43,6 +43,7 @@ import { stringToColor } from "../../Util/stringToAvatar";
 import "./Feedback.css";
 import 'moment/locale/ar-ma' 
 import 'moment/locale/fr' 
+import CircularProgress from '@mui/material/CircularProgress';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -143,10 +144,14 @@ function SendFeedback(props){
                 confirmMailBySender({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : approval});
                 setApproval();
             }
-            enqueueSnackbar( data.addFeedback, { variant: "success" });
+            enqueueSnackbar( t('add_feedback_succes') , { variant: "success" });
         }
         if(isError){
-            enqueueSnackbar(error.data.addFeedback, { variant: "error" });
+            if(error.data === "create_feedback/error_input"){
+                enqueueSnackbar(t("correspondence_informations_incorrects"), { variant: "error" });
+            }else if(error.data === "create_feedback/fields_required"){
+                enqueueSnackbar(t("credentials_empty"), { variant: "error" });
+            }
         }
     },[data,error]);
 
@@ -189,7 +194,7 @@ function SendFeedback(props){
                         </FormControl>
                     )}
                     <Box sx={{ padding: 1 , border : 1 , borderRadius : "6px" , borderColor : "#d6d8da" ,paddingBottom: 6 , marginY : 2}}>
-                        <MUIRichTextEditor label="Start typing..." inlineStyle={{ marginY : 2 }} onChange={handleDataChange} />
+                        <MUIRichTextEditor label="Start typing..." inlineStyle={{ marginY : 2 }} onChange={handleDataChange} controls={["title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "numberList", "bulletList", "quote", "code", "clear"]} />
                     </Box>
                     <DropFileInput
                         onFileChange={(files) => onFileChange(files)}
@@ -267,72 +272,111 @@ export default function FeedbackExport(props){
                             </ListItem>
                         ))}
                     </List>
-                    <Box sx={{ paddingX : 2 , width : "100%" }}>
-                        <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    width: 'fit-content',
-                                    border: (theme) => `1px solid ${theme.palette.divider}`,
-                                    borderRadius: 1,
-                                    bgcolor: 'background.paper',
-                                    color: 'text.secondary',
-                                        '& svg': {
-                                        m: 1.5,
-                                    },
-                                        '& hr': {
-                                        mx: 0.5,
-                                    },
-                                }}
-                            >
-                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receiverDisplay} confirmReceiver={confirmReceiver} />
-                                <Divider orientation="vertical" flexItem />
-                                <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
-                                    <Typography>{t("approval_achevement")}</Typography>
-                                    <Chip label={t(confirmSender)} sx={{marginX: 1} } />
+                    {   receiverDisplay ? (
+                        <Box sx={{ paddingX : 2 , width : "100%" }}>
+                            <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between'}}>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        width: 'fit-content',
+                                        border: (theme) => `1px solid ${theme.palette.divider}`,
+                                        borderRadius: 1,
+                                        bgcolor: 'background.paper',
+                                        color: 'text.secondary',
+                                            '& svg': {
+                                            m: 1.5,
+                                        },
+                                            '& hr': {
+                                            mx: 0.5,
+                                        },
+                                    }}
+                                >
+                                    <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receiverDisplay} confirmReceiver={confirmReceiver} />
+                                    <Divider orientation="vertical" flexItem />
+                                    <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
+                                        <Typography>{t("approval_achevement")}</Typography>
+                                        <Chip label={t(confirmSender)} sx={{marginX: 1} } />
+                                    </Box>
+                                    <Divider orientation="vertical" flexItem />
+                                    <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
+                                        <Typography>{t("achevement_state")}</Typography>
+                                        <Chip label={t(confirmReceiver)} sx={{marginX: 1} } />                                   
+                                    </Box> 
                                 </Box>
-                                <Divider orientation="vertical" flexItem />
-                                <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
-                                    <Typography>{t("achevement_state")}</Typography>
-                                    <Chip label={t(confirmReceiver)} sx={{marginX: 1} } />                                   
-                                </Box> 
                             </Box>
+                            {   isLoading ? (
+                                <Box sx={{ display: 'flex' , p : 4 , position : "relative" , left : "50%" }}>
+                                    <CircularProgress />
+                                </Box>
+                            ):(
+                                <React.Fragment>
+                                    {   data.length > 0 ? (
+                                        <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
+                                            { data.map( message => (
+                                                <Card sx={{ textAlign:"left" , marginY : 1}} key={message.id} >
+                                                    <CardHeader
+                                                        avatar={ message.idSender === props.auth.doti ? (
+                                                            <Avatar alt={props.auth.fullnamela} sx={{ bgcolor : stringToColor(props.auth.fullnamela) }} src="/static/images/avatar/1.jpg" />
+                                                        ):(
+                                                            <Avatar alt={receiverDisplay.fullnamela} sx={{ bgcolor : stringToColor(receiverDisplay.fullnamela) }} src="/static/images/avatar/1.jpg" />
+                                                        )}
+                                                        title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
+                                                            : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
+                                                            : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
+                                                            : (receiverDisplay.fullnamear) }
+                                                        subheader={moment(message.created_at).format('MMMM Do YYYY, HH:mm')}
+                                                    />
+                                                    <CardContent>
+                                                        <ThemeProvider theme={defaultTheme}>
+                                                            <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                        </ThemeProvider>
+                                                    </CardContent>
+                                                    <Divider />
+                                                    <CardActions sx={{ p:2 }}>
+                                                    {
+                                                        message.attachement.map(attach=>(
+                                                            <Tooltip title={attach.filename} arrow key={attach.id}>
+                                                                <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
+                                                                        <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
+                                                                                <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
+                                                                        </Box>
+                                                                </a>
+                                                            </Tooltip>
+                                                        ))
+                                                    }
+                                                    </CardActions>
+                                                </Card>
+                                            ))}
+                                        </Box>
+                                    ):(
+                                        <Box
+                                            sx={{
+                                                maxHeight : 400 , 
+                                                width : "auto",
+                                                overflow : "hidden",
+                                                p:3
+                                            }}
+                                        >
+                                            <img src={require("../../assets/785_generated.jpg")} style={{ marginX : "auto"}} height="300px"/>
+                                            <Typography sx={{ fontWeight : "bold" , fontSize : "20px"}}>{t('empty_message')}</Typography>
+                                        </Box>
+                                    )}
+                                </React.Fragment>
+                            )}
                         </Box>
-                        <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
-                            { data && data.map( message => (
-                                <Card sx={{ textAlign:"left" , marginY : 1}} key={message.id} >
-                                    <CardHeader
-                                        avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
-                                        title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
-                                            : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
-                                            : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
-                                            : (receiverDisplay.fullnamear) }
-                                        subheader={moment(message.created_at).format('MMMM Do YYYY, HH:mm')}
-                                    />
-                                    <CardContent>
-                                        <ThemeProvider theme={defaultTheme}>
-                                            <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
-                                        </ThemeProvider>
-                                    </CardContent>
-                                    <Divider />
-                                    <CardActions sx={{ p:2 }}>
-                                    {
-                                        message.attachement.map(attach=>(
-                                            <Tooltip title={attach.filename} arrow>
-                                                <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
-                                                        <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
-                                                                <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
-                                                        </Box>
-                                                </a>
-                                            </Tooltip>
-                                        ))
-                                    }
-                                    </CardActions>
-                                </Card>
-                            ))}
+                    ):(
+                        <Box
+                            sx={{
+                                maxHeight : 400,
+                                width : "auto",
+                                overflow : "hidden"
+                            }}
+                        >
+                            <img src={require("../../StudyingConceptIllustration.jpg")} style={{ marginX : "auto"}} height="80%"/>
+                            <Typography sx={{ fontWeight : "bold" , fontSize : "20px"}}>Cliquez sur l'utilisateur pour voir la conversation.</Typography>
                         </Box>
-                    </Box>
+                    )}
                 </Box>    
             </Paper>
         </React.Fragment>

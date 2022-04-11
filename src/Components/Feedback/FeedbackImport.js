@@ -135,7 +135,7 @@ function SendFeedback(props){
 
     useEffect(()=>{
         if(isSuccess){
-            if(radioValue !=null || radioValue !=undefined){
+            if( radioValue != null || radioValue != undefined ){
                 onUpdateConfirmationByReceiver({idReceiver: props.sender,mail_id: props.mailID,state: radioValue});
                 setRadioValue('')
             }
