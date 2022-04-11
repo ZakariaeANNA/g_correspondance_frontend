@@ -73,6 +73,7 @@
   "finished": "Fait",
   "achevement_state": "Poste de réalisation",
   "empty_message" : "Aucun message a été envoyé dans cette conversation.",
-  "add_feedback_succes" : "Feedback est ajouté avec succès" 
+  "add_feedback_succes" : "Feedback est ajouté avec succès" ,
+  "seen": "lue en"
 
 }
