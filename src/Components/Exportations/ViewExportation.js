@@ -1,7 +1,7 @@
 import React from 'react'
 import { t } from 'i18next';
 import {FileIcon,defaultStyles} from 'react-file-icon';
-import { Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import {DialogContent, IconButton, Tooltip , Paper , TextField, Container, ListItemButton} from "@mui/material";
 import {Visibility } from '@mui/icons-material'; 
 import moment from 'moment';
@@ -10,15 +10,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Grid from "@material-ui/core/Grid";
-import Collapse from "@material-ui/core/Collapse";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Collapse from '@mui/material/Collapse';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Avatar from "@material-ui/core/Avatar";
+import Avatar from '@mui/material/Avatar';
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
@@ -29,7 +28,9 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { Box } from '@mui/system';
-import i18next from 'i18next'
+import i18next from 'i18next';
+import { stringAvatar } from "../../Util/stringToAvatar";
+
 
 const style = {
     position: 'absolute',
@@ -104,20 +105,20 @@ function ViewUserDetails({params}){
                 <Visibility />
             </IconButton>
             <Modal
-            aria-labelledby="transition-modal-title"
-            aria-describedby="transition-modal-description"
-            open={open}
-            onClose={handleClose}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={open}
+                onClose={handleClose}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}
             >
                 <Fade in={open}>
                     <Box sx={style}>
                         <Box style={{display: 'flex',justifyContent: 'flex-start',flexDirection:'row',paddingLeft: '2em',paddingRight: '2em',marginBottom: 10}}>
-                            <Avatar alt={params.fullnamela} sx={{ bgcolor : "white" }} src="/static/images/avatar/1.jpg" />
+                            <Avatar {...stringAvatar(params.fullnamela)} />
                             <Typography variant='h5' style={{marginTop : 3,marginLeft: 15,marginRight: 15}}>{params.fullnamela}</Typography>
                         </Box>
                         <TableContainer component={Paper} sx={{px:2}}>
@@ -217,71 +218,58 @@ export default function ViewExportation({params}){
                 aria-labelledby="customized-dialog-title"
                 open={open}
                 fullWidth
-                maxWidth="md"
+                maxWidth="lg"
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
                     {t("see_exportation")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("correspondance_number")} variant="filled" rows={4} value={params.number} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("sender")} variant="filled" value={i18next.language === "fr" ? ( params.sender.fullnamela ) : ( params.sender.fullnamear )} inputProps={{ readOnly: true }}/>                                      
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("sending_date")} variant="filled" value={date} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("achevement_date")} variant="filled" value={achevelentDate} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/4 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" fullWidth label={t("correspondance_number")} variant="filled" rows={4} value={params.number} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/4 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" fullWidth label={t("sender")} variant="filled" value={i18next.language === "fr" ? ( params.sender.fullnamela ) : ( params.sender.fullnamear )} inputProps={{ readOnly: true }}/>                                      
+                    <TextField sx={{ width : 1/4 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" fullWidth label={t("sending_date")} variant="filled" value={date} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/4 , marginY : 1 }} id="outlined-basic" fullWidth label={t("achevement_date")} variant="filled" value={achevelentDate} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("subject_message")} variant="filled" value={params.title} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("message")} variant="filled" rows={4} value={params.message} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("concerned")} variant="filled" rows={4} value={params.concerned} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("notes")} variant="filled" rows={4} value={params.notes} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/2 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" multiline rows={2} label={t("concerned")} variant="filled" value={params.concerned} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/2 , marginY : 1 }} id="outlined-basic" multiline rows={2} label={t("notes")} variant="filled" value={params.notes} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("references")} variant="filled" rows={4} value={params.references} inputProps={{ readOnly: true }}/>
                     {/*show users content*/}
-                    <Grid item variant='filled' id='outlined-basic'>
-                        <div>
-                            <List
-                                component="nav"
-                                aria-labelledby="nested-list-subheader"
-                            >
-                                <ListItemButton onClick={handleClick} className={classes.color}>
-                                    <ListItemText primary={t("receivers")} />
-                                    {display ? <ExpandLessIcon /> : <ExpandMoreIcon />} 
-                                </ListItemButton>                                   
-                                <Collapse in={display} timeout="auto" unmountOnExit >
-                                    <List component="div" disablePadding>
-                                        {
-                                            params.receiver.map(email=>(
-                                                email.receiver.map(receive=>(
-                                                    <ListItem key={receive.doti}> 
-                                                        <ListItem>
-                                                            <ListItemText
-                                                                primary={<Typography>{i18next.language === "fr" ? (receive.fullnamela) : (receive.fullnamear)}</Typography>}
-                                                            />
-                                                        </ListItem>
-                                                        <ListItemSecondaryAction>
-                                                            <ViewUserDetails params={receive}/>
-                                                        </ListItemSecondaryAction>
-                                                    </ListItem>
-                                                )
-                                            )))
-                                        }
-                                    </List>
-                                </Collapse>
+                    <List sx={{marginY : 1}} disablePadding>
+                        <ListItemButton onClick={handleClick} className={classes.color}>
+                            <ListItemText primary={t("receivers")} />
+                            {display ? <ExpandLessIcon /> : <ExpandMoreIcon />} 
+                        </ListItemButton>                                   
+                        <Collapse in={display} timeout="auto" unmountOnExit >
+                            <List disablePadding>
+                                {
+                                    params.receiver.map(email=>(
+                                        email.receiver.map(receive=>(
+                                            <ListItem key={receive.doti}> 
+                                                <ListItem>
+                                                    <ListItemText
+                                                        primary={<Typography>{i18next.language === "fr" ? (receive.fullnamela) : (receive.fullnamear)}</Typography>}
+                                                    />
+                                                </ListItem>
+                                                <ListItemSecondaryAction>
+                                                    <ViewUserDetails params={receive}/>
+                                                </ListItemSecondaryAction>
+                                            </ListItem>
+                                        )
+                                    )))
+                                }
                             </List>
-                        </div>
-                    </Grid>
-                    {/*end user content section*/}
-                    <a href={'http://localhost:8000/api/'+params.attachement+'/'+params.filename} style={{textDecoration: 'none'}}>
-                        <Paper
-                            sx={{
-                                p: 2,
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                flexDirection: 'column'
-                            }}
-                        >
-                            <div style={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center'}}>
-                                <FileIcon extension={params.type} {...defaultStyles[params.type]}/>
-                            </div>
+                        </Collapse>
+                    </List>
+                    <Button variant="text" href={'http://localhost:8000/api/'+params.attachement+'/'+params.filename} sx={{ p: 2, display: 'flex', flexDirection : "row" , justifyContent: 'flex-start' , marginY : 2 , backgroundColor : "#E8E8E8",textTransform: 'none'}} color="inherit" >
+                        <Box sx={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center',marginInlineEnd:2 }}>
+                            <FileIcon extension={params.type} {...defaultStyles[params.type]}/>
+                        </Box>
+                        <Box>
+                            <Typography sx={{textTransform: 'uppercase'}}>{params.type}</Typography>
                             <Typography style={{marginTop: 10}}>{params.filename}</Typography>
-                        </Paper>
-                    </a>
+                        </Box>
+                    </Button>
+                    {/*end user content section*/}
                 </DialogContent>
             </BootstrapDialog>
         </div>

@@ -10,8 +10,6 @@ const DropFileInput = props => {
 
     const wrapperRef = useRef(null);
 
-    const [fileList, setFileList] = useState([]);
-
     const onDragEnter = () => wrapperRef.current.classList.add('dragover');
 
     const onDragLeave = () => wrapperRef.current.classList.remove('dragover');
@@ -20,32 +18,25 @@ const DropFileInput = props => {
 
     const onFileDrop = (e) => {
         if (props.multiple === true) {
-            var updatedList = [...fileList];
+            var updatedList = [...props.files];
             for( var i = 0 ; i < e.target.files.length ; i++ ){
-                console.log(i);
                 updatedList = [...updatedList, e.target.files[i]];
             }
-            console.log(updatedList);
-            setFileList(updatedList);
-            props.onFileChange(updatedList);
+            props.setFiles(updatedList);
         }else{
             const newFile = e.target.files[0];
-            setFileList([newFile]);
-            props.onFileChange(newFile);
+            props.setFiles([newFile]);
         }
     }
 
     const fileRemove = (file) => {
         if(props.multiple === true){
-            const updatedList = [...fileList];
-            updatedList.splice(fileList.indexOf(file), 1);
-            setFileList(updatedList);
-            props.onFileChange(updatedList);
+            const updatedList = [...props.files];
+            updatedList.splice(props.files.indexOf(file), 1);
+            props.setFiles(updatedList);
         }else{
-            setFileList([]);
-            props.onFileChange(null);
-        }   
-        
+            props.setFiles([]);
+        }           
     }
 
     const { t } = useTranslation();
@@ -66,10 +57,10 @@ const DropFileInput = props => {
                 <input type="file" value="" onChange={onFileDrop} multiple={props.multiple} />
             </div>
             {
-                fileList.length > 0 ? (
+                props.files.length > 0 ? (
                     <div className="drop-file-preview">
                         {
-                            fileList.map((item, index) => (
+                            props.files.map((item, index) => (
                                 <div key={index} className="drop-file-preview__item">
                                     <img src={ImageConfig[item.type.split('/')[1]] || ImageConfig['default']} alt="" />
                                     <div className="drop-file-preview__item__info">

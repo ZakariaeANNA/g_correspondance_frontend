@@ -38,6 +38,7 @@ import fontTheme from "./Util/fontTheme";
 import { useLogoutMutation } from "./store/api/authApi";
 import { stringAvatar } from "./Util/stringToAvatar";
 import Adduser from './Components/Users/AddUser';
+import AddExportation from './Components/Exportations/AddExportation';
 
 
 const cacheLtr = createCache({
@@ -329,6 +330,9 @@ export default function Home() {
                 </Route>
                 <Route path="/app/adduser">
                     <Adduser />
+                </Route>
+                <Route path="/app/addexportation">
+                    <AddExportation />
                 </Route>
               </Switch>
               {/* Content */}

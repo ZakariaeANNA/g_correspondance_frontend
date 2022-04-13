@@ -11,7 +11,8 @@ import { Box } from '@mui/system';
 import {Delete} from "@mui/icons-material";
 import { Tooltip } from '@material-ui/core';
 import Paper from '@mui/material/Paper';
-import { Chat , Style } from "@mui/icons-material";
+import { Chat , Style  } from "@mui/icons-material";
+import { Send} from "@mui/icons-material";
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {useGetExportationBycodeGRESAQuery } from "../../store/api/exportationApi";
@@ -190,7 +191,11 @@ export default function Exportation(){
                          loading={loading}
                         />
                     </div>
-                    <AddExportation refresh={handlePageChange} />
+                    <Link to={'/app/addexportation'} style={{textDecoration: 'none',color: 'black', display : "flex" , justifyContent : "flex-end"}}>
+                        <Button variant="outlined" endIcon={<Send />} sx={{ marginTop : 1 }} >
+                            {t("sendExportation")}
+                        </Button>
+                    </Link>
                 </Paper>
             )}
         </React.Fragment>

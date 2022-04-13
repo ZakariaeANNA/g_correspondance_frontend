@@ -70,20 +70,20 @@ export default function ViewImportation({params}){
                 aria-labelledby="customized-dialog-title"
                 open={open}
                 fullWidth
-                maxWidth="md"
+                maxWidth="lg"
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
                     {t("see_exportation")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("correspondance_number")} variant="filled" rows={4} value={params.mail.number} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("sender")} variant="filled" value={i18next.language === "fr" ? (params.mail.sender.fullnamela) : (params.mail.sender.fullnamear)} inputProps={{ readOnly: true }}/>                                      
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("sending_date")} variant="filled" value={date} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("achevement_date")} variant="filled" value={achevelentDate} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/4 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" fullWidth label={t("correspondance_number")} variant="filled" rows={4} value={params.mail.number} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/4 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" fullWidth multiline label={t("sender")} variant="filled" value={i18next.language === "fr" ? (params.mail.sender.fullnamela) : (params.mail.sender.fullnamear)} inputProps={{ readOnly: true }}/>                                      
+                    <TextField sx={{ width : 1/4 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" fullWidth multiline label={t("sending_date")} variant="filled" value={date} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/4 , marginY : 1 }} id="outlined-basic" fullWidth label={t("achevement_date")} variant="filled" value={achevelentDate} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("subject_message")} variant="filled" value={params.mail.title} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("message")} variant="filled" rows={4} value={params.mail.message} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("concerned")} variant="filled" rows={4} value={params.mail.concerned} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("notes")} variant="filled" rows={4} value={params.mail.notes} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/2 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" multiline rows={2} label={t("concerned")} variant="filled" value={params.mail.concerned} inputProps={{ readOnly: true }}/>
+                    <TextField sx={{ width : 1/2 , marginY : 1 }} id="outlined-basic" multiline rows={2} label={t("notes")} variant="filled" value={params.mail.notes} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("references")}variant="filled" rows={4} value={params.mail.references} inputProps={{ readOnly: true }}/>
                     <a href={'http://localhost:8000/api/'+params.mail.attachement+'/'+params.mail.fileName} style={{textDecoration: 'none'}}>
                         <Paper

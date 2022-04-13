@@ -20,7 +20,7 @@ import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
-import { red } from '@mui/material/colors';
+import { stringToColor } from "../../Util/stringToAvatar";
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import { convertToRaw } from 'draft-js';
@@ -38,6 +38,8 @@ import DropFileInput from '../drop-file-input/DropFileInput';
 import "./Feedback.css";
 import 'moment/locale/ar-ma' 
 import 'moment/locale/fr' 
+import CircularProgress from '@mui/material/CircularProgress';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -129,6 +131,7 @@ function SendFeedback(props){
             index++;    
         });
         addFeedback(formData);
+        setValue(''); setFiles([]);
     }
 
     const { enqueueSnackbar } = useSnackbar();
@@ -139,10 +142,14 @@ function SendFeedback(props){
                 onUpdateConfirmationByReceiver({idReceiver: props.sender,mail_id: props.mailID,state: radioValue});
                 setRadioValue('')
             }
-            enqueueSnackbar( data.addFeedback, { variant: "success" });
+            enqueueSnackbar( t('add_feedback_succes') , { variant: "success" });
         }
         if(isError){
-            enqueueSnackbar(error.data.addFeedback, { variant: "error" });
+            if(error.data === "create_feedback/error_input"){
+                enqueueSnackbar(t("correspondence_informations_incorrects"), { variant: "error" });
+            }else if(error.data === "create_feedback/fields_required"){
+                enqueueSnackbar(t("credentials_empty"), { variant: "error" });
+            }
         }
     },[data,error]);
 
@@ -186,14 +193,24 @@ function SendFeedback(props){
                         <MUIRichTextEditor label="Start typing..." inlineStyle={{ marginY : 2 }} onChange={handleDataChange} />
                     </Box>
                     <DropFileInput
-                        onFileChange={(files) => onFileChange(files)}
+                        files={files}
+                        setFiles={setFiles}
                         multiple={true}
                     />
                 </DialogContent>
                 <DialogActions>
-                <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={onAddFeedback}>
-                    {t('send')}
-                </Button>
+                    { isLoading ? (
+                        <LoadingButton 
+                            loading 
+                            variant="outlined"
+                        >
+                            Submit
+                        </LoadingButton>
+                    ) : (
+                        <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={onAddFeedback}>
+                            {t("send")}
+                        </Button>
+                    )}
                 </DialogActions>
             </BootstrapDialog>
         </>
@@ -217,7 +234,6 @@ export default function FeedbackImport(props){
         if(isSuccess){
             console.log(data)
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
-                console.log('hhhhidid')
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});                    
             }
             setMessage(data);
@@ -267,41 +283,70 @@ export default function FeedbackImport(props){
                                 </Box> 
                             </Box>
                         </Box>
-                        <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
-                            { data && data.map( message => (
-                                <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6'}:{ textAlign:"left" , marginY : 1}} key={message.id} >
-                                    <CardHeader
-                                        avatar={<Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">R</Avatar>}
-                                        title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
-                                            : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
-                                            : receivers.mail.sender.doti === message.idSender && i18next.language === "fr" ? (receivers.mail.sender.fullnamela) 
-                                            : (receivers.mail.sender.fullnamear) }
-                                        subheader={moment(message.created_at).format('MMMM Do YYYY, hh:mm')}
-                                        action={
-                                           (message.idSender===props.auth.doti && message.status) ? 
-                                            (<Chip label={`${t("seen")} : ${moment(message.update_at).format('DD-MM-YYYY HH:mm')}`} sx={{ marginX : 1 }} />) : (null)
-                                        }
-                                    />
-                                    <CardContent>
-                                        <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
-                                    </CardContent>
-                                    <Divider />
-                                    <CardActions disableSpacing>
-                                    {
-                                        message.attachement.map(attach=>(
-                                            <Tooltip title={attach.filename} arrow key={attach.id}>
-                                                <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
-                                                    <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
-                                                        <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
-                                                    </Box>
-                                                </a>
-                                            </Tooltip>
-                                        ))
+                        {
+                            isLoading ? (
+                                <Box sx={{ display: 'flex' , p : 4 , position : "relative" , left : "50%" }}>
+                                    <CircularProgress />
+                                </Box>
+                            ):(
+                                <React.Fragment>
+                                    {   data?.length > 0 ? (
+                                            <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
+                                                { data && data.map( message => (
+                                                    <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6' , color :"white" , boxShadow : 3 }:{ textAlign:"left" , marginY : 1  , boxShadow : 3}} key={message.id} >
+                                                        <CardHeader
+                                                            avatar={ message.idSender === props.auth.doti ? (
+                                                                <Avatar alt={props.auth.fullnamela} sx={{ bgcolor : stringToColor(props.auth.fullnamela) }} src="/static/images/avatar/1.jpg" />
+                                                            ):(
+                                                                <Avatar alt={receivers.mail.sender.fullnamela} sx={{ bgcolor : stringToColor(receivers.mail.sender.fullnamela) }} src="/static/images/avatar/1.jpg" />
+                                                            )}
+                                                            title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
+                                                                : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
+                                                                : receivers.mail.sender.doti === message.idSender && i18next.language === "fr" ? (receivers.mail.sender.fullnamela) 
+                                                                : (receivers.mail.sender.fullnamear) }
+                                                            subheader={<Box sx={message.idSender===props.auth.doti ? { color : "white"} : {}}>{moment(message.created_at).format('MMMM Do YYYY, HH:mm')}</Box>}
+                                                            action={
+                                                            (message.idSender===props.auth.doti && message.status) ? 
+                                                                (<Chip sx={{ color : "white" , marginX : 1 }} label={`${t("seen")} : ${moment(message.update_at).format('DD-MM-YYYY HH:mm')}`} />) : (null)
+                                                            }
+                                                        />
+                                                        <CardContent>
+                                                            <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                        </CardContent>
+                                                        <Divider />
+                                                        <CardActions disableSpacing>
+                                                        {
+                                                            message.attachement.map(attach=>(
+                                                                <Tooltip title={attach.filename} arrow key={attach.id}>
+                                                                    <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
+                                                                        <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
+                                                                            <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
+                                                                        </Box>
+                                                                    </a>
+                                                                </Tooltip>
+                                                            ))
+                                                        }
+                                                        </CardActions>
+                                                    </Card>
+                                                ))}
+                                            </Box>
+                                        ):(
+                                            <Box
+                                                sx={{
+                                                    maxHeight : 400 , 
+                                                    width : "auto",
+                                                    overflow : "hidden",
+                                                    p:3
+                                                }}
+                                            >
+                                                <img src={require("../../assets/785_generated.jpg")} style={{ marginX : "auto"}} height="300px"/>
+                                                <Typography sx={{ fontWeight : "bold" , fontSize : "20px"}}>{t('empty_message')}</Typography>
+                                            </Box>
+                                        ) 
                                     }
-                                    </CardActions>
-                                </Card>
-                            ))}
-                        </Box>
+                                </React.Fragment>
+                            )
+                        }
                     </Box>
                 </Box>    
             </Paper>

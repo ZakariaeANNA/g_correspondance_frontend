@@ -44,6 +44,7 @@ import "./Feedback.css";
 import 'moment/locale/ar-ma' 
 import 'moment/locale/fr' 
 import CircularProgress from '@mui/material/CircularProgress';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -84,10 +85,13 @@ const defaultTheme = createTheme({
     overrides: {
         MUIRichTextEditor: {
             root: {
+                padding : 3
             },
             editor: {
+                padding : 3
             },
             container: { 
+                padding : 3
             },
         }
     }
@@ -133,7 +137,7 @@ function SendFeedback(props){
             index++;    
         });
         addFeedback(formData);
-        setValue('');
+        setValue(); setFiles([]);
     }
 
     const { enqueueSnackbar } = useSnackbar();
@@ -154,10 +158,6 @@ function SendFeedback(props){
             }
         }
     },[data,error]);
-
-    const onFileChange = (files) => {
-        setFiles(files);
-    }
 
     return(
         <>
@@ -195,14 +195,24 @@ function SendFeedback(props){
                         <MUIRichTextEditor label="Start typing..." inlineStyle={{ marginY : 2 }} onChange={handleDataChange} controls={["title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "numberList", "bulletList", "quote", "code", "clear"]} />
                     </Box>
                     <DropFileInput
-                        onFileChange={(files) => onFileChange(files)}
+                        files={files}
+                        setFiles={setFiles}
                         multiple={true}
                     />
                 </DialogContent>
                 <DialogActions>
-                <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={onAddFeedback}>
-                    {t("send")}
-                </Button>
+                    { isLoading ? (
+                        <LoadingButton 
+                            loading 
+                            variant="outlined"
+                        >
+                            Submit
+                        </LoadingButton>
+                    ) : (
+                        <Button variant="outlined" endIcon={<SendIcon />} autoFocus onClick={onAddFeedback}>
+                            {t("send")}
+                        </Button>
+                    )} 
                 </DialogActions>
             </BootstrapDialog>
         </>
@@ -223,6 +233,7 @@ export default function FeedbackExport(props){
     useEffect(()=>{
         if(isSuccess){
             setMessage(data);
+            console.log(data);
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
                 console.log("reader message")
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail})
@@ -326,10 +337,10 @@ export default function FeedbackExport(props){
                                                             : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
                                                             : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
                                                             : (receiverDisplay.fullnamear) }
-                                                        subheader={moment(message.created_at).format('MMMM Do YYYY, HH:mm')}
+                                                        subheader={<Box sx={message.idSender===props.auth.doti ? { color : "white"} : {}}>{moment(message.created_at).format('MMMM Do YYYY, HH:mm')}</Box>}
                                                         action={
                                                             (message.idSender===props.auth.doti && message.status) ?
-                                                            (<Chip label={`${t("seen")} : ${moment(message.update_at).format('DD-MM-YYYY HH:mm')}`} sx={{ marginX : 1 }} />): (null)
+                                                            (<Chip sx={{ color : "white" , marginX : 1 }} label={`${t("seen")} : ${moment(message.updated_at).format('DD-MM-YYYY HH:mm')}`} />): (null)
                                                         }
                                                     />
                                                     <CardContent>

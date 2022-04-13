@@ -1,59 +1,23 @@
 import React,{useEffect,useState} from 'react';
 import { useAddExportationsMutation } from "../../store/api/exportationApi";
-import { Button, DialogContent, IconButton , TextField } from "@mui/material";
+import { Button, DialogContent, IconButton , TextField , Paper , Typography } from "@mui/material";
 import { Send} from "@mui/icons-material";
-import SendIcon from '@mui/icons-material/Send';
 import { decodeToken } from "react-jwt";
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import DropFileInput from '../drop-file-input/DropFileInput';
-
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-    '& .MuiDialogContent-root': {
-        padding: theme.spacing(2),
-    },
-    '& .MuiDialogActions-root': {
-        padding: theme.spacing(1),
-    },
-  }));
-  const BootstrapDialogTitle = (props) => {
-    const { children, onClose, ...other } = props;
-    return (
-      <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-        {children}
-        {onClose ? (
-            <IconButton
-                aria-label="close"
-                onClick={onClose}
-                sx={{
-                position: 'absolute',
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-            }}
-            >
-            <CloseIcon />
-          </IconButton>
-        ) : null}
-      </DialogTitle>
-    );
-  };
-  BootstrapDialogTitle.propTypes = {
-    children: PropTypes.node,
-    onClose: PropTypes.func.isRequired,
-};
+import LoadingButton from '@mui/lab/LoadingButton';
 
 
-export default function AddExportation({refresh}){
+export default function AddExportation(){
     const [open, setOpen] = useState(false);
-    const [files,setFiles] = useState();
+    const [files,setFiles] = useState([]);
     const [tags, setTags] = React.useState([]);
     const [addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation();
     const { enqueueSnackbar } = useSnackbar();
@@ -71,7 +35,6 @@ export default function AddExportation({refresh}){
     useEffect(()=>{
         if(isSuccess){
             enqueueSnackbar( t('correspondence_success_send') ,  { variant: "success" });
-            refresh(0);
         }
         if(isError){
             if(error.data === "correspondence_add/user_not_found"){
@@ -96,31 +59,26 @@ export default function AddExportation({refresh}){
         const formData = new FormData(event.currentTarget);
         formData.append('receiver', JSON.stringify(tags));
         formData.append('sender',user.doti);
-        formData.append('file', files);
+        formData.append('file', files[0]);
         addExportations(formData);
+        setFiles([]); setTags([]); event.target.reset();
     }
     const onFileChange = (files) => {
         setFiles(files);
     }
     return (
-      <div>
-        <Box sx={{ justifyContent:"flex-end", display:"flex" ,paddingTop:2}} onClick={handleClickOpen}>
-            <Button variant="outlined" endIcon={<SendIcon />} >
-                {t("sendExportation")}
-            </Button>
-        </Box>
-        <BootstrapDialog
-          onClose={handleClose}
-          aria-labelledby="customized-dialog-title"
-          open={open}
-          fullWidth
-          maxWidth="md" 
-        >
-            <form onSubmit={onAddExportations} encType="multipart/form-data">
-                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    {t("sendExportation")}
-                </BootstrapDialogTitle>
-                <DialogContent dividers>
+        <React.Fragment>
+            <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
+                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>{t("sendExportation")}</Typography>
+            </Box>
+            <Paper
+                sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
+            >
+                <form onSubmit={onAddExportations} encType="multipart/form-data">
                     <div className="tags-input">
                         <ul id="tags">
                             {tags.map((tag, index) => (
@@ -141,26 +99,35 @@ export default function AddExportation({refresh}){
                             style={{ fontSize : "1rem" , paddingTop : 2 , paddingBottom : 2}}
                         />
                     </div>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("correspondance_number")} variant="outlined" name="number" required/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("subject_message")} variant="outlined" name="title" required/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("references")} variant="outlined" rows={4} name="references"/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("concerned")} variant="outlined" rows={4} name="concerned" required/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth  className='inputField' label={t("notes")} variant="outlined" rows={4} name="notes"/>
-                    <TextField id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label={t("message")} variant="outlined" rows={4} name="message" required/>
+                    <TextField sx={{ marginY : 1 , width : 3/12 , paddingRight : 1 }} id="outlined-basic" className='inputField' label={t("correspondance_number")} variant="outlined" name="number" required disabled={isLoading} />
+                    <TextField sx={{ marginY : 1 , width : 9/12 }} id="outlined-basic" className='inputField' label={t("subject_message")} variant="outlined" name="title" required disabled={isLoading} />
+                    <TextField sx={{ marginY : 1 , width : 6/12 , paddingRight : 1 }} id="outlined-basic" fullWidth multiline rows={2} className='inputField' label={t("references")} variant="outlined" name="references" disabled={isLoading} />
+                    <TextField sx={{ marginY : 1 , width : 6/12}} id="outlined-basic" fullWidth multiline rows={2} className='inputField' label={t("concerned")} variant="outlined" name="concerned" required disabled={isLoading} />
+                    <TextField sx={{ marginY : 1 , width : 8/12 , paddingRight : 1 }} id="outlined-basic" fullWidth className='inputField' label={t("notes")} variant="outlined" rows={4} name="notes" disabled={isLoading} />
+                    <TextField sx={{ marginY : 1 , width : 4/12}} id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
+                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline className='inputField' label={t("message")} variant="outlined" rows={4} name="message" required disabled={isLoading} />
                     <DropFileInput
-                        onFileChange={(files) => onFileChange(files)}
-                        mutiple={false}
+                        files={files}
+                        setFiles={setFiles}
+                        multiple={false}
                     />
-                </DialogContent>
-                <DialogActions>
-                    <Button variant='contained' type="submit" startIcon={<Send />} autoFocus >
-                        {t("send")}
-                    </Button>
-                </DialogActions>
-            </form> 
-        </BootstrapDialog>
-      </div>
+                    <Box sx={{ display : "flex" , justifyContent:"flex-end" , marginTop : 1}}>
+                        { isLoading ? (
+                            <LoadingButton 
+                                loading 
+                                variant="contained"
+                            >
+                                Submit
+                            </LoadingButton>
+                        ) : (
+                            <Button variant='contained' type="submit" startIcon={<Send />} autoFocus >
+                                {t("send")}
+                            </Button> 
+                        )} 
+                    </Box>
+                </form> 
+            </Paper>
+        </React.Fragment>
     );
   
 }
