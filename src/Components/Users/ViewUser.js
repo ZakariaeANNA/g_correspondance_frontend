@@ -78,64 +78,64 @@ export default function ViewUser({params}){
             {t("viewUser")}
           </BootstrapDialogTitle>
           <DialogContent dividers>
-          <TableContainer>
-                  <Table sx={{ minWidth: '60%' }} aria-label="simple table">
-                      <TableBody>
-                          <TableRow>
-                              <TableCell style={{ fontWeight : "bold" }}>{t("name")}</TableCell>
-                              <TableCell component="th" scope="row">
-                                  {i18next.language==='fr'?params.fullnamela : params.fullnamear}
-                              </TableCell>
-                          </TableRow>
-                          <TableRow>
-                              <TableCell style={{ fontWeight : "bold" }}>{t("cin")}</TableCell>
-                              <TableCell component="th" scope="row">
-                                  {params.cin}
-                              </TableCell>
-                          </TableRow>
-                          <TableRow>
-                              <TableCell style={{ fontWeight : "bold" }}>{t("doti")}</TableCell>
-                              <TableCell component="th" scope="row">
-                                  {params.doti}
-                              </TableCell>
-                          </TableRow>
-                          <TableRow>
-                              <TableCell style={{ fontWeight : "bold" }}>{t("email")}</TableCell>
-                              <TableCell component="th" scope="row">
-                                 {params.email}
-                              </TableCell>
-                          </TableRow>
-                          <TableRow>
-                              <TableCell style={{ fontWeight : "bold" }}>{t("phone")}</TableCell>
-                              <TableCell component="th" scope="row">
-                                 {params.phone}
-                              </TableCell>
-                          </TableRow>
-                          <TableRow>
-                              <TableCell style={{ fontWeight : "bold" }}>{t("establishementName")}</TableCell>
-                              <TableCell component="th" scope="row">
-                                  {i18next.language==='fr'?params.etablissement?.nomla:params.etablissement?.nomar}
-                                  {i18next.language==='fr'?params.departement?.nomLa : params.departement?.nomAr}
-                              </TableCell>
-                          </TableRow>
-                          <TableRow>
-                              <TableCell style={{ fontWeight : "bold" }}>{t("establishementType")}</TableCell>
-                              <TableCell component="th" scope="row">
-                                  {params.etablissement?.type}
-                                  {params.departement?.type}                              
-                              </TableCell>
-                          </TableRow>
-                          <TableRow>
-                              <TableCell style={{ fontWeight : "bold" }}>{t("delegation")}</TableCell>
-                              <TableCell component="th" scope="row">
-                                  {params.departement?.delegation}
-                              </TableCell>
-                          </TableRow>
-                      </TableBody>
-                  </Table>
-              </TableContainer>
+            <TableContainer>
+              <Table sx={{ minWidth: '60%' }} aria-label="simple table">
+                  <TableBody>
+                      <TableRow>
+                          <TableCell style={{ fontWeight : "bold" }}>{t("name")}</TableCell>
+                          <TableCell component="th" scope="row">
+                              {i18next.language==='fr'?params.fullnamela : params.fullnamear}
+                          </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell style={{ fontWeight : "bold" }}>{t("cin")}</TableCell>
+                          <TableCell component="th" scope="row">
+                              {params.cin}
+                          </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell style={{ fontWeight : "bold" }}>{t("doti")}</TableCell>
+                          <TableCell component="th" scope="row">
+                              {params.doti}
+                          </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell style={{ fontWeight : "bold" }}>{t("email")}</TableCell>
+                          <TableCell component="th" scope="row">
+                            {params.email}
+                          </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell style={{ fontWeight : "bold" }}>{t("phone")}</TableCell>
+                          <TableCell component="th" scope="row">
+                            {params.phone}
+                          </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell style={{ fontWeight : "bold" }}>{t("establishementName")}</TableCell>
+                          <TableCell component="th" scope="row">
+                              {i18next.language==='fr'?params.etablissement?.nomla:params.etablissement?.nomar}
+                              {i18next.language==='fr'?params.departement?.nomLa : params.departement?.nomAr}
+                          </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell style={{ fontWeight : "bold" }}>{t("establishementType")}</TableCell>
+                          <TableCell component="th" scope="row">
+                              {params.etablissement?.type}
+                              {params.departement?.type}                              
+                          </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell style={{ fontWeight : "bold" }}>{t("delegation")}</TableCell>
+                          <TableCell component="th" scope="row">
+                              {params.departement?.delegation}
+                          </TableCell>
+                      </TableRow>
+                  </TableBody>
+              </Table>
+            </TableContainer>
           </DialogContent>
-          </BootstrapDialog>
+        </BootstrapDialog>
       </div>
     )
   }

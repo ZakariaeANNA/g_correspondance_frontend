@@ -85,21 +85,15 @@ export default function ViewImportation({params}){
                     <TextField sx={{ width : 1/2 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" multiline rows={2} label={t("concerned")} variant="filled" value={params.mail.concerned} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ width : 1/2 , marginY : 1 }} id="outlined-basic" multiline rows={2} label={t("notes")} variant="filled" value={params.mail.notes} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("references")}variant="filled" rows={4} value={params.mail.references} inputProps={{ readOnly: true }}/>
-                    <a href={'http://localhost:8000/api/'+params.mail.attachement+'/'+params.mail.fileName} style={{textDecoration: 'none'}}>
-                        <Paper
-                            sx={{
-                                p: 2,
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                flexDirection: 'column'
-                            }}
-                        >
-                            <div style={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center'}}>
-                                <FileIcon extension={params.mail.type} {...defaultStyles[params.mail.type]}/>
-                            </div>
-                            <Typography style={{marginTop: 10}}>{params.mail.filename}</Typography>
-                        </Paper>
-                    </a>
+                    <Button variant="text" href={'http://localhost:8000/api/'+params.mail.attachement+'/'+params.mail.fileName} sx={{ p: 2, display: 'flex', flexDirection : "row" , justifyContent: 'flex-start' , marginY : 2 , backgroundColor : "#E8E8E8",textTransform: 'none'}} color="inherit" >
+                        <Box sx={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center',marginInlineEnd:2 }}>
+                            <FileIcon extension={params.type} {...defaultStyles[params.type]}/>
+                        </Box>
+                        <Box>
+                            <Typography sx={{textTransform: 'uppercase'}}>{params.type}</Typography>
+                            <Typography style={{marginTop: 10}}>{params.filename}</Typography>
+                        </Box>
+                    </Button>
                 </DialogContent>
             </BootstrapDialog>
         </div>
