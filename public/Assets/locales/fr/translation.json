@@ -75,6 +75,19 @@
   "empty_message" : "Aucun message a été envoyé dans cette conversation.",
   "add_feedback_succes" : "Feedback est ajouté avec succès",
   "add_feedback" : "Ajouter un feedback",
-  "seen": "lue en"
-
+  "seen": "lue en",
+  "welcome": "Bonjour",
+  "old_password": "mot de passe",
+  "new_password": "nouveau mot de passe",
+  "retype_password": "Confirmez le nouveau mot de passe",
+  "password_condition": "Un mot de passe fort est nécessaire. Les mots de passe forts se composent de 8 à 256 caractères et doivent combiner au moins trois des éléments suivants : lettres majuscules, lettres minuscules, chiffres et symboles.",
+  "change_password": "changer le mot de passe",
+  "password_length_error" : "Le mot de passe doit contenir 8 caractères ou plus",
+  "password_match_error": "Les mots de passe ne correspondent pas",
+  "password_incorrect": "le mot de passe saisie est incorrect",
+  "password_changed": "Le mot de passe a été changé avec succès",
+  "confirm_reset_message": "Est vous sûr de vouloir réinitialiser le mot de pass de ",
+  "confirm": "Confirmer",
+  "edit_user": "Modifier les informations utilisateur",
+  "reset_password_tip": "Réinitialiser le mot de pass"
 }

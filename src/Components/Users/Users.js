@@ -1,6 +1,6 @@
 import React,{useEffect} from 'react';
 import { DataGrid } from "@mui/x-data-grid";
-import {Delete} from "@mui/icons-material";
+import {LockReset} from "@mui/icons-material";
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
@@ -14,8 +14,9 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { TextField } from "@mui/material";
 import './Users.css';
-import {useGetAllUsersQuery } from "../../store/api/userApi";
+import {useGetAllUsersQuery, useResetPasswordMutation } from "../../store/api/userApi";
 import { Typography } from '@mui/material';
+import { useSnackbar } from 'notistack';
 import { t } from 'i18next';
 import { AddCircle } from "@mui/icons-material";
 import i18next from 'i18next';
@@ -24,6 +25,7 @@ import { Box } from '@mui/system';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import EditUser from './EditUser';
 
 
 
@@ -62,8 +64,9 @@ BootstrapDialogTitle.propTypes = {
   children: PropTypes.node,
   onClose: PropTypes.func.isRequired,
 };
-function DeleteUser({params}){
-  
+function ResetUserPassword({params}){
+
+  const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
@@ -71,12 +74,22 @@ function DeleteUser({params}){
   const handleClose = () => {
       setOpen(false);
   };
-
+  const [resetPassword, {data,isLoading,error,isError,isSuccess}] = useResetPasswordMutation()
+  const handleResetClick = () =>{
+    resetPassword({doti: params.doti,cin: params.cin})
+    setOpen(false);
+  }
+  useEffect(()=>{
+    if(isError)
+      enqueueSnackbar("une erreur survenue l'ors de la reinitialisation de mot de passe",  { variant: "error" });
+    if(isSuccess)
+      enqueueSnackbar("le mot de pass a ete reinitialiser avec succe",  { variant: "success" });
+  },[data,error])
   return(
       <div>
-        <Tooltip title={t("deleteUser")}>
+        <Tooltip title={t("reset_password_tip")}>
           <IconButton aria-label="delete" size="large" onClick={handleClickOpen}> 
-                <Delete sx={{ color: 'red' }} color="red" />
+                <LockReset color="red" />
           </IconButton>
         </Tooltip>
         <BootstrapDialog
@@ -87,16 +100,16 @@ function DeleteUser({params}){
           maxWidth="md" 
         >
           <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-            Suprimer Un Utilsateur
+            {t("reset_password_tip")}
           </BootstrapDialogTitle>
           <DialogContent dividers>
             <Typography>
-              Êtes-vous sûr de vouloir supprimer l'utilsateur {params.codeGRESA}
+               {t("confirm_reset_message")} <strong>{i18next.language==="fr" ? params.fullnamela : params.fullnamear}</strong>
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button variant="contained" color='error' startIcon={<Delete />} autoFocus onClick={handleClose}>
-              Confirmer
+            <Button variant="contained" startIcon={<LockReset />} autoFocus onClick={handleResetClick}>
+              {t("confirm")}
             </Button>
           </DialogActions>
         </BootstrapDialog>
@@ -128,7 +141,8 @@ export default function Users(){
     {field: "actions",headerName: t("actions"), flex: 1 ,headerAlign : 'center',align: 'center',renderCell:(params)=>(
       <div style={{display:'flex',flexDirection: 'row'}}>
         <ViewUser params={params.row}/>
-        <DeleteUser params={params.row}/>
+        <EditUser props={params.row}/>
+        <ResetUserPassword params={params.row}/>
       </div>
     )},
   ]
@@ -198,11 +212,11 @@ export default function Users(){
             </Box>
         )}
         <div className='addUserSection'>
-        <Link to="/app/adduser" style={{textDecoration: 'none'}}>
-          <Button variant="outlined" startIcon={<AddCircle />}>
-            {t("addUser")}
-          </Button>
-        </Link>
+          <Link to="/app/adduser" style={{textDecoration: 'none'}}>
+            <Button variant="outlined" startIcon={<AddCircle />}>
+              {t("addUser")}
+            </Button>
+          </Link>
         </div>
       </Paper>
     </React.Fragment>

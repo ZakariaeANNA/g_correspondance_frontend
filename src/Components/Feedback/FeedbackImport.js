@@ -217,7 +217,6 @@ export default function FeedbackImport(props){
         if(isSuccess){
             console.log(data)
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
-                console.log('hhhhidid')
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});                    
             }
             setMessage(data);

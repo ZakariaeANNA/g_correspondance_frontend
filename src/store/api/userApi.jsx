@@ -25,11 +25,39 @@ endpoints: (builder) => ({
     getAllUsers: builder.query({
       query: () => "",
     }),
+    changePassword: builder.mutation({
+      query: (data)=>{
+        return{
+          url: `/changepassword/${data.doti}/${data.password}/${data.currentPassword}`,
+          method: "put"
+        }
+      }
+    }),
+    updateUser: builder.mutation({
+      query: ({body,id})=>{
+        return{
+          url: `/${id}`,
+          method: "put",
+          body,
+        }
+      }
+    }),
+    resetPassword: builder.mutation({
+      query: (data)=>{
+        return {
+          url: `/resetpassword/${data.doti}/${data.cin}`,
+          method: "put"
+        }
+      }
+    })
   }),
 });
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
   useAddUserMutation,
-  useGetAllUsersQuery
+  useGetAllUsersQuery,
+  useChangePasswordMutation,
+  useUpdateUserMutation,
+  useResetPasswordMutation
 } = userApi;

@@ -38,6 +38,8 @@ import fontTheme from "./Util/fontTheme";
 import { useLogoutMutation } from "./store/api/authApi";
 import { stringAvatar } from "./Util/stringToAvatar";
 import Adduser from './Components/Users/AddUser';
+import ChangePassword from './Components/Users/ChangePassword';
+import { Link } from '@material-ui/core';
 
 
 const cacheLtr = createCache({
@@ -133,6 +135,9 @@ export default function Home() {
   const handleCloseUserMenu = (setting) => {
     if(setting === "Logout"){
       logout({token : `${localStorage.getItem("token")}` });
+    }
+    if(setting==="Account"){
+      history.push("/app/changepassword");
     }
     setAnchorElUser(null);
   };
@@ -268,7 +273,7 @@ export default function Home() {
                           <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
                             <Typography textAlign="center">{setting}</Typography>
                           </MenuItem>
-                      ))}
+                      ))}                      
                   </Menu>
               </Box>
             </Toolbar>
@@ -329,6 +334,9 @@ export default function Home() {
                 </Route>
                 <Route path="/app/adduser">
                     <Adduser />
+                </Route>
+                <Route path="/app/changepassword">
+                  <ChangePassword />
                 </Route>
               </Switch>
               {/* Content */}
