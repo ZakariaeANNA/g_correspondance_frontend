@@ -1,14 +1,9 @@
 import React,{useEffect,useState} from 'react';
 import { useAddExportationsMutation } from "../../store/api/exportationApi";
-import { Button, DialogContent, IconButton , TextField , Paper , Typography } from "@mui/material";
+import { Button, TextField , Paper , Typography } from "@mui/material";
 import { Send} from "@mui/icons-material";
 import { decodeToken } from "react-jwt";
 import { useSnackbar } from 'notistack';
-import PropTypes from 'prop-types';
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
-import { styled } from '@mui/material/styles';
-import CloseIcon from '@mui/icons-material/Close';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import DropFileInput from '../drop-file-input/DropFileInput';
@@ -16,18 +11,12 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 
 export default function AddExportation(){
-    const [open, setOpen] = useState(false);
     const [files,setFiles] = useState([]);
     const [tags, setTags] = React.useState([]);
     const [addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation();
     const { enqueueSnackbar } = useSnackbar();
     const { t } = useTranslation();
-    const handleClickOpen = () => {
-      setOpen(true);
-    };
-    const handleClose = () => {
-      setOpen(false);
-    };
+
     const removeTags = indexToRemove => {
 		setTags([...tags.filter((_, index) => index !== indexToRemove)]);
 	};

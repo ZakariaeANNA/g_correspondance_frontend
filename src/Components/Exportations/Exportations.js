@@ -11,7 +11,7 @@ import { Box } from '@mui/system';
 import {Delete} from "@mui/icons-material";
 import { Tooltip } from '@material-ui/core';
 import Paper from '@mui/material/Paper';
-import { Chat , Style  } from "@mui/icons-material";
+import { Style  } from "@mui/icons-material";
 import { Send} from "@mui/icons-material";
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -22,7 +22,6 @@ import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ViewExportation from './ViewExportation';
-import AddExportation from './AddExportation'
 import { t } from 'i18next';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -106,7 +105,7 @@ export default function Exportation(){
     const [ page , setPage ] = useState(1);
     const [ loading , setLoading ] = useState(false);
     const [rows,setRows] = React.useState([]);
-    const {refetch , data, isError, isLoading } = useGetExportationBycodeGRESAQuery({doti:doti,page:page});
+    const {refetch , data, isLoading } = useGetExportationBycodeGRESAQuery({doti:doti,page:page});
     const dispatch = useDispatch();
     const history = useHistory();
     const { t } = useTranslation();

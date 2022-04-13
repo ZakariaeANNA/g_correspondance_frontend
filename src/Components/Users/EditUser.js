@@ -72,7 +72,7 @@ const EditUser = (props) =>{
     const handleUserDepartementChange  = (event)  =>{
       setUserDepartement(event.target.value)
     }
-    const [updateUser,{data,isLoading,error,isError,isSuccess}] = useUpdateUserMutation()
+    const [updateUser,{data,error,isError,isSuccess}] = useUpdateUserMutation()
     
     const onUpdateUser = (event)=>{
         event.preventDefault();

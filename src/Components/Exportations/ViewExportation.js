@@ -2,7 +2,7 @@ import React from 'react'
 import { t } from 'i18next';
 import {FileIcon,defaultStyles} from 'react-file-icon';
 import { Button, Typography } from '@mui/material';
-import {DialogContent, IconButton, Tooltip , Paper , TextField, Container, ListItemButton} from "@mui/material";
+import {DialogContent, IconButton, Tooltip , Paper , TextField, ListItemButton} from "@mui/material";
 import {Visibility } from '@mui/icons-material'; 
 import moment from 'moment';
 import PropTypes from 'prop-types';

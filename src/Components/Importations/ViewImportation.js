@@ -2,7 +2,7 @@ import React from 'react'
 import { t } from 'i18next';
 import {FileIcon,defaultStyles} from 'react-file-icon';
 import { Typography } from '@mui/material';
-import {DialogContent, IconButton, Tooltip , Paper , TextField} from "@mui/material";
+import {DialogContent, IconButton, Tooltip , Paper , TextField , Button , Box} from "@mui/material";
 import {Visibility } from '@mui/icons-material'; 
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -87,11 +87,11 @@ export default function ViewImportation({params}){
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("references")}variant="filled" rows={4} value={params.mail.references} inputProps={{ readOnly: true }}/>
                     <Button variant="text" href={'http://localhost:8000/api/'+params.mail.attachement+'/'+params.mail.fileName} sx={{ p: 2, display: 'flex', flexDirection : "row" , justifyContent: 'flex-start' , marginY : 2 , backgroundColor : "#E8E8E8",textTransform: 'none'}} color="inherit" >
                         <Box sx={{width:'4em',height: '4em',display:'flex',justifyContent: 'flex-start',alignItems: 'center',marginInlineEnd:2 }}>
-                            <FileIcon extension={params.type} {...defaultStyles[params.type]}/>
+                            <FileIcon extension={params.mail.type} {...defaultStyles[params.mail.type]}/>
                         </Box>
                         <Box>
-                            <Typography sx={{textTransform: 'uppercase'}}>{params.type}</Typography>
-                            <Typography style={{marginTop: 10}}>{params.filename}</Typography>
+                            <Typography sx={{textTransform: 'uppercase'}}>{params.mail.type}</Typography>
+                            <Typography style={{marginTop: 10}}>{params.mail.filename}</Typography>
                         </Box>
                     </Button>
                 </DialogContent>

@@ -19,7 +19,6 @@ import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
-import { red } from '@mui/material/colors';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
@@ -114,13 +113,12 @@ function SendFeedback(props){
     const [ approval , setApproval ] = useState();
     
     const handleDataChange = (event)=>{
-        const plainText = event.getCurrentContent().getPlainText() // for plain text
         const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
         rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
     }
     
     const [addFeedback, { data , isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
-    const [confirmMailBySender , {}] = useConfirmMailBySenderMutation();
+    const [confirmMailBySender] = useConfirmMailBySenderMutation();
 
     const [files,setFiles] = useState([]);
 
@@ -222,17 +220,15 @@ function SendFeedback(props){
   
 export default function FeedbackExport(props){
     const receivers = JSON.parse(localStorage.getItem("receivers"));
-    const [ message , setMessage ] = useState([]);
     const [ receiverDisplay , setReceiverDisplay ] = useState();
     const [ selected , setSelected ] = useState();
     const [getFeedbackBymailAndBysenderAndByreceiver,
             {data , isLoading , 
-              isError , isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
+              isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
     moment.locale(i18next.language === "ar" ? ("ar-ma"):("fr"));
     const [onUpdateStatus,{}]= useUpdateFeedbackStatusMutation();
     useEffect(()=>{
         if(isSuccess){
-            setMessage(data);
             console.log(data);
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
                 console.log("reader message")
@@ -374,7 +370,7 @@ export default function FeedbackExport(props){
                                                 p:3
                                             }}
                                         >
-                                            <img src={require("../../assets/785_generated.jpg")} style={{ marginX : "auto"}} height="300px"/>
+                                            <img src={require("../../assets/785_generated.jpg")} style={{ marginX : "auto"}} height="300px" alt=""/>
                                             <Typography sx={{ fontWeight : "bold" , fontSize : "20px"}}>{t('empty_message')}</Typography>
                                         </Box>
                                     )}
@@ -389,7 +385,7 @@ export default function FeedbackExport(props){
                                 overflow : "hidden"
                             }}
                         >
-                            <img src={require("../../StudyingConceptIllustration.jpg")} style={{ marginX : "auto"}} height="80%"/>
+                            <img src={require("../../StudyingConceptIllustration.jpg")} style={{ marginX : "auto"}} height="80%" alt="" />
                             <Typography sx={{ fontWeight : "bold" , fontSize : "20px"}}>Cliquez sur l'utilisateur pour voir la conversation.</Typography>
                         </Box>
                     )}
