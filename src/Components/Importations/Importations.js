@@ -10,16 +10,16 @@ import { Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box } from '@mui/system';
 import {Delete} from "@mui/icons-material";
-import { useGetImportationByCodeDotiQuery } from "../../store/api/importationApi";
+import { useDeleteImportationMutation, useGetImportationByCodeDotiQuery } from "../../store/api/importationApi";
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ViewImportation from './ViewImportation';
 import { t } from 'i18next';
 import i18next from 'i18next';
-import { Chat , Style } from "@mui/icons-material";
+import {Style } from "@mui/icons-material";
+import { useSnackbar } from 'notistack';
 
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -56,8 +56,11 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     children: PropTypes.node,
     onClose: PropTypes.func.isRequired,
 };
-function DeleteImportation(){
+function DeleteImportation(props){
   
+    console.log(props.params)
+    const { enqueueSnackbar } = useSnackbar();
+    const [deleteImportation,{data,error,isLoading,isError,isSuccess}] = useDeleteImportationMutation()
     const [open, setOpen] = React.useState(false);
     const handleClickOpen = () => {
       setOpen(true);
@@ -65,6 +68,19 @@ function DeleteImportation(){
     const handleClose = () => {
         setOpen(false);
     };
+    const handleConfirmDeleteButton = () => {
+        deleteImportation(props.params);
+        setOpen(false)
+    }
+    useEffect(()=>{
+        if(isError){
+            enqueueSnackbar(t("correspondance_delete_error"),  { variant: "error" });
+        }
+        if(isSuccess){
+            enqueueSnackbar(t("correspondance_delete_success"),  { variant: "success" });
+            window.location.reload()
+        }
+    },[data,error])
     return(
         <div>
             <Tooltip title={t("delete_correspondance")}>
@@ -80,17 +96,17 @@ function DeleteImportation(){
                 maxWidth="md" 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    Suprimer Un Importation
+                    {t("delete_correspondance")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                <Typography>
-                    Êtes-vous sûr de vouloir supprimer l'element selectionné
-                </Typography>
+                    <Typography>
+                        {t("correspondance_confirm_message")}
+                    </Typography>
                 </DialogContent>
                 <DialogActions>
-                <Button variant="contained" color='error' startIcon={<Delete />} autoFocus onClick={handleClose}>
-                    Confirmer
-                </Button>
+                    <Button variant="outlined" color='error' startIcon={<Delete />} autoFocus onClick={handleConfirmDeleteButton}>
+                        {t("confirm")}
+                    </Button>
                 </DialogActions>
             </BootstrapDialog>
         </div>
@@ -111,8 +127,8 @@ export default function Importations(){
         if(data){
             setPage(data.meta.current_page);
             setLoading(false);
-            setRows(data.data);
-            refetch();
+            console.log(data.data)
+            setRows(data.data.filter(row=>row.mail!==null && row.mail?.sender!==null));
         }
     },[data]);
     const handlePageChange = (newPage) => {
@@ -133,14 +149,14 @@ export default function Importations(){
             );
         }},
         {field: "sender",headerName: t("sender"), flex: 1 ,headerAlign : 'center' ,align : "center",renderCell : (params)=>(
-            <Box>{i18next.language=== "fr" ? (params.row.mail.sender.fullnamela) : (params.row.mail.sender.fullnamear)}</Box>
+            <Box>{i18next.language=== "fr" ? (params.row.mail?.sender?.fullnamela) : (params.row.mail?.sender?.fullnamear)}</Box>
         )},
         {field: "title",headerName: t("subject_message"), flex: 1 ,headerAlign : 'center',align : "center",renderCell : (params)=>(
-            <Box>{params.row.mail.title}</Box>
+            <Box>{params.row?.mail?.title}</Box>
         )},
         {field: "departement",headerName: t("departement"), flex: 1 ,headerAlign : 'center',align : "center",renderCell: (params)=>{
             return(
-            <Box>{i18next.language==="fr" ? (params.row.mail.sender.departement?.nomLa):(params.row.mail.sender.departement?.nomAr)}{i18next.language==="fr" ? (params.row.mail.sender.etablissement?.nomla) : (params.row.mail.sender.etablissement?.nomar)}</Box>
+                <Box>{i18next.language==="fr" ? (params.row.mail?.sender?.departement?.nomLa):(params.row.mail?.sender?.departement?.nomAr)}{i18next.language==="fr" ? (params.row?.mail?.sender?.etablissement?.nomLa) : (params.row?.mail?.sender?.etablissement?.nomAr)}</Box>
             )
         }},
         {field: "achevementdate",headerName: t("achevement_date"), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
@@ -152,7 +168,7 @@ export default function Importations(){
         {field: "Actions",headerName: t("actions"), flex: 1 ,headerAlign : 'center',align : "center",renderCell : (params)=>(
             <div style={{display: 'flex',flexDirection: 'row',alignContent:"center"}}>
                 <ViewImportation params={params.row}/>
-                <DeleteImportation params={params.row} />
+                <DeleteImportation params={params.row.id} />
             </div>
         )},  
         {field: "Aions",headerName: "", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(

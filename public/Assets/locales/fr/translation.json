@@ -89,5 +89,20 @@
   "confirm_reset_message": "Est vous sûr de vouloir réinitialiser le mot de pass de ",
   "confirm": "Confirmer",
   "edit_user": "Modifier les informations utilisateur",
-  "reset_password_tip": "Réinitialiser le mot de pass"
+  "reset_password_tip": "Réinitialiser le mot de pass",
+  "confirm_delete_message": "Est vous sûr de vouloir Supprimer ",
+  "personal_data" : "Mes données personnelles",
+  "Profile": "Profile",
+  "Account": "Changer mot de passe",
+  "Dashboard": "Page d'Acceuil",
+  "Logout": "Déconnexion",
+  "update_message_success": "les informations utilisateur ont été modifié avec succé",
+  "update_empty_error": "Tous les champs sont obligatoires",
+  "update_message_error": "Une erreur survenue lors de la modification des informations",
+  "correspodance_delete_success": "La correspondance a été supprimer avec succé",
+  "correspodance_delete_error": "Une erreur survenue lors du suppression de la correspondance !",
+  "correspondance_notFound_error": "La correspondance n'existe pas ",
+  "correspondance_confirm_message": " Êtes-vous sûr de vouloir supprimer l'element selectionné ?"
+
+
 }

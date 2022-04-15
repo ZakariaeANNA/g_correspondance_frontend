@@ -23,6 +23,14 @@ export const exportationApi = createApi({
         };
       },
     }),
+    deleteExportation: builder.mutation({
+      query: (id)=>{
+        return{
+          url:`/${id}`,
+          method: "delete"
+        }
+      }
+    }),
     getExportationBycodeGRESA: builder.query({
         query: ({doti , page : pageDefault = 1}) => `/sender/${doti}?page=${pageDefault}`,
     }),
@@ -34,5 +42,5 @@ export const exportationApi = createApi({
 export const {
   useAddExportationsMutation,
   useGetExportationBycodeGRESAQuery,
-  useGetExportationByidAndByreceiverMutation
+  useDeleteExportationMutation,
 } = exportationApi;

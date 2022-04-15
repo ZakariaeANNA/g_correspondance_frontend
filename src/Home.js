@@ -40,6 +40,7 @@ import { stringAvatar } from "./Util/stringToAvatar";
 import Adduser from './Components/Users/AddUser';
 import AddExportation from './Components/Exportations/AddExportation';
 import ChangePassword from './Components/Users/ChangePassword';
+import Profile from './Components/Users/Profile';
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -56,7 +57,7 @@ const cacheRtl = createCache({
 const ltrTheme = createTheme({ direction: "ltr" });
 const rtlTheme = createTheme({ direction: "rtl" });
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = ['Profile','Dashboard', 'Account', 'Logout'];
 const notificationsList = ['mohamed addhamed have sent this notification', 'account that one sent from that one', 'hello body how are you ?', 'there is too many notifications'];
 const drawerWidth = 240;
 
@@ -137,6 +138,12 @@ export default function Home() {
     }
     if(setting==="Account"){
       history.push("/app/changepassword");
+    }
+    if(setting === "Profile"){
+      history.push("/app/profile");
+    }
+    if(setting==="Dashboard"){
+      history.push("/app/")
     }
     setAnchorElUser(null);
   };
@@ -270,7 +277,7 @@ export default function Home() {
                       >
                       {settings.map((setting) => (
                           <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
-                            <Typography textAlign="center">{setting}</Typography>
+                            <Typography textAlign="center">{t(setting)}</Typography>
                           </MenuItem>
                       ))}                      
                   </Menu>
@@ -339,6 +346,9 @@ export default function Home() {
                 </Route>
                 <Route path="/app/changepassword">
                   <ChangePassword />
+                </Route>
+                <Route path="/app/profile">
+                  <Profile />
                 </Route>
               </Switch>
               {/* Content */}

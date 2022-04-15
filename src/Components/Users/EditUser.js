@@ -56,6 +56,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 };
 
 const EditUser = (props) =>{
+ 
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => {
         setOpen(true);
@@ -68,7 +69,7 @@ const EditUser = (props) =>{
     const handleRoleChange = (event) =>{
         setRoles(event.target.value)
     }
-    const [userDepartement,setUserDepartement] = useState(props.props?.departement ? "departement" : "etablissement")
+    const [userDepartement,setUserDepartement] = useState(props.props.departement!==null ? "departement" : "etablissement")
     const handleUserDepartementChange  = (event)  =>{
       setUserDepartement(event.target.value)
     }
@@ -90,11 +91,15 @@ const EditUser = (props) =>{
         updateUser({body: body ,id: props.props.id})
     }
     useEffect(()=>{
-        if(isError){
-            enqueueSnackbar(" ",  { variant: "error" });
+        if(isError){    
+            if(error.data==="update/fields_required"){
+                enqueueSnackbar(t("update_empty_error"),  { variant: "error" });
+            }else{
+                enqueueSnackbar(t("update_message_error"),  { variant: "error" });
+            }
         }
         if(isSuccess){
-            enqueueSnackbar(" ",  { variant: "success" });
+            enqueueSnackbar(t("update_message_success"),  { variant: "success" });
         }
     },[data,error])
     return(
@@ -151,7 +156,7 @@ const EditUser = (props) =>{
                                 </Select>
                             </FormControl>
                             <TextField id="outlined-basic" defaultValue={props.props.doti} name='doti' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em'} : {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'}} className='inputField' label={t("doti")} variant="outlined" required/>
-                            <TextField id="outlined-basic" defaultValue={userDepartement==="departement" ?  props.props?.departement?.id : props.props.etablissement.codegresa} name={userDepartement==="departement"? "idDepartement" : "codegresa"} className='inputField' style={i18next.language==='fr' ? {width: '49.5%',marginTop: '0.5em' ,marginLeft: "1%"}:{width: '49.5%',marginTop: '0.5em'}} label={userDepartement==="departement" ? t("idDepartement") : t("codeGresa")} variant="outlined" required/>
+                            <TextField id="outlined-basic" defaultValue={userDepartement==="departement" ?  props.props?.departement?.id : props.props?.etablissement?.codegresa} name={userDepartement==="departement"? "idDepartement" : "codegresa"} className='inputField' style={i18next.language==='fr' ? {width: '49.5%',marginTop: '0.5em' ,marginLeft: "1%"}:{width: '49.5%',marginTop: '0.5em'}} label={userDepartement==="departement" ? t("idDepartement") : t("codeGresa")} variant="outlined" required/>
                         </Box>
                         <Box sx={{display:'flex',justifyContent: 'flex-end',alignItems: 'center',paddingTop:2}}>
                             <Button variant='outlined' type='submit' startIcon={<Save />} autoFocus>
