@@ -6,26 +6,24 @@ import { t } from 'i18next';
 import { useSelector} from 'react-redux';
 import {useChangePasswordMutation } from "../../store/api/userApi";
 import { useSnackbar } from 'notistack';
-import i18next from 'i18next'
-import Divider from '@mui/material/Divider';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 
 const ChangePassword =  () =>{
     const { enqueueSnackbar } = useSnackbar();
     const auth = useSelector( state => state.auth.user );
-    const [oldPassword,setOldPassword] = React.useState("");
-    const [newPassword,setNewPassword] = React.useState("");
-    const [retypePassword,setRetypePassword] = React.useState("");
     const [onPasswordChange,{ data, isLoading, error, isError, isSuccess}] = useChangePasswordMutation()
-    const handleSaveButton = () =>{
-        if(newPassword.length <= 8){
+    const handleSaveButton = (event) =>{
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        if(formData.get("oldPassword").length <= 8){
             enqueueSnackbar( t("password_length_error"),  { variant: "error" });
-
         }else{
-            if(newPassword!==retypePassword){
+            if(formData.get("newpassword") !== formData.get("retypepassword")){
                 enqueueSnackbar(t("password_match_error"),  { variant: "error" });
             }else{
-                onPasswordChange({doti:auth.doti,password: newPassword,currentPassword: oldPassword});
+                onPasswordChange({doti:auth.doti,password: formData.get("newpassword") ,currentPassword: formData.get("oldPassword")});
+                event.target.reset();
             }
         }
     }
@@ -40,24 +38,29 @@ const ChangePassword =  () =>{
     return(
         <React.Fragment>
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
-                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>{t("welcome")} {i18next.language==="fr" ? auth.fullnamela : auth.fullnamear}</Typography>
+                <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>{t("change_password")}</Typography>
             </Box>
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column',justifyContent: 'space-between' }}>
-                    <Box sx={{display: 'flex',justifyContent: 'flex-start',alignContent: 'center',paddingBottom: 2}}>
-                        <Typography variant='h5' component='p'>
-                            {t("change_password")}
-                        </Typography>
-                    </Box>
-                    <Divider variant='fullWidth' component="hr"/>
-                    <Box sx={{marginTop: 3,width: '50vw'}}>
-                        <TextField id="outlined-basic" type={"password"} sx={{marginY: 1}} onChange={e=>setOldPassword(e.target.value)} name="oldpassword" fullWidth className='inputField' label={t("old_password")} variant="outlined" required/>
-                        <TextField id="outlined-basic" type={"password"} sx={{marginY: 1}} onChange={e=>setNewPassword(e.target.value)} name="newpassword" fullWidth className='inputField' label={t("new_password")} variant="outlined" required/>
-                        <TextField id="outlined-basic" type={"password"} sx={{marginY: 1}} onChange={e=>setRetypePassword(e.target.value)} className='inputField' fullWidth label={t("retype_password")} variant="outlined" required/>
-                        <Box sx={{display:'flex',justifyContent: 'flex-end'}}>
-                            <Button variant='contained' onClick={handleSaveButton} startIcon={<Save />} >
-                                {t("save")}
-                            </Button>
-                        </Box>
+                    <Box>
+                        <form onSubmit={handleSaveButton}>
+                            <TextField type={"password"} sx={{marginY: 1}} name="oldPassword" fullWidth label={t("old_password")} variant="outlined" required disabled={isLoading}/>
+                            <TextField type={"password"} sx={{marginY: 1}} name="newpassword" fullWidth label={t("new_password")} variant="outlined" required disabled={isLoading}/>
+                            <TextField type={"password"} sx={{marginY: 1}} name="retypepassword" fullWidth label={t("retype_password")} variant="outlined" required disabled={isLoading}/>
+                            <Box sx={{display:'flex',justifyContent: 'flex-end'}}>
+                                { isLoading ? (
+                                    <LoadingButton 
+                                        loading 
+                                        variant="contained"
+                                    >
+                                        Submit
+                                    </LoadingButton>
+                                ) : (
+                                    <Button variant='contained' type="submit" startIcon={<Save />} >
+                                        {t("save")}
+                                    </Button>
+                                )}
+                            </Box>
+                        </form>
                     </Box>
                     <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',p:3}}>
                         <Typography style={{color: "#FF0033"}}>

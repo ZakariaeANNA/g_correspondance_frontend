@@ -15,8 +15,9 @@ import { Style  } from "@mui/icons-material";
 import { Send} from "@mui/icons-material";
 import { useSelector,useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import {useGetExportationBycodeGRESAQuery } from "../../store/api/exportationApi";
+import {useDeleteExportationMutation, useGetExportationBycodeGRESAQuery } from "../../store/api/exportationApi";
 import "./Exportations.css";
+import { useSnackbar } from 'notistack';
 import moment from 'moment';
 import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
@@ -59,7 +60,10 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     onClose: PropTypes.func.isRequired,
 };
 
-function DeleteExportation({params}){
+function DeleteExportation(props){
+
+    const { enqueueSnackbar } = useSnackbar();
+    const [deleteExportation,{data,isLoading,error,isError,isSuccess}] = useDeleteExportationMutation()
     const [open, setOpen] = React.useState(false);
     const handleClickOpen = () => {
       setOpen(true);
@@ -67,8 +71,25 @@ function DeleteExportation({params}){
     const handleClose = () => {
         setOpen(false);
     };
+    const handleConfirmDeleteButton = () =>{
+        deleteExportation(props.params.id);
+        setOpen(false)
+    }
+    useEffect(()=>{
+        if(isError){
+            if(error.data==="correspondance_delete/notFound"){
+                enqueueSnackbar(t("correspondance_notFound"), { variant: "error" });
+            }else{
+                enqueueSnackbar(t("correspondance_delete_error"), { variant: "error" });
+            }
+        }
+        if(isSuccess){
+            enqueueSnackbar(t("correspondance_delete_success"),  { variant: "success" });
+            props.refetch();
+        }
+    },[data,error])
     return(
-        <div>
+        <>
             <Tooltip title={t("delete_correspondance")}>
                 <IconButton aria-label="delete" size="large" onClick={handleClickOpen}> 
                         <Delete sx={{ color: 'red' }} color="red" />
@@ -82,20 +103,20 @@ function DeleteExportation({params}){
                 maxWidth="md" 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    Suprimer Un Exportation
+                    {t("delete_correspondance")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                 <Typography>
-                    Êtes-vous sûr de vouloir supprimer l'element selectionné
+                    {t("correspondance_confirm_message")}
                 </Typography>
                 </DialogContent>
                 <DialogActions>
-                <Button variant="contained" color='error' startIcon={<Delete />} autoFocus onClick={handleClose}>
-                    Confirmer
+                <Button variant="outlined" color='error' startIcon={<Delete />} autoFocus onClick={handleConfirmDeleteButton}>
+                    {t("confirm")}
                 </Button>
                 </DialogActions>
             </BootstrapDialog>
-        </div>
+        </>
     );
 }
 
@@ -145,7 +166,7 @@ export default function Exportation(){
         {field: "Actions1",headerName: t('actions'), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
             <Box sx={{display: 'flex',flexDirection: 'row',textAlign:"center"}}>
                 <ViewExportation params={params.row}/>
-                <DeleteExportation params={params.row}/>
+                <DeleteExportation params={params.row} refetch={refetch} />
             </Box>
         )}, 
         {field: "Actions",headerName: "", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(

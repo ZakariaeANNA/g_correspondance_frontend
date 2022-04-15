@@ -17,10 +17,19 @@ export const importationApi = createApi({
     getImportationByCodeDoti: builder.query({
       query: ({doti , page : pageDefault = 1}) => `receiver/${doti}?page=${pageDefault}`,
     }),
+    deleteImportation: builder.mutation({
+      query: (id)=>{
+        return{
+          url:`/delete/${id}`,
+          method: "delete"
+        }
+      }
+    }),
   }),
 });
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
-  useGetImportationByCodeDotiQuery
+  useGetImportationByCodeDotiQuery,
+  useDeleteImportationMutation
 } = importationApi;

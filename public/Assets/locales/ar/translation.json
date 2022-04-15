@@ -95,6 +95,18 @@
   "foreign_not_exist" : "المؤسسة غير موجود في قاعدة البيانات",
   "department" : "قسم",
   "etablishment" : "مؤسسة",
-  "edit_user_success" : "تم تعديل المستخدم بنجاح"
-
+  "edit_user_success" : "تم تعديل المستخدم بنجاح",
+  "confirm_delete_message": "هل أنت متأكد أنك تريد حذف",
+  "personal_data" : "بياناتي الشخصية",
+  "Profile": "الملف الشخصي",
+  "Account": "تغيير كلمة المرور",
+  "Dashboard": "الصفحة الرئيسية",
+  "Logout": "تسجيل الخروج",
+  "update_message_success": "تم تغيير معلومات المستخدم بنجاح",
+  "update_empty_error": "جميع  الحقول الزامية",
+  "update_message_error": "حدث خطأ أثناء تعديل المعلومات",
+  "correspodance_delete_success": "تم حذف المراسلة بنجاح",
+  "correspodance_delete_error": "حدث خطأ أثناء حذف المراسلة !",
+  "correspondance_notFound_error": "المراسلة  غير موجودة بالفعل",
+  "correspondance_confirm_message": "؟ هل أنت متأكد أنك تريد حذف العنصر المحدد"
 }

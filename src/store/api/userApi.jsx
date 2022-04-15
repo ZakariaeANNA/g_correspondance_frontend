@@ -49,6 +49,22 @@ endpoints: (builder) => ({
           method: "put"
         }
       }
+    }),
+    deleteUser: builder.mutation({
+      query: (id)=>{
+        return {
+          url: `/${id}`,
+          method: "delete"
+        }
+      }
+    }),
+    getCurrentUser: builder.query({
+      query: (id)=>{
+        return{
+          url: `/${id}`,
+          method: 'get'
+        }
+      }
     })
   }),
 });
@@ -59,5 +75,7 @@ export const {
   useGetAllUsersQuery,
   useChangePasswordMutation,
   useUpdateUserMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useDeleteUserMutation,
+  useGetCurrentUserQuery
 } = userApi;

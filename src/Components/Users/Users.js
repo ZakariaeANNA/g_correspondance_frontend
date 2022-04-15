@@ -1,6 +1,6 @@
 import React,{useEffect} from 'react';
 import { DataGrid } from "@mui/x-data-grid";
-import {LockReset} from "@mui/icons-material";
+import {LockReset, Delete} from "@mui/icons-material";
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
@@ -14,7 +14,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { TextField } from "@mui/material";
 import './Users.css';
-import {useGetAllUsersQuery, useResetPasswordMutation } from "../../store/api/userApi";
+import {useDeleteUserMutation, useGetAllUsersQuery, useResetPasswordMutation } from "../../store/api/userApi";
 import { Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { t } from 'i18next';
@@ -22,7 +22,7 @@ import { AddCircle } from "@mui/icons-material";
 import i18next from 'i18next';
 import ViewUser from './ViewUser';
 import { Box } from '@mui/system';
-import { useDispatch } from 'react-redux';
+import { useDispatch , useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import EditUser from './EditUser';
@@ -64,6 +64,59 @@ BootstrapDialogTitle.propTypes = {
   children: PropTypes.node,
   onClose: PropTypes.func.isRequired,
 };
+function DeleteUser(props){
+  const { enqueueSnackbar } = useSnackbar();
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+      setOpen(false);
+  };
+  const [deleteUser, {data,isLoading,error,isError,isSuccess}] = useDeleteUserMutation();
+  const handleResetClick = () =>{
+    deleteUser(props.params.id)
+    setOpen(false);
+  }
+  useEffect(()=>{
+    if(isError)
+      enqueueSnackbar("une erreur survenue lors de la Suppression d'utilisateur",  { variant: "error" });
+    if(isSuccess){
+      enqueueSnackbar("l'utilisateur a été Supprimé avec succe",  { variant: "success" });
+      props.refetch();
+    }
+  },[data,error])
+  return(
+      <div>
+        <Tooltip title={t("deleteUser")}>
+          <IconButton aria-label="delete" size="large" onClick={handleClickOpen}> 
+                <Delete  sx={{color: 'red'}}/>
+          </IconButton>
+        </Tooltip>
+        <BootstrapDialog
+          onClose={handleClose}
+          aria-labelledby="customized-dialog-title"
+          open={open}
+          fullWidth
+          maxWidth="md" 
+        >
+          <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+            {t("deleteUser")}
+          </BootstrapDialogTitle>
+          <DialogContent dividers>
+            <Typography>
+               {t("confirm_delete_message")} <strong>{i18next.language==="fr" ? props.params.fullnamela : props.params.fullnamear}</strong>
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" color='error' type='submit' startIcon={<Delete />} autoFocus onClick={handleResetClick}>
+              {t("delete")}
+            </Button>
+          </DialogActions>
+        </BootstrapDialog>
+      </div>
+  );
+}
 function ResetUserPassword({params}){
 
   const { enqueueSnackbar } = useSnackbar();
@@ -81,7 +134,7 @@ function ResetUserPassword({params}){
   }
   useEffect(()=>{
     if(isError)
-      enqueueSnackbar("une erreur survenue l'ors de la reinitialisation de mot de passe",  { variant: "error" });
+      enqueueSnackbar("une erreur survenue lors de la reinitialisation de mot de passe",  { variant: "error" });
     if(isSuccess)
       enqueueSnackbar("le mot de pass a ete reinitialiser avec succe",  { variant: "success" });
   },[data,error])
@@ -118,13 +171,14 @@ function ResetUserPassword({params}){
 }
 export default function Users(){
   const {data, isLoading , refetch } = useGetAllUsersQuery(); 
+  const user = useSelector( state => state.auth.user );
   const [rows,setRows] = React.useState([]); 
   const dispatch = useDispatch();
   const history = useHistory();
   useEffect(() => {
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     if(data){
-        setRows(data.data);
+        setRows(data.data.filter(row=>row.doti!==user.doti));
     }
   },[data]);
   const columns = [
@@ -142,6 +196,7 @@ export default function Users(){
         <ViewUser params={params.row}/>
         <EditUser props={params.row} refetch={refetch} />
         <ResetUserPassword params={params.row}/>
+        <DeleteUser params={params.row} refetch={refetch} />
       </div>
     )},
   ]
