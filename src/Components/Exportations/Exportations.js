@@ -176,25 +176,40 @@ export default function Exportation(){
                         flexDirection: 'column',
                     }}
                 >
-                    <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
-                    <DataGrid
-                         rows={rows}
-                         columns={columns}
-                         pagination
-                         pageSize={data?.meta.per_page}
-                         rowsPerPageOptions={[5]}
-                         rowCount={data?.meta.total}
-                         paginationMode="server"
-                         onPageChange={handlePageChange}
-                         page={(page - 1)}
-                         loading={loading}
-                        />
-                    </div>
-                    <Link to={'/app/addexportation'} style={{textDecoration: 'none',color: 'black', display : "flex" , justifyContent : "flex-end"}}>
-                        <Button variant="outlined" endIcon={<Send />} sx={{ marginTop : 1 }} >
-                            {t("sendExportation")}
-                        </Button>
-                    </Link>
+                    {   rows.length > 0 ? (
+                        <div style={{ height: '60vh', width: '100%' , textAlign: "center",marginTop: '0.5em' }}>
+                            <DataGrid
+                                rows={rows}
+                                columns={columns}
+                                pagination
+                                pageSize={data?.meta.per_page}
+                                rowsPerPageOptions={[5]}
+                                rowCount={data?.meta.total}
+                                paginationMode="server"
+                                onPageChange={handlePageChange}
+                                page={(page - 1)}
+                                loading={loading}
+                            />
+                        </div>
+                    ):(
+                        <Box
+                            sx={{
+                                maxHeight : 500,
+                                width : "auto",
+                                overflow : "hidden"
+                            }}
+                        >
+                            <img src={require("../../StudyingConceptIllustration.jpg")} style={{ marginX : "auto"}} height="35%" width="35%" alt="" />
+                            <Typography sx={{ fontWeight : "bold" , fontSize : "20px"}}>Cliquez sur l'utilisateur pour voir la conversation.</Typography>
+                        </Box>
+                    )}
+                    <Box sx={{display : "flex" , justifyContent : "flex-end"}}>
+                        <Link to={'/app/addexportation'} style={{textDecoration: 'none',color: 'black'}}>
+                            <Button variant="outlined" endIcon={<Send />} sx={{ marginTop : 1 }} >
+                                {t("sendExportation")}
+                            </Button>
+                        </Link>
+                    </Box>
                 </Paper>
             )}
         </React.Fragment>

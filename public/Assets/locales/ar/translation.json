@@ -89,7 +89,12 @@
   "confirm_reset_message": "هل أنت متأكد أنك تريد إعادة تعيين كلمة المرور الخاصة بـ",
   "confirm": "تأكيد",
   "edit_user": "تحرير معلومات المستخدم",
-  "reset_password_tip": "اعادة تعيين كلمة المرور"
-
+  "reset_password_tip": "اعادة تعيين كلمة المرور",
+  "add_user_success" : "تمت إضافة المستخدم بنجاح",
+  "user_already_exist" : "المستخدم الذي تم إدخاله موجود بالفعل في قاعدة البيانات",
+  "foreign_not_exist" : "المؤسسة غير موجود في قاعدة البيانات",
+  "department" : "قسم",
+  "etablishment" : "مؤسسة",
+  "edit_user_success" : "تم تعديل المستخدم بنجاح"
 
 }

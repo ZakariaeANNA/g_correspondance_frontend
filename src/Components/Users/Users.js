@@ -117,7 +117,7 @@ function ResetUserPassword({params}){
   );
 }
 export default function Users(){
-  const {data, isLoading } = useGetAllUsersQuery(); 
+  const {data, isLoading , refetch } = useGetAllUsersQuery(); 
   const [rows,setRows] = React.useState([]); 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -125,7 +125,6 @@ export default function Users(){
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     if(data){
         setRows(data.data);
-        console.log(data.data)
     }
   },[data]);
   const columns = [
@@ -141,7 +140,7 @@ export default function Users(){
     {field: "actions",headerName: t("actions"), flex: 1 ,headerAlign : 'center',align: 'center',renderCell:(params)=>(
       <div style={{display:'flex',flexDirection: 'row'}}>
         <ViewUser params={params.row}/>
-        <EditUser props={params.row}/>
+        <EditUser props={params.row} refetch={refetch} />
         <ResetUserPassword params={params.row}/>
       </div>
     )},
@@ -158,13 +157,9 @@ export default function Users(){
   function FilterSelect(event){
     if(event.target.value!=='all'){
       let filtered = data?.data?.filter((row)=>(
-      row.etablissement?.type===event.target.value || row.departement?.type===event.target.value
-      ))
-      if(filtered){
-        setRows(filtered)
-      }else{
-        setRows(data.data)
-      }
+        row.etablissement?.type===event.target.value || row.departement?.type===event.target.value
+      ));
+      setRows(filtered)
     }else{
       setRows(data.data)
     }
@@ -184,10 +179,11 @@ export default function Users(){
                     id="demo-simple-select"
                     label={t("type_search")}
                     onChange={FilterSelect}
+                    style={{ textAlign : "start" }}
                 >
                     <MenuItem value={'all'}>Tous les Etablissements</MenuItem>
-                    <MenuItem value={'groupe-scolaire'}>G-Scolaire</MenuItem>
-                    <MenuItem value={'administrative'}>Adminstration</MenuItem>
+                    <MenuItem value={'GroupeScolaire'}>G-Scolaire</MenuItem>
+                    <MenuItem value={'Administrative'}>Adminstration</MenuItem>
                 </Select>
             </FormControl>
         </Box>
@@ -208,6 +204,7 @@ export default function Users(){
                 rows={rows}
                 columns={columns}
                 pageSize={5}
+                disableSelectionOnClick
               />
             </Box>
         )}

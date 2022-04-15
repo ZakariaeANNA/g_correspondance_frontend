@@ -1,94 +1,151 @@
 import React ,{useEffect, useState} from 'react'
 import MenuItem from '@mui/material/MenuItem';
 import { useAddUserMutation } from "../../store/api/userApi";
+import { useGetDepartmentsQuery } from "../../store/api/departmentApi";
 import { Button } from "@mui/material";
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import {Save} from "@mui/icons-material";
-import { TextField,Typography,Paper } from "@mui/material";
+import { TextField,Typography,Paper,CircularProgress } from "@mui/material";
 import { t } from 'i18next';
 import i18next from 'i18next'
 import { useSnackbar } from 'notistack';
-import { Box} from '@mui/system';
-
+import { Box } from '@mui/system';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 
 export default function Adduser(){
     const [AddUser, { data, isLoading, error, isError, isSuccess }] = useAddUserMutation();
+    const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery();
     const { enqueueSnackbar } = useSnackbar();
-    const [roles,setRoles] = useState("admin");
-    const handleRoleChange = (event) =>{
-        setRoles(event.target.value)
-    }
-    const [userDepartement,setUserDepartement] = useState("departement")
+    const [ departments , setDepartments ] = useState([]);
+
+    const [userDepartement,setUserDepartement] = useState();
     const handleUserDepartementChange  = (event)  =>{
       setUserDepartement(event.target.value)
+    }
+    const handleUserDepartementSubmit = () => {
+      setUserDepartement();
     }
     const onAddUser = (event) =>{
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
-      formData.append('roles',roles);
       formData.append("online",1);
       AddUser(formData);
+      event.target.reset();
     }
     useEffect(()=>{
       if(isSuccess){
-          enqueueSnackbar( "user has been created successfully",  { variant: "success" });
+          enqueueSnackbar( t("add_user_success") ,  { variant: "success" });
       }
       if(isError){
-          console.log(error)
-          enqueueSnackbar("problem accured while saving data",  { variant: "error" });
+        if(error.data == "register/fields_required")
+          enqueueSnackbar(t("credentials_empty"),  { variant: "error" });
+        else if(error.data == "register/user_already_exist")
+          enqueueSnackbar(t("user_already_exist"),  { variant: "error" });
+        else if(error.data == "register/foreign_not_exist")
+          enqueueSnackbar(t("foreign_not_exist"),  { variant: "error" });
       }
-    },[data,error]);
+      if(isSuccessDep){
+        console.log(dataDep.data);
+        setDepartments(dataDep.data);
+      }
+    },[data,error,dataDep]);
     return (
       <React.Fragment>
           <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
             <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold" }}>{t("addUser")}</Typography>
           </Box>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-            <form className="p" onSubmit={onAddUser}>
-              <Box>
-                  <TextField id="outlined-basic" name='fullnamela' className='inputField' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em'} : {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'}} label={t("namefr")} variant="outlined" required/>
-                  <TextField id="outlined-basic" name='fullnamear' className='inputField' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'} : {width: '49.5%',marginTop: '0.5em'}} label={t("namear")} variant="outlined" required/>
-                  <TextField id="outlined-basic" name='phone' className='inputField' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em'} : {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'}} label={t("phone")} variant="outlined" required/>
-                  <TextField id="outlined-basic" name='CIN' className='inputField' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'} : {width: '49.5%',marginTop: '0.5em'}} label={t("cin")} variant="outlined" required/>
-                  <TextField id="outlined-basic" name='email' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em'} : {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'}} className='inputField' label={t("email")} variant="outlined" required/>
-                  <TextField id="outlined-basic" name='doti' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'} : {width: '49.5%',marginTop: '0.5em'}} className='inputField'  label={t("doti")} variant="outlined" required/>
-                  <FormControl className='inputField' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em'} : {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'}} required>
-                      <InputLabel id="demo-simple-select-label">{t("departementOrestablishement")}</InputLabel>
-                      <Select
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
-                          label={t("departementOrestablishement")}
-                          onChange={handleUserDepartementChange}
-                      >
-                          <MenuItem value={'departement'}>Departement</MenuItem>
-                          <MenuItem value={'etablissement'}>Etablissement</MenuItem>
-                      </Select>
-                  </FormControl>
-                  <FormControl className='inputField' style={i18next.language === 'fr' ? {width: '49.5%',marginTop: '0.5em',marginLeft: '1%'} : {width: '49.5%',marginTop: '0.5em'}} required>
-                      <InputLabel id="demo-simple-select-label">{t("role")}</InputLabel>
-                      <Select
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
-                          label={t("role")}
-                          onChange={handleRoleChange}
-                      >
-                        {userDepartement==="departement" ?
-                          (<MenuItem value={'admin'}>Admin</MenuItem>):
-                          (<MenuItem value={'directeur'}>Directeur</MenuItem>)
-                        }
-                      </Select>
-                  </FormControl>
-                  <TextField id="outlined-basic" name={userDepartement==="departement"? "idDepartement" : "codegresa"} className='inputField' style={i18next.language=='fr' ? {width: '49.5%',marginTop: '0.5em',marginRight:'100%'}:{width: '49.5%',marginTop: '0.5em',marginLeft:'100%'}} label={userDepartement==="departement" ? t("idDepartement") : t("codeGresa")} variant="outlined" required/>
-                </Box>
-                <Box sx={{display:'flex',justifyContent: 'flex-end',alignItems: 'center'}}>
-                  <Button variant='contained' type='submit' startIcon={<Save />} autoFocus>
-                    {t("save")}
-                  </Button>
-                </Box>
-            </form>
+            { isLoadingDep ? (
+              <Box
+                sx={{
+                    position : "absolute",
+                    top : "50%",
+                    right : "50%",
+                    background : "transparent"
+                }}
+              >
+                  <CircularProgress/>
+              </Box>
+            ):(
+              <form className="p" onSubmit={onAddUser}>
+                <Box>
+                    <TextField id="outlined-basic" name='fullnamela' className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("namefr")} variant="outlined" required/>
+                    <TextField id="outlined-basic" name='fullnamear' className='inputField' sx={{ width : 1/2 , marginY : 1 }}label={t("namear")} variant="outlined" required/>
+                    <TextField id="outlined-basic" name='phone' className='inputField' sx={{ width : 1/3 , paddingInlineEnd : 1 , marginY : 1 }} label={t("phone")} variant="outlined" required/>
+                    <TextField id="outlined-basic" name='CIN' className='inputField' sx={{ width : 1/3 , paddingInlineEnd : 1 , marginY : 1 }} label={t("cin")} variant="outlined" required/>
+                    <TextField id="outlined-basic" name='doti' sx={{ width : 1/3 , marginY : 1 }} className='inputField'  label={t("doti")} variant="outlined" required/>
+                    <TextField id="outlined-basic" name='email' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} className='inputField' label={t("email")} variant="outlined" required/>
+                    <FormControl className='inputField' sx={{ width : 1/2 , marginY : 1 }} required>
+                        <InputLabel id="demo-simple-select-label">{t("departementOrestablishement")}</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label={t("departementOrestablishement")}
+                            onChange={handleUserDepartementChange}
+                            onSubmit={handleUserDepartementSubmit}
+                            style={{ textAlign : "start" }}
+                        >
+                            <MenuItem value={'departement'}>Departement</MenuItem>
+                            <MenuItem value={'etablissement'}>Etablissement</MenuItem>
+                        </Select>
+                    </FormControl>
+                    { userDepartement === undefined ? (
+                      null
+                    ):(
+                      <FormControl className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required>
+                        <InputLabel id="demo-simple-select-label">{t("role")}</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label={t("role")}
+                            name="roles"
+                        >
+                          {userDepartement==="departement" ?
+                            (<MenuItem value={'admin'}>Admin</MenuItem>):
+                            (<MenuItem value={'directeur'}>Directeur</MenuItem>)
+                          }
+                        </Select>
+                      </FormControl>
+                    )}
+        
+                    { userDepartement === "departement" ? (
+                      <FormControl className='inputField' sx={{ width : 1/2 , marginY : 1 }} required>
+                        <InputLabel id="demo-simple-select-label">{t("department")}</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label={t("department")}
+                            name="idDepartement"
+                            style={{ textAlign : "start" }}
+                        >
+                          { departments.map( dep => (
+                            <MenuItem value={dep.id}>{i18next.language === "fr" ? (dep.nomLa):(dep.nomAr)}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    ) : userDepartement === "etablissement" ? (
+                      <TextField id="outlined-basic" name={"codegresa"} className='inputField' sx={{ width : 1/2  , marginY : 1 }} label={t("codeGresa")} variant="outlined" required/>
+                    ) : null}
+                  </Box>
+                  <Box sx={{display:'flex',justifyContent: 'flex-end' , marginY : 1}}>
+                    { isLoading ? (
+                        <LoadingButton 
+                            loading 
+                            variant="contained"
+                        >
+                            Submit
+                        </LoadingButton>
+                    ) : (
+                      <Button variant='contained' type='submit' startIcon={<Save />}>
+                        {t("save")}
+                      </Button>
+                    )}
+                  </Box>
+              </form>
+            )}
           </Paper>
       </React.Fragment>
     );

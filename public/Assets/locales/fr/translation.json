@@ -81,7 +81,7 @@
   "new_password": "nouveau mot de passe",
   "retype_password": "Confirmez le nouveau mot de passe",
   "password_condition": "Un mot de passe fort est nécessaire. Les mots de passe forts se composent de 8 à 256 caractères et doivent combiner au moins trois des éléments suivants : lettres majuscules, lettres minuscules, chiffres et symboles.",
-  "change_password": "changer le mot de passe",
+  "change_password": "Changer le mot de passe",
   "password_length_error" : "Le mot de passe doit contenir 8 caractères ou plus",
   "password_match_error": "Les mots de passe ne correspondent pas",
   "password_incorrect": "le mot de passe saisie est incorrect",
@@ -89,5 +89,11 @@
   "confirm_reset_message": "Est vous sûr de vouloir réinitialiser le mot de pass de ",
   "confirm": "Confirmer",
   "edit_user": "Modifier les informations utilisateur",
-  "reset_password_tip": "Réinitialiser le mot de pass"
+  "reset_password_tip": "Réinitialiser le mot de passe",
+  "add_user_success" : "L'utilisateur est ajouté avec succès",
+  "user_already_exist" : "L'utilisateur saisie est déjà existe dans la base de données.",
+  "foreign_not_exist" : "L'établissement n'existe pas dans la base de données.",
+  "department" : "Departement",
+  "etablishment" : "Etablissement",
+  "edit_user_success" : "La modification d'utilisateur est effectué avec succès"
 }

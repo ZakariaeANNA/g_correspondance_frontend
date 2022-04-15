@@ -109,7 +109,7 @@ export default function AddExportation(){
                                 Submit
                             </LoadingButton>
                         ) : (
-                            <Button variant='contained' type="submit" startIcon={<Send />} autoFocus >
+                            <Button variant='contained' type="submit" startIcon={<Send />} >
                                 {t("send")}
                             </Button> 
                         )} 
