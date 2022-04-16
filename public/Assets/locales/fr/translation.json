@@ -108,7 +108,7 @@
   "correspodance_delete_success": "La correspondance a été supprimer avec succé",
   "correspodance_delete_error": "Une erreur survenue lors du suppression de la correspondance !",
   "correspondance_notFound_error": "La correspondance n'existe pas ",
-  "correspondance_confirm_message": " Êtes-vous sûr de vouloir supprimer l'element selectionné ?"
-
-
+  "correspondance_confirm_message": " Êtes-vous sûr de vouloir supprimer l'element selectionné ?",
+  "user_delete_error": "Une erreur survenue lors de la Suppression d'utilisateur",
+  "user_delete_success": "L'utilisateur a été Supprimé avec succe"
 }

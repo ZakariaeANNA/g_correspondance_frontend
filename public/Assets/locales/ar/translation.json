@@ -108,5 +108,7 @@
   "correspodance_delete_success": "تم حذف المراسلة بنجاح",
   "correspodance_delete_error": "حدث خطأ أثناء حذف المراسلة !",
   "correspondance_notFound_error": "المراسلة  غير موجودة بالفعل",
-  "correspondance_confirm_message": "؟ هل أنت متأكد أنك تريد حذف العنصر المحدد"
+  "correspondance_confirm_message": "؟ هل أنت متأكد أنك تريد حذف العنصر المحدد",
+  "user_delete_error": "حدث خطأ أثناء حذف المستخدم",
+  "user_delete_success": "تم حذف المستخدم بنجاح"
 }

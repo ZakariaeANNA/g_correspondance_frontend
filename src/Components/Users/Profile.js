@@ -17,7 +17,7 @@ import EditUser from './EditUser';
 
 const Profile = () =>{
     const user = decodeToken(localStorage.getItem("token"));
-    const {data,isLoading} = useGetCurrentUserQuery(user.doti);
+    const {refetch,data,isLoading} = useGetCurrentUserQuery(user.doti);
     const [userInfo,setUserInfo] = React.useState([]);
     const dispatch = useDispatch();
     const history = useHistory();
@@ -122,7 +122,7 @@ const Profile = () =>{
                                 </Table>        
                             </TableContainer>
                             <Box  sx={{display: 'flex',justifyContent: 'flex-end'}}>
-                                <EditUser props={userInfo}/>
+                                <EditUser props={userInfo} refetch={refetch} disabled={true}/>
                             </Box>
                         </Box>
                     )}
