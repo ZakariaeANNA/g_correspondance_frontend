@@ -74,12 +74,11 @@ const EditUser = (props) =>{
     const handleRoleChange = (event) =>{
         setRoles(event.target.value)
     }
-    const [userDepartement,setUserDepartement] = useState(props.props?.departement ? "departement" : "etablissement")
+    const [userDepartement,setUserDepartement] = useState(props.props?.departement ? "departement" : "etablissement");
     const handleUserDepartementChange  = (event) => {
       setUserDepartement(event.target.value)
     }
     const [updateUser,{data,error,isLoading,isError,isSuccess}] = useUpdateUserMutation();
-    
     
     const onUpdateUser = (event)=>{
         event.preventDefault();

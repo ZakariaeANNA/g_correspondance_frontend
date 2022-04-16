@@ -21,7 +21,7 @@ import Menu from '@mui/material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { Route , Switch } from "react-router-dom";
+import { Route , Switch , Link } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Users from '../src/Components/Users/Users';
@@ -183,15 +183,17 @@ export default function Home() {
               >
                 <MenuIcon />
               </IconButton>
-              <Typography
-                component="h1"
-                variant="h6"
-                color="inherit"
-                noWrap
-                sx={{ flexGrow: 1 , textAlign : "left" }}
-              >
-                {t('project_title')}
-              </Typography>
+                <Typography
+                  component="h1"
+                  variant="h6"
+                  color="inherit"
+                  noWrap
+                  sx={{ flexGrow: 1 , textAlign : "left" }}
+                >
+                  <Link to={"/app/"} style={{ textDecoration : "none" , color : "white"}}>
+                    {t('project_title')}
+                  </Link>
+                </Typography>
               <Box sx={{ flexGrow: 0 }}>
                   <Tooltip title={t("language")}>
                     <Translate onClick={handleOpenLanguage} />
