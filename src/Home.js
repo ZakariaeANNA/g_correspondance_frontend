@@ -1,4 +1,4 @@
-import React , { useEffect } from 'react';
+import React , { useEffect, useState } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -41,6 +41,7 @@ import Adduser from './Components/Users/AddUser';
 import AddExportation from './Components/Exportations/AddExportation';
 import ChangePassword from './Components/Users/ChangePassword';
 import Profile from './Components/Users/Profile';
+import IdleTimer from 'react-idle-timer';
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -110,10 +111,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 export default function Home() {
   const [open, setOpen] = React.useState(false);
   const dispatch = useDispatch();
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [ timeOut , setTimeOut ] = useState(false);
   const [anchorLanguage, setAnchorLanguage] = React.useState(null);
   const [notifications, setNotifications] = React.useState(null);
   const [logout , { isLoading : isLoadingLogout , isSuccess : isSuccessLogout }] = useLogoutMutation();
@@ -121,11 +120,18 @@ export default function Home() {
   const history = useHistory();
   const { t } = useTranslation();
 
+  const toggleDrawer = () => {
+    setOpen(!open);
+  };
 
   useEffect(()=>{
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
-    if(isSuccessLogout)
-      dispatch({ type : "logout" , history : history , route : "/auth/"});
+    if(isSuccessLogout){
+      if(timeOut)
+        dispatch({ type : "logoutTimeOut" , history : history , route : "/auth/" });
+      else
+        dispatch({ type : "logout" , history : history , route : "/auth/" });
+    }
   },[isSuccessLogout]);
 
   const handleOpenUserMenu = (event) => {
@@ -161,200 +167,211 @@ export default function Home() {
     setNotifications(null);
   };
 
+  const handleOnIdle = () => {
+    setTimeOut(true);
+    logout({token : `${localStorage.getItem("token")}` });
+  }
+
   return (
-    <CacheProvider value={i18next.language === "ar" ? cacheRtl : cacheLtr}>
-      <ThemeProvider theme={i18next.language === "ar" ? { rtlTheme , fontTheme } : { ltrTheme , fontTheme }}>
-        <Box sx={{ display: 'flex' }}>
-          <CssBaseline />
-          <AppBar position="absolute" open={open} sx={{ justifyItems : "center" , zIndex : "2" }}>
-            <Toolbar
+    <IdleTimer
+      timeout={18000000}
+      onIdle={handleOnIdle}
+      debounce={250}
+    >
+      <CacheProvider value={i18next.language === "ar" ? cacheRtl : cacheLtr}>
+        <ThemeProvider theme={i18next.language === "ar" ? { rtlTheme , fontTheme } : { ltrTheme , fontTheme }}>
+          <Box sx={{ display: 'flex' }}>
+            <CssBaseline />
+            <AppBar position="absolute" open={open} sx={{ justifyItems : "center" , zIndex : "2" }}>
+              <Toolbar
+                sx={{
+                  pr: '24px', // keep right padding when drawer closed
+                }}
+              >
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={toggleDrawer}
+                  sx={{
+                    marginRight:"36px"
+                  }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                  <Typography
+                    component="h1"
+                    variant="h6"
+                    color="inherit"
+                    noWrap
+                    sx={{ flexGrow: 1 , textAlign : "left" }}
+                  >
+                    <Link to={"/app/"} style={{ textDecoration : "none" , color : "white"}}>
+                      {t('project_title')}
+                    </Link>
+                  </Typography>
+                <Box sx={{ flexGrow: 0 }}>
+                    <Tooltip title={t("language")}>
+                      <Translate onClick={handleOpenLanguage} />
+                    </Tooltip>
+                    <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar"
+                        anchorEl={anchorLanguage}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(anchorLanguage)}
+                        onClose={handleCloseLanguage}
+                    >
+                        <MenuItem key={t('fr')} onClick={() => { handleCloseLanguage(); i18next.changeLanguage("fr");}}>
+                          <Typography textAlign="center">{t('fr')}</Typography>
+                        </MenuItem>
+                        <MenuItem key={t('ar')} onClick={() => { handleCloseLanguage(); i18next.changeLanguage("ar");}}>
+                          <Typography textAlign="center">{t('ar')}</Typography>
+                        </MenuItem>
+                    </Menu>
+                  </Box>
+                <Box sx={{ marginX : 2 }}>
+                  <Tooltip title={t("notification")}>
+                    <IconButton color="inherit" onClick={handleOpenNotification}>
+                        <Badge badgeContent={4} color="secondary">
+                            <NotificationsIcon />
+                        </Badge>
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar"
+                        anchorEl={notifications}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(notifications)}
+                        onClose={handleCloseNotification}
+                        >
+                        {notificationsList.map((notification) => (
+                            <MenuItem key={notification} onClick={handleCloseNotification}>
+                              <Typography textAlign="center">{notification}</Typography>
+                            </MenuItem>
+                        ))}
+                    </Menu>
+
+                </Box>
+                <Box sx={{ flexGrow: 0 }}>
+                    <Tooltip title={auth?.fullnamela || "Open Settings"}>
+                    <Avatar {...stringAvatar(`${auth?.fullnamela} ${auth?.fullnamear}`)} onClick={handleOpenUserMenu} />
+                    </Tooltip>
+                    <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar"
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                        >
+                        {settings.map((setting) => (
+                            <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
+                              <Typography textAlign="center">{t(setting)}</Typography>
+                            </MenuItem>
+                        ))}                      
+                    </Menu>
+                </Box>
+              </Toolbar>
+            </AppBar>
+            <Drawer variant="permanent" open={open} sx={{ zIndex : "0" }}>
+              <Toolbar
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-end',
+                    px: [1],
+                  }}
+                >
+              </Toolbar>
+              <List component="nav" sx={{ paddingInlineStart: 1 }}>
+                <MainListItems />
+                <Divider sx={{ my: 1 }} />
+                <SecondaryListItems/>
+              </List>
+            </Drawer>
+            <Box
+              component="main"
               sx={{
-                pr: '24px', // keep right padding when drawer closed
+                backgroundColor: (theme) =>
+                  theme.palette.mode === 'light'
+                    ? theme.palette.grey[100]
+                    : theme.palette.grey[900],
+                flexGrow: 1,
+                height: '100vh',
+                overflow: 'auto',
               }}
             >
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleDrawer}
-                sx={{
-                  marginRight:"36px"
-                }}
-              >
-                <MenuIcon />
-              </IconButton>
-                <Typography
-                  component="h1"
-                  variant="h6"
-                  color="inherit"
-                  noWrap
-                  sx={{ flexGrow: 1 , textAlign : "left" }}
-                >
-                  <Link to={"/app/"} style={{ textDecoration : "none" , color : "white"}}>
-                    {t('project_title')}
-                  </Link>
-                </Typography>
-              <Box sx={{ flexGrow: 0 }}>
-                  <Tooltip title={t("language")}>
-                    <Translate onClick={handleOpenLanguage} />
-                  </Tooltip>
-                  <Menu
-                      sx={{ mt: '45px' }}
-                      id="menu-appbar"
-                      anchorEl={anchorLanguage}
-                      anchorOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
+              <Toolbar />
+              <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+                <Switch>
+                  <Route exact path="/app/" >
+                    <Paper
+                      sx={{
+                        p: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
                       }}
-                      keepMounted
-                      transformOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                      }}
-                      open={Boolean(anchorLanguage)}
-                      onClose={handleCloseLanguage}
-                  >
-                      <MenuItem key={t('fr')} onClick={() => { handleCloseLanguage(); i18next.changeLanguage("fr");}}>
-                        <Typography textAlign="center">{t('fr')}</Typography>
-                      </MenuItem>
-                      <MenuItem key={t('ar')} onClick={() => { handleCloseLanguage(); i18next.changeLanguage("ar");}}>
-                        <Typography textAlign="center">{t('ar')}</Typography>
-                      </MenuItem>
-                  </Menu>
-                </Box>
-              <Box sx={{ marginX : 2 }}>
-                <Tooltip title={t("notification")}>
-                  <IconButton color="inherit" onClick={handleOpenNotification}>
-                      <Badge badgeContent={4} color="secondary">
-                          <NotificationsIcon />
-                      </Badge>
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                      sx={{ mt: '45px' }}
-                      id="menu-appbar"
-                      anchorEl={notifications}
-                      anchorOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                      }}
-                      keepMounted
-                      transformOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                      }}
-                      open={Boolean(notifications)}
-                      onClose={handleCloseNotification}
-                      >
-                      {notificationsList.map((notification) => (
-                          <MenuItem key={notification} onClick={handleCloseNotification}>
-                            <Typography textAlign="center">{notification}</Typography>
-                          </MenuItem>
-                      ))}
-                  </Menu>
-
-              </Box>
-              <Box sx={{ flexGrow: 0 }}>
-                  <Tooltip title={auth?.fullnamela || "Open Settings"}>
-                  <Avatar {...stringAvatar(`${auth?.fullnamela} ${auth?.fullnamear}`)} onClick={handleOpenUserMenu} />
-                  </Tooltip>
-                  <Menu
-                      sx={{ mt: '45px' }}
-                      id="menu-appbar"
-                      anchorEl={anchorElUser}
-                      anchorOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                      }}
-                      keepMounted
-                      transformOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                      }}
-                      open={Boolean(anchorElUser)}
-                      onClose={handleCloseUserMenu}
-                      >
-                      {settings.map((setting) => (
-                          <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
-                            <Typography textAlign="center">{t(setting)}</Typography>
-                          </MenuItem>
-                      ))}                      
-                  </Menu>
-              </Box>
-            </Toolbar>
-          </AppBar>
-          <Drawer variant="permanent" open={open} sx={{ zIndex : "0" }}>
-            <Toolbar
-                sx={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-end',
-                  px: [1],
-                }}
-              >
-            </Toolbar>
-            <List component="nav" sx={{ paddingInlineStart: 1 }}>
-              <MainListItems />
-              <Divider sx={{ my: 1 }} />
-              <SecondaryListItems/>
-            </List>
-          </Drawer>
-          <Box
-            component="main"
-            sx={{
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'light'
-                  ? theme.palette.grey[100]
-                  : theme.palette.grey[900],
-              flexGrow: 1,
-              height: '100vh',
-              overflow: 'auto',
-            }}
-          >
-            <Toolbar />
-            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-              <Switch>
-                <Route exact path="/app/" >
-                  <Paper
-                    sx={{
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
-                    <Chart />
-                  </Paper>
-                </Route>
-                <Route path="/app/exportations">
-                    <Exportation />
-                </Route>
-                <Route path="/app/importations">
-                    <Importations />
-                </Route>
-                <Route path="/app/feedback/:idemail">
-                    <Feedback />
-                </Route>
-                <Route path="/app/users">
-                    <Users />
-                </Route>
-                <Route path="/app/adduser">
-                    <Adduser />
-                </Route>
-                <Route path="/app/addexportation">
-                    <AddExportation />
-                </Route>
-                <Route path="/app/changepassword">
-                  <ChangePassword />
-                </Route>
-                <Route path="/app/profile">
-                  <Profile />
-                </Route>
-              </Switch>
-              {/* Content */}
-            </Container>
+                    >
+                      <Chart />
+                    </Paper>
+                  </Route>
+                  <Route path="/app/exportations">
+                      <Exportation />
+                  </Route>
+                  <Route path="/app/importations">
+                      <Importations />
+                  </Route>
+                  <Route path="/app/feedback/:idemail">
+                      <Feedback />
+                  </Route>
+                  <Route path="/app/users">
+                      <Users />
+                  </Route>
+                  <Route path="/app/adduser">
+                      <Adduser />
+                  </Route>
+                  <Route path="/app/addexportation">
+                      <AddExportation />
+                  </Route>
+                  <Route path="/app/changepassword">
+                    <ChangePassword />
+                  </Route>
+                  <Route path="/app/profile">
+                    <Profile />
+                  </Route>
+                </Switch>
+                {/* Content */}
+              </Container>
+            </Box>
           </Box>
-        </Box>
-      </ThemeProvider>
-    </CacheProvider>
+        </ThemeProvider>
+      </CacheProvider>
+    </IdleTimer>
   );
 }

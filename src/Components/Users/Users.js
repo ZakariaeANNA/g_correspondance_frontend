@@ -80,14 +80,14 @@ function DeleteUser(props){
   }
   useEffect(()=>{
     if(isError)
-      enqueueSnackbar("une erreur survenue lors de la Suppression d'utilisateur",  { variant: "error" });
+      enqueueSnackbar(t("user_delete_error"),  { variant: "error" });
     if(isSuccess){
-      enqueueSnackbar("l'utilisateur a été Supprimé avec succe",  { variant: "success" });
+      enqueueSnackbar(t("user_delete_success"),  { variant: "success" });
       props.refetch();
     }
   },[data,error])
   return(
-      <div>
+      <>
         <Tooltip title={t("deleteUser")}>
           <IconButton aria-label="delete" size="large" onClick={handleClickOpen}> 
                 <Delete  sx={{color: 'red'}}/>
@@ -114,7 +114,7 @@ function DeleteUser(props){
             </Button>
           </DialogActions>
         </BootstrapDialog>
-      </div>
+      </>
   );
 }
 function ResetUserPassword({params}){
@@ -196,7 +196,7 @@ export default function Users(){
         <ViewUser params={params.row}/>
         <EditUser props={params.row} refetch={refetch} />
         <ResetUserPassword params={params.row}/>
-        <DeleteUser params={params.row} refetch={refetch} />
+        <DeleteUser params={params.row} refetch={refetch} disabled={false}/>
       </div>
     )},
   ]

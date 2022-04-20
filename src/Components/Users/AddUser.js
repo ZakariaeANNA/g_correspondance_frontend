@@ -13,6 +13,8 @@ import i18next from 'i18next'
 import { useSnackbar } from 'notistack';
 import { Box } from '@mui/system';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { useRefreshMutation } from "../../store/api/authApi";
+
 
 
 export default function Adduser(){
@@ -20,7 +22,7 @@ export default function Adduser(){
     const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery();
     const { enqueueSnackbar } = useSnackbar();
     const [ departments , setDepartments ] = useState([]);
-
+    const [ refresh ] = useRefreshMutation();
     const [userDepartement,setUserDepartement] = useState();
     const handleUserDepartementChange  = (event)  =>{
       setUserDepartement(event.target.value)
@@ -28,11 +30,20 @@ export default function Adduser(){
     const handleUserDepartementSubmit = () => {
       setUserDepartement();
     }
-    const onAddUser = (event) =>{
+    const onAddUser = async(event) =>{
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
       formData.append("online",1);
-      AddUser(formData);
+      try{
+        await AddUser(formData).unwrap();
+      }catch(error){
+          if(error.status === 401){
+              await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
+                  localStorage.setItem( "token" , data );
+                  AddUser(formData);
+              });
+          }
+      }
       event.target.reset();
     }
     useEffect(()=>{

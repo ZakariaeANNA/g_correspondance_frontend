@@ -24,6 +24,17 @@ export const authApi = createApi({
         };
       },
     }),
+    refresh: builder.mutation({
+      query : (body) => {
+        return {
+          url : "/refresh",
+          method : "post" ,
+          headers: {
+            authorization : `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      }
+    })
   }),
 });
 
@@ -31,5 +42,6 @@ export const authApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useSigninUserMutation,
-  useLogoutMutation
+  useLogoutMutation,
+  useRefreshMutation
 } = authApi;

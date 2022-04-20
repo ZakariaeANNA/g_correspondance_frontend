@@ -1,21 +1,25 @@
 import React,{useEffect,useState} from 'react';
 import { useAddExportationsMutation } from "../../store/api/exportationApi";
+import { useRefreshMutation } from "../../store/api/authApi";
 import { Button, TextField , Paper , Typography } from "@mui/material";
-import { Send} from "@mui/icons-material";
+import { Send, Store} from "@mui/icons-material";
 import { decodeToken } from "react-jwt";
 import { useSnackbar } from 'notistack';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import DropFileInput from '../drop-file-input/DropFileInput';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { useSelector } from 'react-redux';
 
 
 export default function AddExportation(){
     const [files,setFiles] = useState([]);
     const [tags, setTags] = React.useState([]);
     const [addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation();
+    const [ refresh ] = useRefreshMutation();
     const { enqueueSnackbar } = useSnackbar();
     const { t } = useTranslation();
+    const user = useSelector( state => state.auth.user );
 
     const removeTags = indexToRemove => {
 		setTags([...tags.filter((_, index) => index !== indexToRemove)]);
@@ -41,15 +45,22 @@ export default function AddExportation(){
         }
     }
 
-    const onAddExportations = (event) => {
+    const onAddExportations = async(event) => {
         event.preventDefault();
-        const token = localStorage.getItem("token");
-        const user = decodeToken(token);
         const formData = new FormData(event.currentTarget);
         formData.append('receiver', JSON.stringify(tags));
         formData.append('sender',user.doti);
         formData.append('file', files[0]);
-        addExportations(formData);
+        try{
+            await addExportations(formData).unwrap();
+        }catch(error){
+            if(error.status === 401){
+                await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
+                    localStorage.setItem( "token" , data );
+                    addExportations(formData);
+                });
+            }
+        }
         setFiles([]); setTags([]); event.target.reset();
     }
     const onFileChange = (files) => {
