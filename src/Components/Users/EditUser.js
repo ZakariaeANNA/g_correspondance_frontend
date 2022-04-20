@@ -58,23 +58,25 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 };
 
 const EditUser = (props) =>{
-    console.log(props)
+ 
     const [open, setOpen] = useState(false);
+    const [ departments , setDepartments ] = useState([]);
+    const [roles,setRoles] = useState(props.props.roles ? props.props.roles : "admin");
+    const [userDepartement,setUserDepartement] = useState(props.props?.departement ? "departement" : "etablissement")
     const handleClickOpen = () => {
         setOpen(true);
+        setUserDepartement(props.props?.departement ? "departement" : "etablissement")
+        setRoles(props.props.roles ? props.props.roles : "admin")
     };
     const handleClose = () => {
         setOpen(false);
     };
-    const [ departments , setDepartments ] = useState([]);
     const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery("",{skip : !open,});
     
     const { enqueueSnackbar } = useSnackbar();
-    const [roles,setRoles] = useState(props.props.roles ? props.props.roles : "admin");
     const handleRoleChange = (event) =>{
         setRoles(event.target.value)
     }
-    const [userDepartement,setUserDepartement] = useState(props.props?.departement ? "departement" : "etablissement")
     const handleUserDepartementChange  = (event) => {
       setUserDepartement(event.target.value)
     }
@@ -98,11 +100,11 @@ const EditUser = (props) =>{
     }
     useEffect(()=>{
         if(isError){
-            if(error.data == "edit_user/fields_required")
+            if(error.data === "edit_user/fields_required")
                 enqueueSnackbar(t("credentials_empty"),  { variant: "error" });
-            else if(error.data == "edit_user/user_already_exist")
+            else if(error.data === "edit_user/user_already_exist")
                 enqueueSnackbar(t("user_already_exist"),  { variant: "error" });
-            else if(error.data == "edit_user/foreign_not_exist")
+            else if(error.data === "edit_user/foreign_not_exist")
                 enqueueSnackbar(t("foreign_not_exist"),  { variant: "error" });
         }
         if(isSuccess){
@@ -146,31 +148,33 @@ const EditUser = (props) =>{
                     ):(
                         <form className="p" onSubmit={onUpdateUser}>
                             <Box>
-                                <TextField id="outlined-basic" defaultValue={props.props.fullnamela} name='fullnamela' className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("namefr")} variant="outlined" required disabled={isLoading}/>
-                                <TextField id="outlined-basic" defaultValue={props.props.fullnamear} name='fullnamear' className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("namear")} variant="outlined" required disabled={isLoading}/>
-                                <TextField id="outlined-basic" defaultValue={props.props.phone} name='phone' className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("phone")} variant="outlined" required disabled={isLoading}/>
-                                <TextField id="outlined-basic" defaultValue={props.props.cin} name='CIN' className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("cin")} variant="outlined" required disabled={isLoading}/>
-                                <TextField id="outlined-basic" defaultValue={props.props.email} name='email' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} className='inputField' label={t("email")} variant="outlined" required disabled={isLoading}/>
-                                <FormControl className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading} inputProps={{readOnly: props.disabled}}>
+                                <TextField defaultValue={props.props.fullnamela} name='fullnamela' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("namefr")} variant="outlined" required disabled={isLoading}/>
+                                <TextField defaultValue={props.props.fullnamear} name='fullnamear' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("namear")} variant="outlined" required disabled={isLoading}/>
+                                <TextField defaultValue={props.props.phone} name='phone' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("phone")} variant="outlined" required disabled={isLoading}/>
+                                <TextField defaultValue={props.props.cin} name='CIN' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("cin")} variant="outlined" required disabled={isLoading}/>
+                                <TextField defaultValue={props.props.email} name='email' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("email")} variant="outlined" required disabled={isLoading}/>
+                                <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading}>
                                     <InputLabel id="demo-simple-select-label">{t("departementOrestablishement")}</InputLabel>
                                     <Select
                                         value={userDepartement}
                                         labelId="demo-simple-select-label"
                                         id="demo-simple-select"
                                         label={t("departementOrestablishement")}
+                                        inputprops={{readOnly: props.disabled}}
                                         onChange={handleUserDepartementChange}
                                     >
                                         <MenuItem value={'departement'}>Departement</MenuItem>
                                         <MenuItem value={'etablissement'}>Etablissement</MenuItem>
                                     </Select>
                                 </FormControl>
-                                <FormControl className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading} inputProps={{ readOnly: props.disabled }}>
+                                <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading}>
                                     <InputLabel id="demo-simple-select-label">{t("role")}</InputLabel>
                                     <Select
                                         labelId="demo-simple-select-label"
                                         id="demo-simple-select"
                                         label={t("role")}
                                         value={roles}
+                                        inputprops={{readOnly: props.disabled}}
                                         onChange={handleRoleChange}
                                     >
                                         {userDepartement==="departement" ?
@@ -179,14 +183,15 @@ const EditUser = (props) =>{
                                         }
                                     </Select>
                                 </FormControl>
-                                <TextField id="outlined-basic" defaultValue={props.props.doti} name='doti' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} className='inputField' label={t("doti")} variant="outlined" required disabled={isLoading}/>
+                                <TextField defaultValue={props.props.doti} name='doti' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("doti")} variant="outlined" required disabled={isLoading}/>
                                 { userDepartement === "departement" ? (
-                                    <FormControl className='inputField' sx={{ width : 1/2 , marginY : 1 }} required disabled={isLoading} inputProps={{ readOnly: props.disabled }}>
+                                    <FormControl sx={{ width : 1/2 , marginY : 1 }} required disabled={isLoading}>
                                         <InputLabel id="demo-simple-select-label">{t("department")}</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-label"
                                             id="demo-simple-select"
                                             label={t("department")}
+                                            inputprops={{readOnly: props.disabled}}
                                             name="idDepartement"
                                             style={{ textAlign : "start" }}
                                             defaultValue={props.props?.departement?.id}
@@ -197,7 +202,7 @@ const EditUser = (props) =>{
                                         </Select>
                                     </FormControl>
                                 ) : userDepartement === "etablissement" ? (
-                                    <TextField id="outlined-basic" defaultValue={props.props?.etablissement?.codegresa} name={"codegresa"} sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("codeGresa")} variant="outlined" required disabled={isLoading} inputProps={{ readOnly: props.disabled }}/>
+                                    <TextField defaultValue={props.props?.etablissement?.codegresa} name={"codegresa"} sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("codeGresa")} variant="outlined" required disabled={isLoading} inputprops={{readOnly: props.disabled}}/>
                                 ) : null}
                             </Box>
                             <Box sx={{display:'flex',justifyContent: 'flex-end',alignItems: 'center',paddingTop:2}}>

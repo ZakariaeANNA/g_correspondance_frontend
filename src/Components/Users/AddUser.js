@@ -20,8 +20,8 @@ export default function Adduser(){
     const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery();
     const { enqueueSnackbar } = useSnackbar();
     const [ departments , setDepartments ] = useState([]);
-
     const [userDepartement,setUserDepartement] = useState();
+
     const handleUserDepartementChange  = (event)  =>{
       setUserDepartement(event.target.value)
     }
@@ -40,15 +40,14 @@ export default function Adduser(){
           enqueueSnackbar( t("add_user_success") ,  { variant: "success" });
       }
       if(isError){
-        if(error.data == "register/fields_required")
+        if(error.data === "register/fields_required")
           enqueueSnackbar(t("credentials_empty"),  { variant: "error" });
-        else if(error.data == "register/user_already_exist")
+        else if(error.data === "register/user_already_exist")
           enqueueSnackbar(t("user_already_exist"),  { variant: "error" });
-        else if(error.data == "register/foreign_not_exist")
+        else if(error.data === "register/foreign_not_exist")
           enqueueSnackbar(t("foreign_not_exist"),  { variant: "error" });
       }
       if(isSuccessDep){
-        console.log(dataDep.data);
         setDepartments(dataDep.data);
       }
     },[data,error,dataDep]);
@@ -72,13 +71,13 @@ export default function Adduser(){
             ):(
               <form className="p" onSubmit={onAddUser}>
                 <Box>
-                    <TextField id="outlined-basic" name='fullnamela' className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("namefr")} variant="outlined" required/>
-                    <TextField id="outlined-basic" name='fullnamear' className='inputField' sx={{ width : 1/2 , marginY : 1 }}label={t("namear")} variant="outlined" required/>
-                    <TextField id="outlined-basic" name='phone' className='inputField' sx={{ width : 1/3 , paddingInlineEnd : 1 , marginY : 1 }} label={t("phone")} variant="outlined" required/>
-                    <TextField id="outlined-basic" name='CIN' className='inputField' sx={{ width : 1/3 , paddingInlineEnd : 1 , marginY : 1 }} label={t("cin")} variant="outlined" required/>
-                    <TextField id="outlined-basic" name='doti' sx={{ width : 1/3 , marginY : 1 }} className='inputField'  label={t("doti")} variant="outlined" required/>
-                    <TextField id="outlined-basic" name='email' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} className='inputField' label={t("email")} variant="outlined" required/>
-                    <FormControl className='inputField' sx={{ width : 1/2 , marginY : 1 }} required>
+                    <TextField name='fullnamela' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("namefr")} variant="outlined" required/>
+                    <TextField name='fullnamear' sx={{ width : 1/2 , marginY : 1 }}label={t("namear")} variant="outlined" required/>
+                    <TextField name='phone' sx={{ width : 1/3 , paddingInlineEnd : 1 , marginY : 1 }} label={t("phone")} variant="outlined" required/>
+                    <TextField name='CIN' sx={{ width : 1/3 , paddingInlineEnd : 1 , marginY : 1 }} label={t("cin")} variant="outlined" required/>
+                    <TextField name='doti' sx={{ width : 1/3 , marginY : 1 }}  label={t("doti")} variant="outlined" required/>
+                    <TextField name='email' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("email")} variant="outlined" required/>
+                    <FormControl sx={{ width : 1/2 , marginY : 1 }} required>
                         <InputLabel id="demo-simple-select-label">{t("departementOrestablishement")}</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
@@ -95,7 +94,7 @@ export default function Adduser(){
                     { userDepartement === undefined ? (
                       null
                     ):(
-                      <FormControl className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required>
+                      <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required>
                         <InputLabel id="demo-simple-select-label">{t("role")}</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
@@ -112,7 +111,7 @@ export default function Adduser(){
                     )}
         
                     { userDepartement === "departement" ? (
-                      <FormControl className='inputField' sx={{ width : 1/2 , marginY : 1 }} required>
+                      <FormControl sx={{ width : 1/2 , marginY : 1 }} required>
                         <InputLabel id="demo-simple-select-label">{t("department")}</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
@@ -127,7 +126,7 @@ export default function Adduser(){
                         </Select>
                       </FormControl>
                     ) : userDepartement === "etablissement" ? (
-                      <TextField id="outlined-basic" name={"codegresa"} className='inputField' sx={{ width : 1/2  , marginY : 1 }} label={t("codeGresa")} variant="outlined" required/>
+                      <TextField name={"codegresa"} sx={{ width : 1/2  , marginY : 1 }} label={t("codeGresa")} variant="outlined" required/>
                     ) : null}
                   </Box>
                   <Box sx={{display:'flex',justifyContent: 'flex-end' , marginY : 1}}>

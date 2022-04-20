@@ -65,6 +65,22 @@ endpoints: (builder) => ({
           method: 'get'
         }
       }
+    }),
+    getUserByIdDepartement: builder.mutation({
+      query: (idDep)=>{
+        return{
+          url: `/getuserbyiddpartement/${idDep}`,
+          method: 'get'
+        }
+      }
+    }),
+    getUserByCodeGresa: builder.mutation({
+      query: (codegresa)=>{
+        return{
+          url: `/getuserbycodegresa/${codegresa}`,
+          method: 'get'
+        }
+      }
     })
   }),
 });
@@ -77,5 +93,7 @@ export const {
   useUpdateUserMutation,
   useResetPasswordMutation,
   useDeleteUserMutation,
-  useGetCurrentUserQuery
+  useGetCurrentUserQuery,
+  useGetUserByIdDepartementMutation,
+  useGetUserByCodeGresaMutation
 } = userApi;
