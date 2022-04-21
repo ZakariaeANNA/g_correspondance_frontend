@@ -68,15 +68,10 @@ export default function AddExportation(){
         const user = decodeToken(token);
         const formData = new FormData(event.currentTarget);
         formData.append('receiver', JSON.stringify(tags));
-        formData.append('department',idDepartment);
-        formData.append('codegresa',codeGresa);
         formData.append('sender',user.doti);
         formData.append('file', files[0]);
         addExportations(formData);
         setFiles([]); setTags([]); event.target.reset();
-    }
-    const onFileChange = (files) => {
-        setFiles(files);
     }
     return (
         <React.Fragment>
@@ -116,8 +111,9 @@ export default function AddExportation(){
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                label={t("departementOrestablishement")}
+                                label={t("the_department")}
                                 onChange={handleChooseDepartement}
+                                name={'department'}
                                 style={{textAlign: 'start'}}
                             >
                                 {
@@ -133,8 +129,9 @@ export default function AddExportation(){
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                label={t("establishement")}
+                                label={t("the_establishment")}
                                 onChange={handleChooseEstablishment}
+                                name={'codegresa'}
                             >
                                 {
                                     establishment && establishment.map(row=>(
