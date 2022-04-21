@@ -112,11 +112,11 @@ const EditUser = (props) =>{
     }
     useEffect(()=>{
         if(isError){
-            if(error.data == "edit_user/fields_required")
+            if(error.data === "edit_user/fields_required")
                 enqueueSnackbar(t("credentials_empty"),  { variant: "error" });
-            else if(error.data == "edit_user/user_already_exist")
+            else if(error.data === "edit_user/user_already_exist")
                 enqueueSnackbar(t("user_already_exist"),  { variant: "error" });
-            else if(error.data == "edit_user/foreign_not_exist")
+            else if(error.data === "edit_user/foreign_not_exist")
                 enqueueSnackbar(t("foreign_not_exist"),  { variant: "error" });
         }
         if(isSuccess){
@@ -172,6 +172,7 @@ const EditUser = (props) =>{
                                         labelId="demo-simple-select-label"
                                         id="demo-simple-select"
                                         label={t("departementOrestablishement")}
+                                        inputprops={{readOnly: props.disabled}}
                                         onChange={handleUserDepartementChange}
                                         inputProps={{ readOnly: props.disabled }}
                                     >
@@ -186,6 +187,7 @@ const EditUser = (props) =>{
                                         id="demo-simple-select"
                                         label={t("role")}
                                         value={roles}
+                                        inputprops={{readOnly: props.disabled}}
                                         onChange={handleRoleChange}
                                         inputProps={{ readOnly: props.disabled }}
                                     >
@@ -203,6 +205,7 @@ const EditUser = (props) =>{
                                             labelId="demo-simple-select-label"
                                             id="demo-simple-select"
                                             label={t("department")}
+                                            inputprops={{readOnly: props.disabled}}
                                             name="idDepartement"
                                             style={{ textAlign : "start" }}
                                             inputProps={{ readOnly: props.disabled }}

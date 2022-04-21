@@ -174,7 +174,7 @@ export default function Home() {
 
   return (
     <IdleTimer
-      timeout={18000000}
+      timeout={900000}
       onIdle={handleOnIdle}
       debounce={250}
     >

@@ -7,6 +7,7 @@ import { feedbackApi } from "./api/feedbackApi";
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { userApi } from "./api/userApi";
 import { departmentApi } from "./api/departmentApi";
+import { establishementApi } from "./api/establishementApi";
 
 
 
@@ -19,12 +20,14 @@ export const store = configureStore({
     [exportationApi.reducerPath]: exportationApi.reducer,
     [importationApi.reducerPath]: importationApi.reducer,
     [feedbackApi.reducerPath]: feedbackApi.reducer,
+    [feedbackApi.reducerPath]: feedbackApi.reducer,
+    [establishementApi.reducerPath]: establishementApi.reducer,
     [departmentApi.reducerPath]: departmentApi.reducer
   },
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware({
       serializableCheck: false
-    }).concat(authApi.middleware,userApi.middleware,exportationApi.middleware,importationApi.middleware,feedbackApi.middleware,departmentApi.middleware),
-});
+    }).concat(authApi.middleware,userApi.middleware,exportationApi.middleware,importationApi.middleware,feedbackApi.middleware,departmentApi.middleware,establishementApi.middleware),
+  });
 
 setupListeners(store.dispatch);
