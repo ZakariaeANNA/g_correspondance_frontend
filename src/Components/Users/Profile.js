@@ -11,12 +11,12 @@ import { decodeToken } from 'react-jwt';
 import { useGetCurrentUserQuery } from '../../store/api/userApi';
 import { t } from 'i18next';
 import i18next from 'i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch , useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import EditUser from './EditUser';
 
 const Profile = () =>{
-    const user = decodeToken(localStorage.getItem("token"));
+    const user = useSelector( state => state.auth.user );
     const {refetch,data,isLoading} = useGetCurrentUserQuery(user.doti);
     const [userInfo,setUserInfo] = React.useState([]);
     const dispatch = useDispatch();
@@ -38,7 +38,7 @@ const Profile = () =>{
                     <Box sx={{display: "flex",justifyContent: "flex-start",p:1.6,bgcolor: "#EAEEF4",borderRadius: 2,marginY: 1}}>
                         <Typography variant='h5'>{t("personal_data")}</Typography>
                     </Box>
-                    {isLoading ? 
+                    { isLoading ? 
                     (
                         <Box
                             sx={{
@@ -121,7 +121,7 @@ const Profile = () =>{
                                     </TableBody>
                                 </Table>        
                             </TableContainer>
-                            <Box  sx={{display: 'flex',justifyContent: 'flex-end'}}>
+                            <Box sx={{display: 'flex',justifyContent: 'flex-end'}}>
                                 <EditUser props={userInfo} refetch={refetch} disabled={true}/>
                             </Box>
                         </Box>

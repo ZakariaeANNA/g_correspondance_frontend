@@ -19,6 +19,7 @@ import { useSnackbar } from 'notistack';
 import { useUpdateUserMutation } from "../../store/api/userApi";
 import { useGetDepartmentsQuery } from "../../store/api/departmentApi";
 import LoadingButton from '@mui/lab/LoadingButton';
+import { useRefreshMutation } from "../../store/api/authApi";
 
 
 
@@ -58,31 +59,33 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 };
 
 const EditUser = (props) =>{
- 
     const [open, setOpen] = useState(false);
+    const [userDepartement,setUserDepartement] = useState();
     const [ departments , setDepartments ] = useState([]);
-    const [roles,setRoles] = useState(props.props.roles ? props.props.roles : "admin");
-    const [userDepartement,setUserDepartement] = useState(props.props?.departement ? "departement" : "etablissement")
+    const [roles,setRoles] = useState();
+    const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery("",{skip : !open,});
+    const [updateUser,{data,error,isLoading,isError,isSuccess}] = useUpdateUserMutation();
+    const { enqueueSnackbar } = useSnackbar();
+    const [ refresh ] = useRefreshMutation();
     const handleClickOpen = () => {
         setOpen(true);
-        setUserDepartement(props.props?.departement ? "departement" : "etablissement")
-        setRoles(props.props.roles ? props.props.roles : "admin")
+        setRoles(props.props.roles ? props.props.roles : "admin");
+        setUserDepartement(props.props?.departement ? "departement" : "etablissement");
     };
+
     const handleClose = () => {
         setOpen(false);
     };
-    const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery("",{skip : !open,});
     
-    const { enqueueSnackbar } = useSnackbar();
     const handleRoleChange = (event) =>{
         setRoles(event.target.value)
     }
+
     const handleUserDepartementChange  = (event) => {
       setUserDepartement(event.target.value)
     }
-    const [updateUser,{data,error,isLoading,isError,isSuccess}] = useUpdateUserMutation();
     
-    const onUpdateUser = (event)=>{
+    const onUpdateUser = async(event)=>{
         event.preventDefault();
         const formdata = new FormData(event.currentTarget);
         const body = {
@@ -96,7 +99,16 @@ const EditUser = (props) =>{
             idDepartement: formdata.get("idDepartement"),
             codegresa : formdata.get("codegresa")
         }
-        updateUser({body: body ,id: props.props.id})
+        try{
+            await updateUser({body: body ,id: props.props.id}).unwrap();
+        }catch(error){
+            if(error.status === 401){
+                await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
+                    localStorage.setItem( "token" , data );
+                    updateUser({body: body ,id: props.props.id});
+                });
+            }
+        }
     }
     useEffect(()=>{
         if(isError){
@@ -152,8 +164,8 @@ const EditUser = (props) =>{
                                 <TextField defaultValue={props.props.fullnamear} name='fullnamear' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("namear")} variant="outlined" required disabled={isLoading}/>
                                 <TextField defaultValue={props.props.phone} name='phone' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("phone")} variant="outlined" required disabled={isLoading}/>
                                 <TextField defaultValue={props.props.cin} name='CIN' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("cin")} variant="outlined" required disabled={isLoading}/>
-                                <TextField defaultValue={props.props.email} name='email' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("email")} variant="outlined" required disabled={isLoading}/>
-                                <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading}>
+                                <TextField defaultValue={props.props.email} name='email' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} className='inputField' label={t("email")} variant="outlined" required disabled={isLoading}/>
+                                <FormControl className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading}>
                                     <InputLabel id="demo-simple-select-label">{t("departementOrestablishement")}</InputLabel>
                                     <Select
                                         value={userDepartement}
@@ -162,12 +174,13 @@ const EditUser = (props) =>{
                                         label={t("departementOrestablishement")}
                                         inputprops={{readOnly: props.disabled}}
                                         onChange={handleUserDepartementChange}
+                                        inputProps={{ readOnly: props.disabled }}
                                     >
                                         <MenuItem value={'departement'}>Departement</MenuItem>
                                         <MenuItem value={'etablissement'}>Etablissement</MenuItem>
                                     </Select>
                                 </FormControl>
-                                <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading}>
+                                <FormControl className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading}>
                                     <InputLabel id="demo-simple-select-label">{t("role")}</InputLabel>
                                     <Select
                                         labelId="demo-simple-select-label"
@@ -176,16 +189,17 @@ const EditUser = (props) =>{
                                         value={roles}
                                         inputprops={{readOnly: props.disabled}}
                                         onChange={handleRoleChange}
+                                        inputProps={{ readOnly: props.disabled }}
                                     >
                                         {userDepartement==="departement" ?
-                                        (<MenuItem value={'admin'}>Admin</MenuItem>):
-                                        (<MenuItem value={'directeur'}>Directeur</MenuItem>)
+                                            (<MenuItem value={'admin'}>Admin</MenuItem>):
+                                            (<MenuItem value={'directeur'}>Directeur</MenuItem>)
                                         }
                                     </Select>
                                 </FormControl>
-                                <TextField defaultValue={props.props.doti} name='doti' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("doti")} variant="outlined" required disabled={isLoading}/>
+                                <TextField id="outlined-basic" defaultValue={props.props.doti} name='doti' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} className='inputField' label={t("doti")} variant="outlined" required disabled={isLoading} inputProps={{ readOnly: props?.disabled }}/>
                                 { userDepartement === "departement" ? (
-                                    <FormControl sx={{ width : 1/2 , marginY : 1 }} required disabled={isLoading}>
+                                    <FormControl className='inputField' sx={{ width : 1/2 , marginY : 1 }} required disabled={isLoading}>
                                         <InputLabel id="demo-simple-select-label">{t("department")}</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-label"
@@ -194,15 +208,16 @@ const EditUser = (props) =>{
                                             inputprops={{readOnly: props.disabled}}
                                             name="idDepartement"
                                             style={{ textAlign : "start" }}
+                                            inputProps={{ readOnly: props.disabled }}
                                             defaultValue={props.props?.departement?.id}
                                         >
                                         { departments.map( dep => 
-                                            <MenuItem value={dep.id} selected={true}>{i18next.language === "fr" ? (dep.nomLa):(dep.nomAr)}</MenuItem>
+                                            <MenuItem key={dep.id} value={dep.id} selected={true}>{i18next.language === "fr" ? (dep.nomLa):(dep.nomAr)}</MenuItem>
                                         )}
                                         </Select>
                                     </FormControl>
                                 ) : userDepartement === "etablissement" ? (
-                                    <TextField defaultValue={props.props?.etablissement?.codegresa} name={"codegresa"} sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("codeGresa")} variant="outlined" required disabled={isLoading} inputprops={{readOnly: props.disabled}}/>
+                                    <TextField id="outlined-basic" defaultValue={props.props?.etablissement?.codegresa} name={"codegresa"} sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} label={t("codeGresa")} variant="outlined" required disabled={isLoading} InputProps={{ readOnly: props.disabled }}/>
                                 ) : null}
                             </Box>
                             <Box sx={{display:'flex',justifyContent: 'flex-end',alignItems: 'center',paddingTop:2}}>

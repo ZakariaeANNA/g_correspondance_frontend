@@ -16,7 +16,7 @@ const authSlice = createSlice({
       const token = localStorage.getItem("token");
       if(isExpired(token)){
         localStorage.clear("token");
-        action.history.push(action.route);
+        action.history.push({pathname: action.route , appState: { session : true } });
       }else{
         state.user = decodeToken(token);
       }
@@ -25,11 +25,17 @@ const authSlice = createSlice({
     builder.addCase("logout" , (state,action)=>{
       localStorage.removeItem("token");
       state.user = {};
+      action.history.push(action.route);
+      return state;
+    });
+    builder.addCase("logoutTimeOut" , (state,action)=>{
+      localStorage.removeItem("token");
+      state.user = {};
       action.history.push({pathname: action.route , appState: { session : true } });
       return state;
     });
   }
 })
 
-export const { checkLogin , logout } = authSlice.actions
+export const { checkLogin , logout , logoutTimeOut } = authSlice.actions
 export default authSlice.reducer

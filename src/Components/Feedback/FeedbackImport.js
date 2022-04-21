@@ -40,6 +40,7 @@ import 'moment/locale/ar-ma'
 import 'moment/locale/fr' 
 import CircularProgress from '@mui/material/CircularProgress';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { useRefreshMutation } from "../../store/api/authApi";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -103,7 +104,7 @@ function SendFeedback(props){
     };
     
     const [value,setValue] = React.useState('')
-    
+    const [ refresh ] = useRefreshMutation();
     const handleDataChange = (event)=>{
         const plainText = event.getCurrentContent().getPlainText() // for plain text
         const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
@@ -118,7 +119,7 @@ function SendFeedback(props){
         setRadioValue(event.target.value);
     }
     const [onUpdateConfirmationByReceiver,{}] = useConfirmMailByReceiverMutation();
-    const onAddFeedback = () => {
+    const onAddFeedback = async() => {
         const formData = new FormData();
         var index = 0;
         formData.append('mail_id', props.mailID);
@@ -130,7 +131,16 @@ function SendFeedback(props){
             formData.append('file['+index+']', file);        
             index++;    
         });
-        addFeedback(formData);
+        try{
+            await addFeedback(formData).unwrap();
+        }catch(error){
+            if(error.status === 401){
+                await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
+                    localStorage.setItem( "token" , data );
+                    addFeedback(formData);
+                });
+            }
+        }
         setValue(''); setFiles([]);
     }
 
