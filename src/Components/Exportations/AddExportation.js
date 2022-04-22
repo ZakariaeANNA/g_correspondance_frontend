@@ -3,9 +3,8 @@ import { useAddExportationsMutation } from "../../store/api/exportationApi";
 import { useRefreshMutation } from "../../store/api/authApi";
 import { useGetDepartmentsQuery } from "../../store/api/departmentApi";
 import { useGetEstablishmentsQuery } from '../../store/api/establishementApi';
-import { Button, TextField , Paper , Typography } from "@mui/material";
-import { Send, Store} from "@mui/icons-material";
-import { decodeToken } from "react-jwt";
+import { Button, TextField , Paper , Typography , CircularProgress } from "@mui/material";
+import { Send } from "@mui/icons-material";
 import { useSnackbar } from 'notistack';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
@@ -17,28 +16,41 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import i18next from 'i18next';
+import Autocomplete from '@mui/material/Autocomplete';
 
+
+const departmentWorkers = [ 
+    { id : "chef" , nomar : "رئيس المصلحة" , nomla : "Chef de département" },
+    { id : "tous" , nomar : "كل الموظفين" , nomla : "Tous les employés" }
+]
 
 export default function AddExportation(){
-    const [ departments , setDepartments ] = useState([]);
-    const [establishment,setEstablishment] = useState([]);
-    const [files,setFiles] = useState([]);
-    const [tags, setTags] = React.useState([]);
-    const [addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation();
-    const [ refresh ] = useRefreshMutation();
-    const { enqueueSnackbar } = useSnackbar();
-    const { t } = useTranslation();
-    const user = useSelector( state => state.auth.user );
-
-    const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery();
-    const { data : dataEsta , isLoading : isLoadingEsta , error : errorEsta , isError : isErrorEsta , isSuccess : isSuccessEsta } = useGetEstablishmentsQuery();
-    const removeTags = indexToRemove => {
+    const [ departments , setDepartments ] = useState([]); // liste des departements existe dans la base de données
+    const [ establishment , setEstablishment ] = useState([]); // liste des etablissements existe dans la base de données
+    const [ dep , setDep ] = useState(null); // id departement ajouté par utilisateur
+    const [ depWorkers , setDepWorkers ] = useState(null); // les employés du departement choisi
+    const [ eta , setEta ] = useState(null); // codegresa de l'etablissement ajouté par l'utilisateur
+    const [ files , setFiles ] = useState([]); // fichier saisie par l'utilisateur ( pdf , image )
+    const [ tags , setTags ] = React.useState([]); // les doti saisie par l'utilisateur 
+    const [ addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation(); // la fonction qui envoi l'exportation vers backend avec les messages d'erreurs et de succès
+    const [ refresh ] = useRefreshMutation(); // la fonction refresh qui est responsable à actualiser JWT token pour l'utilisateur 
+    const { enqueueSnackbar } = useSnackbar(); // enqueueSnackbar pour afficher les messages flottants après effectuant une action
+    const { t } = useTranslation(); // useTranslation qui est responsable à traduire la page selon la langue demandé
+    const user = useSelector( state => state.auth.user ); // on a utilisé useSelector pour avoir les données d'utilisateur à partir de la fonction dispatch de redux
+    const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery(); // getdepartments responsable à recevoir tous les departements existe dans le systeme
+    const { data : dataEsta , isLoading : isLoadingEsta , error : errorEsta , isError : isErrorEsta , isSuccess : isSuccessEsta } = useGetEstablishmentsQuery(); // get etablishments responsable à recevoir tous les etablissemnts existe dans la base de données
+    
+    // la fonction removeTags pour supprimer un doti existe par l'utilisateur
+    const removeTags = indexToRemove => { 
 		setTags([...tags.filter((_, index) => index !== indexToRemove)]);
 	};
+
     useEffect(()=>{
+        // Si la requete est effectue avec succès on peut afficher un message de succès
         if(isSuccess){
             enqueueSnackbar( t('correspondence_success_send') ,  { variant: "success" });
         }
+        //Sinon on va afficher un message d'erreur selon l'erreur recu
         if(isError){
             if(error.data === "correspondence_add/user_not_found"){
                 enqueueSnackbar( t('correspondence_send_user_not_found') ,  { variant: "error" });
@@ -46,13 +58,25 @@ export default function AddExportation(){
                 enqueueSnackbar( t('correspondence_informations_incorrects') ,  { variant: "error" });
             }
         }
+        // si les données d'etablissements ont recus avec succès on peut les sauvegarder dans une state
         if(dataEsta){
-            setEstablishment(dataEsta)
+            setEstablishment(dataEsta);
+            setEstablishment((prev) => [   
+                { codegresa : "all" , nomar : "جميع المدارس" , nomla : "Tous les établissments" , delegation : "tetouan" , type : "administrative" }    ,
+                ...prev   
+            ]);
         }
+        // si les données des departements ont recus avec succèes on peut les sauvegarder dans state 
         if(dataDep){
-            setDepartments(dataDep.data)
+            setDepartments(dataDep.data);
+            setDepartments((prev) => [  
+                { id:"all", nomAr : "جميع المصالح" , nomLa : "Tous les departements" , delegation : "tetouan" , type : "administrative" },
+                ...prev          
+            ]);
         }
-    },[data,error,dataDep,dataEsta]);
+    },[data,isError,isSuccessDep,isSuccessEsta]); // les données qui actualiser components
+    
+    // la fonction addTags qui permet d'ajouter les doti saisie par l'utilisateur dans state
     const addTags = event => {
         if (event.key === " " && event.target.value !== "") {
             setTags([...tags, { idReceiver : event.target.value.replace(/\s+/g, '') } ]);
@@ -60,10 +84,16 @@ export default function AddExportation(){
         }
     }
 
+    // la fonctions qui permet d'envoyer l'exportation vers backend
     const onAddExportations = async(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         formData.append('receiver', JSON.stringify(tags));
+        if(dep && depWorkers){
+            formData.append('depRoles',depWorkers.id);
+            formData.append('department',dep.id);
+        } 
+        if(eta) formData.append('codegresa',eta.codegresa);
         formData.append('sender',user.doti);
         formData.append('file', files[0]);
         try{
@@ -76,108 +106,118 @@ export default function AddExportation(){
                 });
             }
         }
-        setFiles([]); setTags([]); event.target.reset();
+        setFiles([]); setTags([]); event.target.reset(); setDep(null); setEta(null); // pour supprimer tous les données saisies après l'envoi
     }
-    const onFileChange = (files) => {
-        setFiles(files);
-    }
+
     return (
         <React.Fragment>
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
                 <Typography variant='h6' sx={{fontSize:25 , fontWeight:"bold"}}>{t("sendExportation")}</Typography>
             </Box>
-            <Paper
-                sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}
-            >
-                <form onSubmit={onAddExportations} encType="multipart/form-data">
-                    <div className="tags-input">
-                        <ul id="tags">
-                            {tags.map((tag, index) => (
-                                <li key={index} className="tag">
-                                    <span className='tag-title'>{tag.idReceiver}</span>
-                                    <span className='tag-close-icon'
-                                        onClick={() => removeTags(index)}
-                                    >
-                                        x
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                        <input
-                            type="text"
-                            onKeyDown={event => event.key === " " ? addTags(event) : null}
-                            placeholder={t("doti")}
-                            style={{ fontSize : "1rem" , paddingTop : 2 , paddingBottom : 2}}
+            { isLoadingDep || isLoadingEsta ? (
+                <Box
+                    sx={{
+                        position : "absolute",
+                        top : "50%",
+                        right : "50%",
+                        background : "transparent"
+                    }}
+                >
+                    <CircularProgress/>
+                </Box>
+            ):(
+                <Paper
+                    sx={{
+                        p: 2,
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
+                >
+                    <form onSubmit={onAddExportations} encType="multipart/form-data">
+                        <div className="tags-input">
+                            <ul id="tags">
+                                {tags.map((tag, index) => (
+                                    <li key={index} className="tag">
+                                        <span className='tag-title'>{tag.idReceiver}</span>
+                                        <span className='tag-close-icon'
+                                            onClick={() => removeTags(index)}
+                                        >
+                                            x
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                            <input
+                                type="text"
+                                onKeyDown={event => event.key === " " ? addTags(event) : null}
+                                placeholder={t("doti")}
+                                style={{ fontSize : "1rem" , paddingTop : 2 , paddingBottom : 2}}
+                            />
+                        </div>
+                        <Box sx={{ display : "flex" , marginBottom : 1 , marginTop : 2  }}>
+                            <Autocomplete
+                                value={eta}
+                                autoHighlight
+                                onChange={(e,v) => setEta(v)}
+                                id="combo-box-demo"
+                                options={establishment}
+                                getOptionLabel={(option) => i18next.language === "ar" ? (option.nomar) : (option.nomla) }
+                                sx={{ width: 1/2 , paddingInlineEnd : 1}}
+                                renderInput={(params) => <TextField {...params} label={t("the_etablishment")} inputProps={{...params.inputProps,autoComplete: "disabled"}} />}
+                            />
+                            <Autocomplete
+                                value={dep}
+                                autoHighlight
+                                onChange={(e,v) => setDep(v)}
+                                id="combo-box-demo"
+                                options={departments}
+                                getOptionLabel={(option) => i18next.language === "ar" ? (option.nomAr) : (option.nomLa) }
+                                sx={{ width: 1/2  , paddingInlineEnd : dep ? 1 : 0 }}
+                                renderInput={(params) => <TextField {...params} label={t("the_department")} inputProps={{...params.inputProps,autoComplete: "disabled"}} />}
+                            />
+                            {   dep ? (
+                                <Autocomplete
+                                    value={depWorkers}
+                                    autoHighlight
+                                    onChange={(e,v) => setDepWorkers(v)}
+                                    id="combo-box-demo"
+                                    options={departmentWorkers}
+                                    getOptionLabel={(option) => i18next.language === "ar" ? (option.nomar) : (option.nomla) }
+                                    sx={{ width: 1/2  }}
+                                    renderInput={(params) => <TextField {...params} label={t("departmentWorkers")} inputProps={{...params.inputProps,autoComplete: "disabled"}} />}
+                                />
+                            ):null}
+                        </Box>
+                        <TextField sx={{ marginY : 1 , width : 3/12 , paddingRight : 1 }} label={t("correspondance_number")} variant="outlined" name="number" required disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 , width : 9/12 }} label={t("subject_message")} variant="outlined" name="title" required disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 , width : 6/12 , paddingRight : 1 }} fullWidth multiline rows={2} label={t("references")} variant="outlined" name="references" disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 , width : 6/12}} fullWidth multiline rows={2} label={t("concerned")} variant="outlined" name="concerned" required disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 , width : 8/12 , paddingRight : 1 }} fullWidth label={t("notes")} variant="outlined" rows={4} name="notes" disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 , width : 4/12}} id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 }} fullWidth multiline label={t("message")} variant="outlined" rows={4} name="message" required disabled={isLoading} />
+                        <DropFileInput
+                            files={files}
+                            setFiles={setFiles}
+                            multiple={false}
                         />
-                    </div>
-                    <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} disabled={isLoading}>
-                        <InputLabel id="demo-simple-select-label">{t("department")}</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                label={t("department")}
-                                style={{textAlign: 'start'}}
-                                name="department"
-                            >
-                                {
-                                    departments && departments.map(row=>(
-                                        <MenuItem key={row.id} value={row.id}>{i18next.language==="fr" ? (row.nomLa) : (row.nomAr)}</MenuItem>
-                                    ))
-                                }
-                                <MenuItem value={'all'}>Tout Les Departements</MenuItem>
-                            </Select>
-                    </FormControl>
-                    <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} disabled={isLoading}>
-                        <InputLabel id="demo-simple-select-label">{t("establishement")}</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                label={t("establishement")}
-                                name="codegresa"
-                            >
-                                {
-                                    establishment && establishment.map(row=>(
-                                        <MenuItem key={row.codegresa} value={row.codegresa}>{i18next.language==="fr"? (row.nomla) : (row.nomar)}</MenuItem>)
-                                    )
-                                }
-                                <MenuItem value={'g-scolaire'}>Group-scolaire</MenuItem>
-                                <MenuItem value={'primaire'}>Primaires</MenuItem>
-                                <MenuItem value={'lycee'}>Lycees</MenuItem>
-                                <MenuItem value={'all'}>Tout Les etablissements</MenuItem>
-                            </Select>
-                    </FormControl>
-                    <TextField sx={{ marginY : 1 , width : 3/12 , paddingRight : 1 }} label={t("correspondance_number")} variant="outlined" name="number" required disabled={isLoading} />
-                    <TextField sx={{ marginY : 1 , width : 9/12 }} label={t("subject_message")} variant="outlined" name="title" required disabled={isLoading} />
-                    <TextField sx={{ marginY : 1 , width : 6/12 , paddingRight : 1 }} fullWidth multiline rows={2} label={t("references")} variant="outlined" name="references" disabled={isLoading} />
-                    <TextField sx={{ marginY : 1 , width : 6/12}} fullWidth multiline rows={2} label={t("concerned")} variant="outlined" name="concerned" required disabled={isLoading} />
-                    <TextField sx={{ marginY : 1 , width : 8/12 , paddingRight : 1 }} fullWidth label={t("notes")} variant="outlined" rows={4} name="notes" disabled={isLoading} />
-                    <TextField sx={{ marginY : 1 , width : 4/12}} id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
-                    <TextField sx={{ marginY : 1 }} fullWidth multiline label={t("message")} variant="outlined" rows={4} name="message" required disabled={isLoading} />
-                    <DropFileInput
-                        files={files}
-                        setFiles={setFiles}
-                        multiple={false}
-                    />
-                    <Box sx={{ display : "flex" , justifyContent:"flex-end" , marginTop : 1}}>
-                        { isLoading ? (
-                            <LoadingButton 
-                                loading 
-                                variant="contained"
-                            >
-                                Submit
-                            </LoadingButton>
-                        ) : (
-                            <Button variant='contained' type="submit" startIcon={<Send />} >
-                                {t("send")}
-                            </Button> 
-                        )} 
-                    </Box>
-                </form> 
-            </Paper>
+                        <Box sx={{ display : "flex" , justifyContent:"flex-end" , marginTop : 1}}>
+                            { isLoading ? (
+                                <LoadingButton 
+                                    loading 
+                                    variant="contained"
+                                >
+                                    Submit
+                                </LoadingButton>
+                            ) : (
+                                <Button variant='contained' type="submit" startIcon={<Send />} >
+                                    {t("send")}
+                                </Button> 
+                            )} 
+                        </Box>
+                    </form> 
+                </Paper>
+            )}
+            
         </React.Fragment>
     );
 }

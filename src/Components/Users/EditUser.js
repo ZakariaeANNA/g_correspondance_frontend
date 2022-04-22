@@ -95,17 +95,19 @@ const EditUser = (props) =>{
             CIN: formdata.get("CIN"),
             email: formdata.get("email"),
             phone: formdata.get("phone"),
-            roles: roles,
+            roles: userDepartement === "etablissement" ? "directeur" : roles,
             idDepartement: formdata.get("idDepartement"),
             codegresa : formdata.get("codegresa")
         }
         try{
             await updateUser({body: body ,id: props.props.id}).unwrap();
+            setRoles();
         }catch(error){
             if(error.status === 401){
                 await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
                     localStorage.setItem( "token" , data );
                     updateUser({body: body ,id: props.props.id});
+                    setRoles();
                 });
             }
         }
@@ -180,23 +182,23 @@ const EditUser = (props) =>{
                                         <MenuItem value={'etablissement'}>Etablissement</MenuItem>
                                     </Select>
                                 </FormControl>
-                                <FormControl className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading}>
-                                    <InputLabel id="demo-simple-select-label">{t("role")}</InputLabel>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        label={t("role")}
-                                        value={roles}
-                                        inputprops={{readOnly: props.disabled}}
-                                        onChange={handleRoleChange}
-                                        inputProps={{ readOnly: props.disabled }}
-                                    >
-                                        {userDepartement==="departement" ?
-                                            (<MenuItem value={'admin'}>Admin</MenuItem>):
-                                            (<MenuItem value={'directeur'}>Directeur</MenuItem>)
-                                        }
-                                    </Select>
-                                </FormControl>
+                                {userDepartement==="departement" ? (
+                                    <FormControl className='inputField' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required disabled={isLoading}>
+                                        <InputLabel id="demo-simple-select-label">{t("role")}</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            label={t("role")}
+                                            value={roles}
+                                            inputprops={{readOnly: props.disabled}}
+                                            onChange={handleRoleChange}
+                                            inputProps={{ readOnly: props.disabled }}
+                                        >
+                                            <MenuItem value={'admin'}>Admin</MenuItem>
+                                            <MenuItem value={'chefDep'}>Chef département</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                ):null}
                                 <TextField id="outlined-basic" defaultValue={props.props.doti} name='doti' sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} className='inputField' label={t("doti")} variant="outlined" required disabled={isLoading} inputProps={{ readOnly: props?.disabled }}/>
                                 { userDepartement === "departement" ? (
                                     <FormControl className='inputField' sx={{ width : 1/2 , marginY : 1 }} required disabled={isLoading}>

@@ -105,10 +105,13 @@
   "update_message_success": "تم تغيير معلومات المستخدم بنجاح",
   "update_empty_error": "جميع  الحقول الزامية",
   "update_message_error": "حدث خطأ أثناء تعديل المعلومات",
-  "correspodance_delete_success": "تم حذف المراسلة بنجاح",
-  "correspodance_delete_error": "حدث خطأ أثناء حذف المراسلة !",
+  "correspondance_delete_success": "تم حذف المراسلة بنجاح",
+  "correspondance_delete_error": "حدث خطأ أثناء حذف المراسلة !",
   "correspondance_notFound_error": "المراسلة  غير موجودة بالفعل",
   "correspondance_confirm_message": "؟ هل أنت متأكد أنك تريد حذف العنصر المحدد",
   "user_delete_error": "حدث خطأ أثناء حذف المستخدم",
-  "user_delete_success": "تم حذف المستخدم بنجاح"
+  "user_delete_success": "تم حذف المستخدم بنجاح",
+  "the_etablishment" : "المؤسسة" ,
+  "the_department" : "المصلحة",
+  "departmentWorkers" : "موظفي المصلحة"
 }
