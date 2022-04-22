@@ -249,8 +249,14 @@ export default function FeedbackImport(props){
             setMessage(data);
         }
     },[isSuccess]);
-
-
+    function isJson(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
     return(
         <React.Fragment>
             <Paper
@@ -320,7 +326,7 @@ export default function FeedbackImport(props){
                                                                 (<Chip sx={{ color : "white" , marginX : 1 }} label={`${t("seen")} : ${moment(message.update_at).format('DD-MM-YYYY HH:mm')}`} />) : (null)
                                                             }
                                                         />
-                                                        { message.message!=='undefined' &&
+                                                        { isJson(message.message) &&
                                                             <CardContent>
                                                                 <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
                                                             </CardContent>

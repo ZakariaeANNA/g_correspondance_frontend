@@ -257,6 +257,14 @@ export default function FeedbackExport(props){
         getFeedbackBymailAndBysenderAndByreceiver({ mail : props.idemail , receiver : props.auth.doti , sender : receiver.doti });
         setReceiverDisplay(receiver);
     }
+    function isJson(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
     return(
         <React.Fragment>
             <Paper
@@ -352,7 +360,7 @@ export default function FeedbackExport(props){
                                                         }
                                                     />
                                                     <CardContent>
-                                                        { message.message!=='undefined' &&
+                                                        { isJson(message.message) &&
                                                             <ThemeProvider theme={defaultTheme}>
                                                                 <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
                                                             </ThemeProvider>
