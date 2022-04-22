@@ -320,9 +320,11 @@ export default function FeedbackImport(props){
                                                                 (<Chip sx={{ color : "white" , marginX : 1 }} label={`${t("seen")} : ${moment(message.update_at).format('DD-MM-YYYY HH:mm')}`} />) : (null)
                                                             }
                                                         />
-                                                        <CardContent>
-                                                            <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
-                                                        </CardContent>
+                                                        { message.message!=='undefined' &&
+                                                            <CardContent>
+                                                                <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                            </CardContent>
+                                                        }
                                                         <Divider />
                                                         <CardActions disableSpacing>
                                                         {

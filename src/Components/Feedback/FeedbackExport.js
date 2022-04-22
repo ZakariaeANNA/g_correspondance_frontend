@@ -200,7 +200,8 @@ function SendFeedback(props){
                         </FormControl>
                     )}
                     <Box sx={{ padding: 1 , border : 1 , borderRadius : "6px" , borderColor : "#d6d8da" ,paddingBottom: 6 , marginY : 2}}>
-                        <MUIRichTextEditor label="Start typing..." inlineStyle={{ marginY : 2 }} onChange={handleDataChange} controls={["title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "numberList", "bulletList", "quote", "code", "clear"]} />
+                        <MUIRichTextEditor label="Start typing..." inlineStyle={{ marginY : 2 }} onChange={handleDataChange} control
+                        s={["title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "numberList", "bulletList", "quote", "code", "clear"]} />
                     </Box>
                     <DropFileInput
                         files={files}
@@ -267,28 +268,29 @@ export default function FeedbackExport(props){
             >
                 <Box sx={{ display:"flex"}}>
                    <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
-                        { receivers.map( receiver =>(
-                            <ListItem  
-                                key={receiver.receiver[0].doti}
-                                secondaryAction={
-                                    receiver.receiverConfirmation === "pending" ? (
-                                        <Chip label={t('pending')} />
-                                    ):(
-                                        <Chip label={t(receiver.receiverConfirmation)} />
-                                    )
-                                } 
-                                onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation,receiver.receiverConfirmation)}
-                                disablePadding
-                            >
-                                <ListItemButton role={undefined} dense selected={selected === receiver.receiver[0].doti}>   
-                                    <ListItemAvatar>
-                                        <Avatar alt={receiver.receiver[0].fullnamela} sx={{ bgcolor : stringToColor(receiver.receiver[0].fullnamela) }} src="/static/images/avatar/1.jpg" />
-                                    </ListItemAvatar>
-                                    <ListItemText primary={ i18next.language === "fr" ? (receiver.receiver[0].fullnamela) : (receiver.receiver[0].fullnamear) }/>
-                                    <Divider variant="inset" component="li" />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
+                        { receivers.map( receiver =>{
+                            return(
+                                <ListItem  
+                                    key={receiver.receiver[0].doti}
+                                    secondaryAction={
+                                        receiver.receiverConfirmation === "pending" ? (
+                                            <Chip label={t('pending')} />
+                                        ):(
+                                            <Chip label={t(receiver.receiverConfirmation)} />
+                                        )
+                                    } 
+                                    onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation,receiver.receiverConfirmation)}
+                                    disablePadding
+                                >
+                                    <ListItemButton role={undefined} dense selected={selected === receiver.receiver[0].doti}>   
+                                        <ListItemAvatar>
+                                            <Avatar alt={receiver.receiver[0].fullnamela} sx={{ bgcolor : stringToColor(receiver.receiver[0].fullnamela) }} src="/static/images/avatar/1.jpg" />
+                                        </ListItemAvatar>
+                                        <ListItemText primary={ i18next.language === "fr" ? (receiver.receiver[0].fullnamela) : (receiver.receiver[0].fullnamear) }/>
+                                        <Divider variant="inset" component="li" />
+                                    </ListItemButton>
+                                </ListItem>
+                            )})}
                     </List>
                     {   receiverDisplay ? (
                         <Box sx={{ paddingX : 2 , width : "100%" }}>
@@ -350,14 +352,16 @@ export default function FeedbackExport(props){
                                                         }
                                                     />
                                                     <CardContent>
-                                                        <ThemeProvider theme={defaultTheme}>
-                                                            <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
-                                                        </ThemeProvider>
+                                                        { message.message!=='undefined' &&
+                                                            <ThemeProvider theme={defaultTheme}>
+                                                                <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                            </ThemeProvider>
+                                                        }
                                                     </CardContent>
                                                     <Divider />
                                                     <CardActions sx={{ p:2 }}>
                                                     {
-                                                        message.attachement.map(attach=>(
+                                                        message?.attachement?.map(attach=>(
                                                             <Tooltip title={attach.filename} arrow key={attach.id}>
                                                                 <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
                                                                         <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>

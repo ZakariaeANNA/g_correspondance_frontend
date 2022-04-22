@@ -5,7 +5,6 @@ import { useGetDepartmentsQuery } from "../../store/api/departmentApi";
 import { useGetEstablishmentsQuery } from '../../store/api/establishementApi';
 import { Button, TextField , Paper , Typography } from "@mui/material";
 import { Send, Store} from "@mui/icons-material";
-import { decodeToken } from "react-jwt";
 import { useSnackbar } from 'notistack';
 import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
@@ -112,11 +111,11 @@ export default function AddExportation(){
                         />
                     </div>
                     <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} disabled={isLoading}>
-                        <InputLabel id="demo-simple-select-label">{t("department")}</InputLabel>
+                        <InputLabel id="demo-simple-select-label">{t("the_department")}</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                label={t("department")}
+                                label={t("the_department")}
                                 style={{textAlign: 'start'}}
                                 name="department"
                             >
@@ -129,11 +128,12 @@ export default function AddExportation(){
                             </Select>
                     </FormControl>
                     <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} disabled={isLoading}>
-                        <InputLabel id="demo-simple-select-label">{t("establishement")}</InputLabel>
+                        <InputLabel id="demo-simple-select-label">{t("the_establishment")}</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                label={t("establishement")}
+                                label={t("the_establishment")}
+                                style={{textAlign: 'start'}}
                                 name="codegresa"
                             >
                                 {
