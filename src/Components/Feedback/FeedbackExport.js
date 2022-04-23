@@ -101,7 +101,7 @@ const defaultTheme = createTheme({
 
 function SendFeedback(props){
     const [open, setOpen] = React.useState(false);
-    
+    const [plainTextValue,setPlainTextValue] = useState();
     const handleClickOpen = () => {
       setOpen(true);
     };
@@ -114,6 +114,7 @@ function SendFeedback(props){
     const [ approval , setApproval ] = useState();
     const [ refresh ] = useRefreshMutation();
     const handleDataChange = (event)=>{
+        setPlainTextValue(event.getCurrentContent().getPlainText()) // for plain text
         const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
         rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
     }
@@ -130,7 +131,7 @@ function SendFeedback(props){
         formData.append('idSender',props.sender);
         formData.append('idReceiver',props.receiver.doti);
         formData.append('file', files);
-        formData.append('message',value);
+        if(plainTextValue) formData.append('message',value);
         files.map( file => {
             formData.append('file['+index+']', file);        
             index++;    
@@ -240,9 +241,7 @@ export default function FeedbackExport(props){
     const [onUpdateStatus,{}]= useUpdateFeedbackStatusMutation();
     useEffect(()=>{
         if(isSuccess){
-            console.log(data);
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
-                console.log("reader message")
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail})
                 
             }

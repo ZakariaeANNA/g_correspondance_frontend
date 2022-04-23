@@ -13,7 +13,7 @@ import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Translate , Language } from '@mui/icons-material/';
+import { Translate } from '@mui/icons-material/';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { MainListItems, SecondaryListItems } from './Components/listItems/listItems';
 import Chart from './Components/Chart/Chart';
@@ -42,6 +42,9 @@ import AddExportation from './Components/Exportations/AddExportation';
 import ChangePassword from './Components/Users/ChangePassword';
 import Profile from './Components/Users/Profile';
 import IdleTimer from 'react-idle-timer';
+import NotFoud from './Components/Error/NotFound';
+import UnAuthorized from './Components/Error/UnAuthorized';
+import Forbidden from './Components/Error/Forbidden';
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -364,6 +367,15 @@ export default function Home() {
                   </Route>
                   <Route path="/app/profile">
                     <Profile />
+                  </Route>
+                  <Route path={'/app/not_found'}>
+                      <NotFoud/>
+                  </Route>
+                  <Route path={'/app/unauthorized'}>
+                      <UnAuthorized />
+                  </Route>
+                  <Route path={'/app/forbidden'}>
+                      <Forbidden />
                   </Route>
                 </Switch>
                 {/* Content */}

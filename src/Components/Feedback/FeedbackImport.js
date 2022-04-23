@@ -27,7 +27,7 @@ import { convertToRaw } from 'draft-js';
 import { useSnackbar } from 'notistack';
 import { createTheme } from '@mui/material/styles';
 import { t } from 'i18next';
-import i18next from 'i18next'
+import i18next from 'i18next';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -36,8 +36,8 @@ import FormLabel from '@mui/material/FormLabel';
 import Email from '@mui/icons-material/Email';
 import DropFileInput from '../drop-file-input/DropFileInput';
 import "./Feedback.css";
-import 'moment/locale/ar-ma' 
-import 'moment/locale/fr' 
+import 'moment/locale/ar-ma';
+import 'moment/locale/fr';
 import CircularProgress from '@mui/material/CircularProgress';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
@@ -94,6 +94,10 @@ const defaultTheme = createTheme({
 
 function SendFeedback(props){
     const [open, setOpen] = React.useState(false);
+    const [value,setValue] = React.useState('')
+    const [files,setFiles] = useState([]);
+    const [radioValue,setRadioValue] = useState('');
+    const [plainTextValue,setPlainTextValue] = useState();
     
     const handleClickOpen = () => {
       setOpen(true);
@@ -103,18 +107,15 @@ function SendFeedback(props){
         setOpen(false);
     };
     
-    const [value,setValue] = React.useState('')
     const [ refresh ] = useRefreshMutation();
     const handleDataChange = (event)=>{
-        const plainText = event.getCurrentContent().getPlainText() // for plain text
+        setPlainTextValue(event.getCurrentContent().getPlainText()) // for plain text
         const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
         rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
     }
     
     const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
     
-    const [files,setFiles] = useState([]);
-    const [radioValue,setRadioValue] = useState('');
     const handleRadioChange = (event) =>{
         setRadioValue(event.target.value);
     }
@@ -126,7 +127,7 @@ function SendFeedback(props){
         formData.append('idSender',props.sender);
         formData.append('idReceiver',props.receiver.doti);
         formData.append('file', files);
-        formData.append('message',value);
+        if(plainTextValue) formData.append('message',value);
         files.map( file => {
             formData.append('file['+index+']', file);        
             index++;    
@@ -230,7 +231,6 @@ function SendFeedback(props){
   
 export default function FeedbackImport(props){
     const receivers = JSON.parse(localStorage.getItem("receivers"));
-    const [expanded, setExpanded] = React.useState(false);
     const [ message , setMessage ] = useState([]);
     
     const { refetch,data , isLoading , 
@@ -242,7 +242,6 @@ export default function FeedbackImport(props){
 
     useEffect(()=>{
         if(isSuccess){
-            console.log(data)
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});                    
             }
