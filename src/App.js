@@ -29,7 +29,6 @@ function App() {
   const currentLanguageCode = cookies.get('i18next') || 'fr'
   const currentLanguage = languages.find((l) => l.code === currentLanguageCode)
   const { t } = useTranslation();
-
   useEffect(() => {
     document.body.dir = currentLanguage.dir || 'ltr'
     document.title = t('project_title')
@@ -47,7 +46,7 @@ function App() {
             <Route exact path="/auth" >
               <Login />
             </Route>
-            <Route path="/app/*">
+            <Route exact path="/app/*">
               <Home />
             </Route>
           </Switch>

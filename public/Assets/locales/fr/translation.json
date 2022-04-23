@@ -112,6 +112,7 @@
   "user_delete_error": "Une erreur survenue lors de la Suppression d'utilisateur",
   "user_delete_success": "L'utilisateur a été Supprimé avec succès",
   "the_etablishment" : "Etablissement",
-  "the_department" : "Département",
-  "departmentWorkers" : "Les employés du département"
+  "departmentWorkers" : "Les employés du département",
+  "the_establishment": "Etablissement",
+  "the_department": "Departement"
 }

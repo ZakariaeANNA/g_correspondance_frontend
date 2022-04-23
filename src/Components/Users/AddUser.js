@@ -14,23 +14,31 @@ import { useSnackbar } from 'notistack';
 import { Box } from '@mui/system';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
-
+import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 
 export default function Adduser(){
     const [AddUser, { data, isLoading, error, isError, isSuccess }] = useAddUserMutation();
     const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery();
     const { enqueueSnackbar } = useSnackbar();
+    const history = useHistory();
     const [ departments , setDepartments ] = useState([]);
     const [ refresh ] = useRefreshMutation();
     const [userDepartement,setUserDepartement] = useState(null);
+    const user = useSelector( state => state.auth.user );
+
+    if(user && user.role === "directeur")
+      history.push("/app/");
 
     const handleUserDepartementChange  = (event)  =>{
       setUserDepartement(event.target.value)
     }
+
     const handleUserDepartementSubmit = () => {
       setUserDepartement();
     }
+
     const onAddUser = async(event) =>{
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
@@ -49,6 +57,7 @@ export default function Adduser(){
       }
       event.target.reset(); setUserDepartement();
     }
+
     useEffect(()=>{
       if(isSuccess){
           enqueueSnackbar( t("add_user_success") ,  { variant: "success" });
@@ -65,6 +74,7 @@ export default function Adduser(){
         setDepartments(dataDep.data);
       }
     },[data,error,dataDep]);
+
     return (
       <React.Fragment>
           <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>

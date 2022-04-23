@@ -12,7 +12,6 @@ export default function Feedback(){
     const history = useHistory();
     const { idemail } = useParams();
     const previousRoute = localStorage.getItem("path");
-    
     useEffect(()=>{
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     },[]);

@@ -21,7 +21,7 @@ import Menu from '@mui/material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { Route , Switch , Link } from "react-router-dom";
+import { Route , Switch , Link , Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Users from '../src/Components/Users/Users';
@@ -42,6 +42,7 @@ import AddExportation from './Components/Exportations/AddExportation';
 import ChangePassword from './Components/Users/ChangePassword';
 import Profile from './Components/Users/Profile';
 import IdleTimer from 'react-idle-timer';
+import { isExpired } from "react-jwt";
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -118,6 +119,7 @@ export default function Home() {
   const [logout , { isLoading : isLoadingLogout , isSuccess : isSuccessLogout }] = useLogoutMutation();
   const auth = useSelector( state => state.auth.user );
   const history = useHistory();
+  const token = localStorage.getItem("token");
   const { t } = useTranslation();
 
   const toggleDrawer = () => {
@@ -174,7 +176,7 @@ export default function Home() {
 
   return (
     <IdleTimer
-      timeout={900000}
+      timeout={300000}
       onIdle={handleOnIdle}
       debounce={250}
     >
@@ -330,41 +332,55 @@ export default function Home() {
               <Toolbar />
               <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
                 <Switch>
-                  <Route exact path="/app/" >
-                    <Paper
-                      sx={{
-                        p: 2,
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <Chart />
-                    </Paper>
-                  </Route>
-                  <Route path="/app/exportations">
-                      <Exportation />
-                  </Route>
-                  <Route path="/app/importations">
-                      <Importations />
-                  </Route>
-                  <Route path="/app/feedback/:idemail">
-                      <Feedback />
-                  </Route>
-                  <Route path="/app/users">
-                      <Users />
-                  </Route>
-                  <Route path="/app/adduser">
-                      <Adduser />
-                  </Route>
-                  <Route path="/app/addexportation">
-                      <AddExportation />
-                  </Route>
-                  <Route path="/app/changepassword">
-                    <ChangePassword />
-                  </Route>
-                  <Route path="/app/profile">
-                    <Profile />
-                  </Route>
+                  { !token || isExpired(token) ? (
+                    <Redirect to="/auth/" />
+                  ):(
+                    <React.Fragment>
+                      <Route exact path="/app/" >
+                        <Paper
+                          sx={{
+                            p: 2,
+                            display: 'flex',
+                            flexDirection: 'column',
+                          }}
+                        >
+                          <Chart />
+                        </Paper>
+                      </Route>
+                      <Route path="/app/exportations">
+                          <Exportation />
+                      </Route>
+                      <Route path="/app/importations">
+                          <Importations />
+                      </Route>
+                      <Route path="/app/feedback/:idemail">
+                          <Feedback />
+                      </Route>
+                      <Route path="/app/users">
+                        { auth && auth.role === "directeur" ? (
+                          <Redirect to="/app/" />
+                        ):(
+                          <Users />
+                        )}
+                      </Route>
+                      <Route path="/app/adduser">
+                        { auth && auth.role === "directeur" ? (
+                          <Redirect to="/app/" />
+                        ):(
+                          <Adduser />
+                        )}
+                      </Route>
+                      <Route path="/app/addexportation">
+                        <AddExportation />
+                      </Route>
+                      <Route path="/app/changepassword">
+                        <ChangePassword />
+                      </Route>
+                      <Route path="/app/profile">
+                        <Profile />
+                      </Route>
+                    </React.Fragment>
+                  )}
                 </Switch>
                 {/* Content */}
               </Container>

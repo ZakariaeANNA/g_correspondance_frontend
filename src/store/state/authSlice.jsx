@@ -14,7 +14,10 @@ const authSlice = createSlice({
   extraReducers: function(builder){
     builder.addCase("checkLogin" , (state,action)=>{
       const token = localStorage.getItem("token");
-      if(isExpired(token)){
+      if(!token){
+        action.history.push(action.route);
+      }
+      if(token && isExpired(token)){
         localStorage.clear("token");
         action.history.push({pathname: action.route , appState: { session : true } });
       }else{

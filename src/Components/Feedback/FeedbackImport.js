@@ -94,7 +94,14 @@ const defaultTheme = createTheme({
 
 function SendFeedback(props){
     const [open, setOpen] = React.useState(false);
-    
+    const [value,setValue] = React.useState('')
+    const [ refresh ] = useRefreshMutation();
+    const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
+    const [files,setFiles] = useState([]);
+    const [radioValue,setRadioValue] = useState('');
+    const [onUpdateConfirmationByReceiver] = useConfirmMailByReceiverMutation();
+    const { enqueueSnackbar } = useSnackbar();
+
     const handleClickOpen = () => {
       setOpen(true);
     };
@@ -103,22 +110,15 @@ function SendFeedback(props){
         setOpen(false);
     };
     
-    const [value,setValue] = React.useState('')
-    const [ refresh ] = useRefreshMutation();
     const handleDataChange = (event)=>{
-        const plainText = event.getCurrentContent().getPlainText() // for plain text
         const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
         rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
     }
-    
-    const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
-    
-    const [files,setFiles] = useState([]);
-    const [radioValue,setRadioValue] = useState('');
+        
     const handleRadioChange = (event) =>{
         setRadioValue(event.target.value);
     }
-    const [onUpdateConfirmationByReceiver,{}] = useConfirmMailByReceiverMutation();
+
     const onAddFeedback = async() => {
         const formData = new FormData();
         var index = 0;
@@ -141,10 +141,9 @@ function SendFeedback(props){
                 });
             }
         }
-        setValue(''); setFiles([]);
+        setValue(''); setFiles([]); props.refetch();
     }
 
-    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(()=>{
         if(isSuccess){
@@ -162,10 +161,6 @@ function SendFeedback(props){
             }
         }
     },[data,error]);
-
-    const onFileChange = (files) => {
-        setFiles(files);
-    }
   
     return(
         <>
@@ -232,17 +227,14 @@ export default function FeedbackImport(props){
     const receivers = JSON.parse(localStorage.getItem("receivers"));
     const [expanded, setExpanded] = React.useState(false);
     const [ message , setMessage ] = useState([]);
-    
     const { refetch,data , isLoading , 
             isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : receivers.mail.sender.doti });
-    const [onUpdateStatus,{}] = useUpdateFeedbackStatusMutation();
+    const [onUpdateStatus] = useUpdateFeedbackStatusMutation();
     const previousRoute = localStorage.getItem("path");
-    
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
 
     useEffect(()=>{
         if(isSuccess){
-            console.log(data)
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});                    
             }
@@ -250,6 +242,14 @@ export default function FeedbackImport(props){
         }
     },[isSuccess]);
 
+    const isJson = (str) => {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
 
     return(
         <React.Fragment>
@@ -280,7 +280,7 @@ export default function FeedbackImport(props){
                                     },
                                 }}
                             >
-                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receivers.mail.sender} senderConfirm={receivers.senderConfirmation} receiverConfirm={receivers.receiverConfirmation}/>
+                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receivers.mail.sender} senderConfirm={receivers.senderConfirmation} receiverConfirm={receivers.receiverConfirmation} refetch={refetch}/>
                                 <Divider orientation="vertical" flexItem />
                                 <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
                                     <Typography>{t("approval_achevement")}</Typography>
@@ -320,9 +320,11 @@ export default function FeedbackImport(props){
                                                                 (<Chip sx={{ color : "white" , marginX : 1 }} label={`${t("seen")} : ${moment(message.update_at).format('DD-MM-YYYY HH:mm')}`} />) : (null)
                                                             }
                                                         />
-                                                        <CardContent>
-                                                            <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
-                                                        </CardContent>
+                                                        { isJson(message.message) &&
+                                                            <CardContent>
+                                                                <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                            </CardContent>
+                                                        }
                                                         <Divider />
                                                         <CardActions disableSpacing>
                                                         {

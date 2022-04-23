@@ -39,7 +39,8 @@ export default function AddExportation(){
     const user = useSelector( state => state.auth.user ); // on a utilisé useSelector pour avoir les données d'utilisateur à partir de la fonction dispatch de redux
     const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery(); // getdepartments responsable à recevoir tous les departements existe dans le systeme
     const { data : dataEsta , isLoading : isLoadingEsta , error : errorEsta , isError : isErrorEsta , isSuccess : isSuccessEsta } = useGetEstablishmentsQuery(); // get etablishments responsable à recevoir tous les etablissemnts existe dans la base de données
-    
+    const auth = useSelector( state => state.auth.user );
+
     // la fonction removeTags pour supprimer un doti existe par l'utilisateur
     const removeTags = indexToRemove => { 
 		setTags([...tags.filter((_, index) => index !== indexToRemove)]);
@@ -69,10 +70,11 @@ export default function AddExportation(){
         // si les données des departements ont recus avec succèes on peut les sauvegarder dans state 
         if(dataDep){
             setDepartments(dataDep.data);
-            setDepartments((prev) => [  
-                { id:"all", nomAr : "جميع المصالح" , nomLa : "Tous les departements" , delegation : "tetouan" , type : "administrative" },
-                ...prev          
-            ]);
+            if(auth.role !== "directeur")
+                setDepartments((prev) => [  
+                    { id:"all", nomAr : "جميع المصالح" , nomLa : "Tous les departements" , delegation : "tetouan" , type : "administrative" },
+                    ...prev          
+                ]);
         }
     },[data,isError,isSuccessDep,isSuccessEsta]); // les données qui actualiser components
     
@@ -155,16 +157,19 @@ export default function AddExportation(){
                             />
                         </div>
                         <Box sx={{ display : "flex" , marginBottom : 1 , marginTop : 2  }}>
-                            <Autocomplete
-                                value={eta}
-                                autoHighlight
-                                onChange={(e,v) => setEta(v)}
-                                id="combo-box-demo"
-                                options={establishment}
-                                getOptionLabel={(option) => i18next.language === "ar" ? (option.nomar) : (option.nomla) }
-                                sx={{ width: 1/2 , paddingInlineEnd : 1}}
-                                renderInput={(params) => <TextField {...params} label={t("the_etablishment")} inputProps={{...params.inputProps,autoComplete: "disabled"}} />}
-                            />
+                            { auth.role != "directeur" ? (
+                                <Autocomplete
+                                    value={eta}
+                                    autoHighlight
+                                    onChange={(e,v) => setEta(v)}
+                                    id="combo-box-demo"
+                                    options={establishment}
+                                    getOptionLabel={(option) => i18next.language === "ar" ? (option.nomar) : (option.nomla) }
+                                    sx={{ paddingInlineEnd : 1}}
+                                    fullWidth
+                                    renderInput={(params) => <TextField {...params} label={t("the_etablishment")} inputProps={{...params.inputProps,autoComplete: "disabled"}} />}
+                                />
+                            ): null}
                             <Autocomplete
                                 value={dep}
                                 autoHighlight
@@ -172,7 +177,8 @@ export default function AddExportation(){
                                 id="combo-box-demo"
                                 options={departments}
                                 getOptionLabel={(option) => i18next.language === "ar" ? (option.nomAr) : (option.nomLa) }
-                                sx={{ width: 1/2  , paddingInlineEnd : dep ? 1 : 0 }}
+                                sx={{ paddingInlineEnd : dep ? 1 : 0 }}
+                                fullWidth
                                 renderInput={(params) => <TextField {...params} label={t("the_department")} inputProps={{...params.inputProps,autoComplete: "disabled"}} />}
                             />
                             {   dep ? (
@@ -182,8 +188,8 @@ export default function AddExportation(){
                                     onChange={(e,v) => setDepWorkers(v)}
                                     id="combo-box-demo"
                                     options={departmentWorkers}
+                                    fullWidth
                                     getOptionLabel={(option) => i18next.language === "ar" ? (option.nomar) : (option.nomla) }
-                                    sx={{ width: 1/2  }}
                                     renderInput={(params) => <TextField {...params} label={t("departmentWorkers")} inputProps={{...params.inputProps,autoComplete: "disabled"}} />}
                                 />
                             ):null}
