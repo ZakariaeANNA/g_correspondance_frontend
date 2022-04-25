@@ -53,8 +53,8 @@ export default function ViewImportation({params}){
     const handleClickOpen = () => {
       setOpen(true);
     };
-    const date = moment(params.created_at).format('DD-MM-YYYY HH:mm');
-    const achevelentDate = moment(params.created_at).format('DD-MM-YYYY HH:mm');
+    const date = moment(params.mail.created_at).format('DD-MM-YYYY HH:mm');
+    const achevelentDate = moment(params.mail.achevementdate).format('DD-MM-YYYY HH:mm');
     const handleClose = () => {
         setOpen(false);
     };

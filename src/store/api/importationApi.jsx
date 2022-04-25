@@ -8,7 +8,6 @@ export const importationApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://127.0.0.1:8000/api/correspondences",
     prepareHeaders: (headers) => {
-        console.log("fff");
         const token = localStorage.getItem("token"); 
         if (token && !isExpired(token))
             headers.set('authorization', `Bearer ${token}`);

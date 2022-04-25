@@ -112,8 +112,8 @@ export default function Adduser(){
                             style={{ textAlign : "start" }}
                             value={userDepartement}
                         >
-                            <MenuItem value={'departement'}>Departement</MenuItem>
-                            <MenuItem value={'etablissement'}>Etablissement</MenuItem>
+                            <MenuItem value={'departement'}>{t("the_department")}</MenuItem>
+                            <MenuItem value={'etablissement'}>{t("the_establishment")}</MenuItem>
                         </Select>
                     </FormControl>
                     { userDepartement === undefined ? (

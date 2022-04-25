@@ -1,4 +1,4 @@
-import React,{ useState,useEffect } from 'react'
+import React,{ useState,useEffect,useRef } from 'react'
 import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -27,7 +27,7 @@ import { convertToRaw } from 'draft-js';
 import { useSnackbar } from 'notistack';
 import { createTheme } from '@mui/material/styles';
 import { t } from 'i18next';
-import i18next from 'i18next'
+import i18next from 'i18next';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -36,8 +36,8 @@ import FormLabel from '@mui/material/FormLabel';
 import Email from '@mui/icons-material/Email';
 import DropFileInput from '../drop-file-input/DropFileInput';
 import "./Feedback.css";
-import 'moment/locale/ar-ma' 
-import 'moment/locale/fr' 
+import 'moment/locale/ar-ma';
+import 'moment/locale/fr';
 import CircularProgress from '@mui/material/CircularProgress';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
@@ -99,6 +99,7 @@ function SendFeedback(props){
     const [addFeedback, { data, isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
     const [files,setFiles] = useState([]);
     const [radioValue,setRadioValue] = useState('');
+    const [plainTextValue,setPlainTextValue] = useState();
     const [onUpdateConfirmationByReceiver] = useConfirmMailByReceiverMutation();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -111,6 +112,7 @@ function SendFeedback(props){
     };
     
     const handleDataChange = (event)=>{
+        setPlainTextValue(event.getCurrentContent().getPlainText()) // for plain text
         const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
         rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
     }
@@ -126,7 +128,7 @@ function SendFeedback(props){
         formData.append('idSender',props.sender);
         formData.append('idReceiver',props.receiver.doti);
         formData.append('file', files);
-        formData.append('message',value);
+        if(plainTextValue) formData.append('message',value);
         files.map( file => {
             formData.append('file['+index+']', file);        
             index++;    
@@ -225,20 +227,23 @@ function SendFeedback(props){
   
 export default function FeedbackImport(props){
     const receivers = JSON.parse(localStorage.getItem("receivers"));
-    const [expanded, setExpanded] = React.useState(false);
     const [ message , setMessage ] = useState([]);
     const { refetch,data , isLoading , 
             isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : receivers.mail.sender.doti });
     const [onUpdateStatus] = useUpdateFeedbackStatusMutation();
     const previousRoute = localStorage.getItem("path");
+    const listRef = useRef(null);
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
 
     useEffect(()=>{
         if(isSuccess){
-            if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
+            if(data.filter(item => item.status === 0 && item.idReceiver === props.auth.doti).length > 0){
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});                    
             }
             setMessage(data);
+            if(listRef.current){
+                listRef.current.scrollTop = listRef.current.scrollHeight
+            }
         }
     },[isSuccess]);
 
@@ -301,7 +306,7 @@ export default function FeedbackImport(props){
                             ):(
                                 <React.Fragment>
                                     {   data?.length > 0 ? (
-                                            <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
+                                            <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable" ref={listRef}>
                                                 { data && data.map( message => (
                                                     <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6' , color :"white" , boxShadow : 3 }:{ textAlign:"left" , marginY : 1  , boxShadow : 3}} key={message.id} >
                                                         <CardHeader

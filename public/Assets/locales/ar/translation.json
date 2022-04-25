@@ -114,5 +114,9 @@
   "the_etablishment" : "المؤسسة" ,
   "departmentWorkers" : "موظفي المصلحة",
   "the_establishment": "المؤسسة",
-  "the_department": "المصلحة"
+  "the_department": "المصلحة",
+  "see_conversation" : "انقر فوق المستخدم لعرض المحادثة.",
+  "admin" : "مشرف",
+  "chefDep" : "رئيس مصلحة",
+  "delete" : "حذف"
 }

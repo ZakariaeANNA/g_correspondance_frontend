@@ -13,7 +13,7 @@ import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Translate , Language } from '@mui/icons-material/';
+import { Translate } from '@mui/icons-material/';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { MainListItems, SecondaryListItems } from './Components/listItems/listItems';
 import Chart from './Components/Chart/Chart';
@@ -43,6 +43,7 @@ import ChangePassword from './Components/Users/ChangePassword';
 import Profile from './Components/Users/Profile';
 import IdleTimer from 'react-idle-timer';
 import { isExpired } from "react-jwt";
+import NotFound from './Components/Error/NotFound';
 
 const cacheLtr = createCache({
   key: "muiltr"

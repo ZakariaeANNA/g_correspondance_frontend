@@ -8,6 +8,9 @@ import cookies from 'js-cookie';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import fontTheme from "./Util/fontTheme";
+import NotFound from './Components/Error/NotFound';
+import UnAuthorized from './Components/Error/UnAuthorized';
+import Forbidden from './Components/Error/Forbidden';
 
 const languages = [
   {
@@ -48,6 +51,18 @@ function App() {
             </Route>
             <Route exact path="/app/*">
               <Home />
+            </Route>
+            <Route exact path="/403">
+              <Forbidden />
+            </Route>
+            <Route exact path="/401">
+              <UnAuthorized />
+            </Route>
+            <Route path="*">
+              <NotFound />
+            </Route>
+            <Route path="/404">
+              <NotFound />
             </Route>
           </Switch>
         </div>        

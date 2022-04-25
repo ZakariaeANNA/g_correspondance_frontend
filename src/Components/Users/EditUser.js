@@ -178,8 +178,8 @@ const EditUser = (props) =>{
                                         onChange={handleUserDepartementChange}
                                         inputProps={{ readOnly: props.disabled }}
                                     >
-                                        <MenuItem value={'departement'}>Departement</MenuItem>
-                                        <MenuItem value={'etablissement'}>Etablissement</MenuItem>
+                                        <MenuItem value={'departement'}>{t("the_department")}</MenuItem>
+                                        <MenuItem value={'etablissement'}>{t("the_establishment")}</MenuItem>
                                     </Select>
                                 </FormControl>
                                 {userDepartement==="departement" ? (

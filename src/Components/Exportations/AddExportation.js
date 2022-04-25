@@ -53,6 +53,7 @@ export default function AddExportation(){
         }
         //Sinon on va afficher un message d'erreur selon l'erreur recu
         if(isError){
+            console.log(error.data);
             if(error.data === "correspondence_add/user_not_found"){
                 enqueueSnackbar( t('correspondence_send_user_not_found') ,  { variant: "error" });
             }else if(error.data === "correspondence_add/informations_incorrects"){
@@ -64,6 +65,9 @@ export default function AddExportation(){
             setEstablishment(dataEsta);
             setEstablishment((prev) => [   
                 { codegresa : "all" , nomar : "جميع المدارس" , nomla : "Tous les établissments" , delegation : "tetouan" , type : "administrative" }    ,
+                { codegresa:"primaire", nomar : "مدارس التعليم الابتدائي" , nomla : "Ecoles primaires" , delegation : "tetouan" },
+                { codegresa:"college", nomar : "مدارس التعليم الاعدادي" , nomla : "Ecoles colleges" , delegation : "tetouan" },
+                { codegresa:"lycee", nomar : "مدارس التعليم الثانوي" , nomla : "Ecoles lycee" , delegation : "tetouan" },
                 ...prev   
             ]);
         }
@@ -72,7 +76,7 @@ export default function AddExportation(){
             setDepartments(dataDep.data);
             if(auth.role !== "directeur")
                 setDepartments((prev) => [  
-                    { id:"all", nomAr : "جميع المصالح" , nomLa : "Tous les departements" , delegation : "tetouan" , type : "administrative" },
+                    { id:"all", nomAr : "جميع المصالح" , nomLa : "Tous les departements" , delegation : "tetouan" },
                     ...prev          
                 ]);
         }

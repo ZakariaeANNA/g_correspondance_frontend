@@ -114,5 +114,9 @@
   "the_etablishment" : "Etablissement",
   "departmentWorkers" : "Les employés du département",
   "the_establishment": "Etablissement",
-  "the_department": "Departement"
+  "the_department": "Departement",
+  "see_conversation": "Cliquez sur l'utilisateur pour voir la conversation.",
+  "admin" : "Admin" ,
+  "chefDep": "Chef Département",
+  "delete" : "Supprimer"
 }
