@@ -5,7 +5,7 @@ import { Box } from '@mui/system';
 
 
 
-const NotFoud =  () =>{
+const NotFound =  () =>{
 return(
     <React.Fragment>
         <Paper
@@ -31,4 +31,4 @@ return(
     </React.Fragment>    
 )
 }
-export default NotFoud;
+export default NotFound;

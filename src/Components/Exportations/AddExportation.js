@@ -138,8 +138,8 @@ export default function AddExportation(){
                             >
                                 {
                                     establishment && establishment.map(row=>(
-                                        <MenuItem key={row.codegresa} value={row.codegresa}>{i18next.language==="fr"? (row.nomla) : (row.nomar)}</MenuItem>)
-                                    )
+                                        <MenuItem key={row.codegresa} value={row.codegresa}>{i18next.language==="fr"? (row.nomla) : (row.nomar)}</MenuItem>
+                                    ))
                                 }
                                 <MenuItem value={'g-scolaire'}>Group-scolaire</MenuItem>
                                 <MenuItem value={'primaire'}>Primaires</MenuItem>

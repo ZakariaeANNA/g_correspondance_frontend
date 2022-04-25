@@ -112,5 +112,6 @@
   "user_delete_error": "Une erreur survenue lors de la Suppression d'utilisateur",
   "user_delete_success": "L'utilisateur a été Supprimé avec succe",
   "the_establishment": "Etablissement",
-  "the_department": "Departement"
+  "the_department": "Departement",
+  "is_confirmation": "Message de Confirmation"
 }

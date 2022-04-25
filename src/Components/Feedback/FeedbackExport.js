@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useAddFeedbackMutation,useConfirmMailBySenderMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation, useUpdateFeedbackStatusMutation } from "../../store/api/feedbackApi";
+import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useConfirmMailBySenderMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation, useUpdateFeedbackStatusMutation } from "../../store/api/feedbackApi";
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
 import { DialogContent, IconButton , ListItemButton  } from "@mui/material";
@@ -102,16 +102,18 @@ const defaultTheme = createTheme({
 function SendFeedback(props){
     const [open, setOpen] = React.useState(false);
     const [plainTextValue,setPlainTextValue] = useState();
+    const [isConirmation,setIsCormiation] = useState(0);
+    const [value,setValue] = React.useState('');
+    const [ approval , setApproval ] = useState();
     const handleClickOpen = () => {
       setOpen(true);
     };
-    
+    console.log(props.receiverConfirmation);
+    console.log(props.senderConfirmation);
     const handleClose = () => {
         setOpen(false);
     };
-    
-    const [value,setValue] = React.useState('');
-    const [ approval , setApproval ] = useState();
+  
     const [ refresh ] = useRefreshMutation();
     const handleDataChange = (event)=>{
         setPlainTextValue(event.getCurrentContent().getPlainText()) // for plain text
@@ -121,6 +123,7 @@ function SendFeedback(props){
     
     const [addFeedback, { data , isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
     const [confirmMailBySender] = useConfirmMailBySenderMutation();
+    const [confirmMailByReceiever] = useConfirmMailByReceiverMutation();
 
     const [files,setFiles] = useState([]);
 
@@ -131,6 +134,7 @@ function SendFeedback(props){
         formData.append('idSender',props.sender);
         formData.append('idReceiver',props.receiver.doti);
         formData.append('file', files);
+        if(isConirmation) formData.append('isConfirmation',isConirmation);
         if(plainTextValue) formData.append('message',value);
         files.map( file => {
             formData.append('file['+index+']', file);        
@@ -155,7 +159,10 @@ function SendFeedback(props){
         if(isSuccess){
             if(approval != null){
                 confirmMailBySender({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : approval});
+                if(approval==="notcomplet") 
+                    confirmMailByReceiever({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : "unfinished"});
                 setApproval();
+                setIsCormiation(0)
             }
             enqueueSnackbar( t('add_feedback_succes') , { variant: "success" });
         }
@@ -167,7 +174,6 @@ function SendFeedback(props){
             }
         }
     },[data,error]);
-
     return(
         <>
             <Button variant="text" onClick={handleClickOpen} startIcon={<Email />}>
@@ -184,7 +190,7 @@ function SendFeedback(props){
                     {t("add_feedback")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    {  ["pending","unfinished"].includes(props.confirmReceiver) ? (
+                    {  ((props.receiverConfirmation==="finished" && props.senderConfirmation==="approved") || (props.senderConfirmation==="pending" && props.receiverConfirmation==="pending")) ? (
                         null
                     ):(
                         <FormControl sx={{ border : "1px solid #d6d8da" , padding : "4px 14px 4px 14px" , borderRadius : "6px"}} fullWidth>
@@ -193,7 +199,7 @@ function SendFeedback(props){
                                 row
                                 aria-labelledby="demo-row-radio-buttons-group-label"
                                 name="row-radio-buttons-group"
-                                onChange={(event)=>setApproval(event.target.value)}
+                                onChange={(event)=>{setApproval(event.target.value);setIsCormiation(1)}}
                             >
                                 <FormControlLabel value="notcomplet" control={<Radio />} label={t("notcomplet")} />
                                 <FormControlLabel value="approved" control={<Radio />} label={t("approved")} />
@@ -251,8 +257,8 @@ export default function FeedbackExport(props){
     const [confirmReceiver,setConfirmReceiver] = React.useState('pending');
     const handleConversation = (receiver,confirmationSender,confirmationReceiver) => {
         setSelected(receiver.doti);
-        setConfirmSender(confirmationSender)
-        setConfirmReceiver(confirmationReceiver)
+        setConfirmSender(confirmationSender);
+        setConfirmReceiver(confirmationReceiver);
         getFeedbackBymailAndBysenderAndByreceiver({ mail : props.idemail , receiver : props.auth.doti , sender : receiver.doti });
         setReceiverDisplay(receiver);
     }
@@ -274,16 +280,17 @@ export default function FeedbackExport(props){
                 }}
             >
                 <Box sx={{ display:"flex"}}>
-                   <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
+                    <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
                         { receivers.map( receiver =>{
+                            console.log(receiver)
                             return(
                                 <ListItem  
                                     key={receiver.receiver[0].doti}
                                     secondaryAction={
                                         receiver.receiverConfirmation === "pending" ? (
-                                            <Chip label={t('pending')} />
+                                            <Chip label={t('pending')}  color={'warning'}/>
                                         ):(
-                                            <Chip label={t(receiver.receiverConfirmation)} />
+                                            <Chip label={t(receiver.receiverConfirmation)} color={receiver.receiverConfirmation==="finished"? 'success': receiver.receiverConfirmation==="pending" ? "warning" :'error'} />
                                         )
                                     } 
                                     onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation,receiver.receiverConfirmation)}
@@ -323,12 +330,12 @@ export default function FeedbackExport(props){
                                     <Divider orientation="vertical" flexItem />
                                     <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
                                         <Typography>{t("approval_achevement")}</Typography>
-                                        <Chip label={t(confirmSender)} sx={{marginX: 1} } />
+                                        <Chip label={t(confirmSender)} color={confirmSender==="approved" ? 'success': confirmSender==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />
                                     </Box>
                                     <Divider orientation="vertical" flexItem />
                                     <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
                                         <Typography>{t("achevement_state")}</Typography>
-                                        <Chip label={t(confirmReceiver)} sx={{marginX: 1} } />                                   
+                                        <Chip label={t(confirmReceiver)} color={confirmReceiver==="finished"? 'success': confirmReceiver==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />                                   
                                     </Box> 
                                 </Box>
                             </Box>
@@ -341,7 +348,7 @@ export default function FeedbackExport(props){
                                     {   data?.length > 0 ? (
                                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
                                             { data.map( message => (
-                                                <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6' , color : "white"}:{ textAlign:"left" , marginY : 1}} key={message.id} >
+                                                <Card sx={message.idSender===props.auth.doti ? { textAlign:"left", marginY : 1,backgroundColor:  '#64b5f6' , color : "white"}:{ textAlign:"left" , marginY : 1}} key={message.id} >
                                                     <CardHeader
                                                         avatar={ message.idSender === props.auth.doti ? (
                                                             <Avatar alt={props.auth.fullnamela} sx={{ bgcolor : stringToColor(props.auth.fullnamela) }} src="/static/images/avatar/1.jpg" />
@@ -357,14 +364,18 @@ export default function FeedbackExport(props){
                                                             (message.idSender===props.auth.doti && message.status) ?
                                                             (<Chip sx={{ color : "white" , marginX : 1 }} label={`${t("seen")} : ${moment(message.updated_at).format('DD-MM-YYYY HH:mm')}`} />): (null)
                                                         }
-                                                    />
-                                                    <CardContent>
-                                                        { isJson(message.message) &&
+                                                    />      
+                                                    { isJson(message.message) &&
+                                                        <CardContent>
                                                             <ThemeProvider theme={defaultTheme}>
                                                                 <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
                                                             </ThemeProvider>
-                                                        }
-                                                    </CardContent>
+                                                            { message.isConfirmation ? (<Box sx={{display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
+                                                                <Chip sx={message.idSender===props.auth.doti ? {color: "white",marginX: 1} : {color: "black",marginX: 1}} label={t('is_confirmation')}/>
+                                                                </Box>) : null
+                                                            }
+                                                        </CardContent>
+                                                    }
                                                     <Divider />
                                                     <CardActions sx={{ p:2 }}>
                                                     {

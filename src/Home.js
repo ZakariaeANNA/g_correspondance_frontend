@@ -42,7 +42,7 @@ import AddExportation from './Components/Exportations/AddExportation';
 import ChangePassword from './Components/Users/ChangePassword';
 import Profile from './Components/Users/Profile';
 import IdleTimer from 'react-idle-timer';
-import NotFoud from './Components/Error/NotFound';
+import NotFound from './Components/Error/NotFound';
 import UnAuthorized from './Components/Error/UnAuthorized';
 import Forbidden from './Components/Error/Forbidden';
 
@@ -369,7 +369,7 @@ export default function Home() {
                     <Profile />
                   </Route>
                   <Route path={'/app/not_found'}>
-                      <NotFoud/>
+                      <NotFound/>
                   </Route>
                   <Route path={'/app/unauthorized'}>
                       <UnAuthorized />

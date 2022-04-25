@@ -225,7 +225,7 @@ export default function Exportation(){
                         </Box>
                     )}
                     <Box sx={{display : "flex" , justifyContent : "flex-end"}}>
-                        <Link to={'/app/unauthorized'} style={{textDecoration: 'none',color: 'black'}}>
+                        <Link to={'/app/addexportation'} style={{textDecoration: 'none',color: 'black'}}>
                             <Button variant="outlined" endIcon={<Send />} sx={{ marginTop : 1 }} >
                                 {t("sendExportation")}
                             </Button>

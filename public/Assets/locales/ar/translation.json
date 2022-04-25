@@ -112,5 +112,7 @@
   "user_delete_error": "حدث خطأ أثناء حذف المستخدم",
   "user_delete_success": "تم حذف المستخدم بنجاح",
   "the_establishment": "المؤسسة",
-  "the_department": "المصلحة"
+  "the_department": "المصلحة",
+  "is_confirmation": "رسالة التاكيد"
+
 }
