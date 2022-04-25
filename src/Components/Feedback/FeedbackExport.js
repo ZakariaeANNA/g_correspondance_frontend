@@ -108,8 +108,6 @@ function SendFeedback(props){
     const handleClickOpen = () => {
       setOpen(true);
     };
-    console.log(props.receiverConfirmation);
-    console.log(props.senderConfirmation);
     const handleClose = () => {
         setOpen(false);
     };
@@ -190,7 +188,7 @@ function SendFeedback(props){
                     {t("add_feedback")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    {  ((props.receiverConfirmation==="finished" && props.senderConfirmation==="approved") || (props.senderConfirmation==="pending" && props.receiverConfirmation==="pending")) ? (
+                    {  ((props.confirmReceiver==="finished" && props.confirmSender==="approved") || (props.confirmSender==="pending" && props.confirmReceiver==="pending")) ? (
                         null
                     ):(
                         <FormControl sx={{ border : "1px solid #d6d8da" , padding : "4px 14px 4px 14px" , borderRadius : "6px"}} fullWidth>
@@ -282,7 +280,6 @@ export default function FeedbackExport(props){
                 <Box sx={{ display:"flex"}}>
                     <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
                         { receivers.map( receiver =>{
-                            console.log(receiver)
                             return(
                                 <ListItem  
                                     key={receiver.receiver[0].doti}
@@ -326,7 +323,7 @@ export default function FeedbackExport(props){
                                         },
                                     }}
                                 >
-                                    <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receiverDisplay} confirmReceiver={confirmReceiver} />
+                                    <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receiverDisplay} confirmReceiver={confirmReceiver} confirmSender={confirmSender}/>
                                     <Divider orientation="vertical" flexItem />
                                     <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
                                         <Typography>{t("approval_achevement")}</Typography>
