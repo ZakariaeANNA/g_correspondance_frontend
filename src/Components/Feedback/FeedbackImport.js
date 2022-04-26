@@ -98,7 +98,7 @@ function SendFeedback(props){
     const [files,setFiles] = useState([]);
     const [radioValue,setRadioValue] = useState('');
     const [plainTextValue,setPlainTextValue] = useState();
-    const [isConirmation,setIsCormiation] = useState(0);
+    const [isConfirmation,setIsConfirmation] = useState(0);
     
     const handleClickOpen = () => {
       setOpen(true);
@@ -119,7 +119,7 @@ function SendFeedback(props){
     
     const handleRadioChange = (event) =>{
         setRadioValue(event.target.value);
-        setIsCormiation(1)
+        setIsConfirmation(1)
     }
     const [onUpdateConfirmationByReceiver,{}] = useConfirmMailByReceiverMutation();
     const onAddFeedback = async() => {
@@ -129,7 +129,7 @@ function SendFeedback(props){
         formData.append('idSender',props.sender);
         formData.append('idReceiver',props.receiver.doti);
         formData.append('file', files);
-        if(isConirmation) formData.append('isConfirmation',isConirmation);
+        if(isConfirmation) formData.append('isConfirmation',isConfirmation);
         if(plainTextValue) formData.append('message',value);
         files.map( file => {
             formData.append('file['+index+']', file);        
@@ -155,7 +155,7 @@ function SendFeedback(props){
             if( radioValue != null || radioValue != undefined ){
                 onUpdateConfirmationByReceiver({idReceiver: props.sender,mail_id: props.mailID,state: radioValue});
                 setRadioValue('')
-                setIsCormiation(0)
+                setIsConfirmation(0)
             }
             enqueueSnackbar( t('add_feedback_succes') , { variant: "success" });
         }
@@ -329,15 +329,15 @@ export default function FeedbackImport(props){
                                                                 (<Chip sx={{ color : "white" , marginX : 1 }} label={`${t("seen")} : ${moment(message.update_at).format('DD-MM-YYYY HH:mm')}`} />) : (null)
                                                             }
                                                         />
-                                                        { isJson(message.message) &&
                                                             <CardContent>
-                                                                <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                                {isJson(message.message) &&                                                           
+                                                                    <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                                }
                                                                 { message.isConfirmation ? (<Box sx={{display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
                                                                     <Chip sx={message.idSender===props.auth.doti ? {color: "white",marginX: 1} : {color: "black",marginX: 1}} label={t('is_confirmation')}/>
                                                                     </Box>) : null
                                                                 }
                                                             </CardContent>
-                                                        }
                                                         <Divider />
                                                         <CardActions disableSpacing>
                                                         {

@@ -362,17 +362,17 @@ export default function FeedbackExport(props){
                                                             (<Chip sx={{ color : "white" , marginX : 1 }} label={`${t("seen")} : ${moment(message.updated_at).format('DD-MM-YYYY HH:mm')}`} />): (null)
                                                         }
                                                     />      
-                                                    { isJson(message.message) &&
                                                         <CardContent>
-                                                            <ThemeProvider theme={defaultTheme}>
-                                                                <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
-                                                            </ThemeProvider>
+                                                            { isJson(message.message) &&
+                                                                <ThemeProvider theme={defaultTheme}>
+                                                                    <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                                </ThemeProvider>
+                                                            }
                                                             { message.isConfirmation ? (<Box sx={{display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
                                                                 <Chip sx={message.idSender===props.auth.doti ? {color: "white",marginX: 1} : {color: "black",marginX: 1}} label={t('is_confirmation')}/>
                                                                 </Box>) : null
                                                             }
                                                         </CardContent>
-                                                    }
                                                     <Divider />
                                                     <CardActions sx={{ p:2 }}>
                                                     {

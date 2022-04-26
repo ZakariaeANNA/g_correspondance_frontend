@@ -23,6 +23,7 @@ export default function AddExportation(){
     const [establishment,setEstablishment] = useState([]);
     const [files,setFiles] = useState([]);
     const [tags, setTags] = React.useState([]);
+    const [dateAchevement,setDateAchevement] = useState()
     const [addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation();
     const [ refresh ] = useRefreshMutation();
     const { enqueueSnackbar } = useSnackbar();
@@ -61,21 +62,25 @@ export default function AddExportation(){
 
     const onAddExportations = async(event) => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        formData.append('receiver', JSON.stringify(tags));
-        formData.append('sender',user.doti);
-        formData.append('file', files[0]);
-        try{
-            await addExportations(formData).unwrap();
-        }catch(error){
-            if(error.status === 401){
-                await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
-                    localStorage.setItem( "token" , data );
-                    addExportations(formData);
-                });
+        if(dateAchevement && new Date(dateAchevement) > new Date()){
+            const formData = new FormData(event.currentTarget);
+            formData.append('receiver', JSON.stringify(tags));
+            formData.append('sender',user.doti);
+            formData.append('file', files[0]);
+            try{
+                await addExportations(formData).unwrap();
+            }catch(error){
+                if(error.status === 401){
+                    await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
+                        localStorage.setItem( "token" , data );
+                        addExportations(formData);
+                    });
+                }
             }
+            setFiles([]); setTags([]); event.target.reset();
+        }else{
+            enqueueSnackbar(t('achevement_date_error') ,  { variant: "error" });
         }
-        setFiles([]); setTags([]); event.target.reset();
     }
     return (
         <React.Fragment>
@@ -152,7 +157,7 @@ export default function AddExportation(){
                     <TextField sx={{ marginY : 1 , width : 6/12 , paddingRight : 1 }} fullWidth multiline rows={2} label={t("references")} variant="outlined" name="references" disabled={isLoading} />
                     <TextField sx={{ marginY : 1 , width : 6/12}} fullWidth multiline rows={2} label={t("concerned")} variant="outlined" name="concerned" required disabled={isLoading} />
                     <TextField sx={{ marginY : 1 , width : 8/12 , paddingRight : 1 }} fullWidth label={t("notes")} variant="outlined" rows={4} name="notes" disabled={isLoading} />
-                    <TextField sx={{ marginY : 1 , width : 4/12}} id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
+                    <TextField sx={{ marginY : 1 , width : 4/12}} error={dateAchevement && new Date(dateAchevement) <=new Date()} onChange={(event)=>{setDateAchevement(event.target.value)}} id="datetime-local" label={t("achevement_date")} type="datetime-local" name="dateachevement"  fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
                     <TextField sx={{ marginY : 1 }} fullWidth multiline label={t("message")} variant="outlined" rows={4} name="message" required disabled={isLoading} />
                     <DropFileInput
                         files={files}

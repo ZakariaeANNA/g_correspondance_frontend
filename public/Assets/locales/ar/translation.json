@@ -113,6 +113,7 @@
   "user_delete_success": "تم حذف المستخدم بنجاح",
   "the_establishment": "المؤسسة",
   "the_department": "المصلحة",
-  "is_confirmation": "رسالة التاكيد"
+  "is_confirmation": "رسالة التاكيد",
+  "achevement_date_error": "يجب ألا يكون تاريخ الإنجاز أقل من التاريخ الحالي"
 
 }

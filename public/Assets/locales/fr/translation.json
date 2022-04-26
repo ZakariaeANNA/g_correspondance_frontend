@@ -113,5 +113,6 @@
   "user_delete_success": "L'utilisateur a été Supprimé avec succe",
   "the_establishment": "Etablissement",
   "the_department": "Departement",
-  "is_confirmation": "Message de Confirmation"
+  "is_confirmation": "Message de Confirmation",
+  "achevement_date_error": "La date d'achevement ne doit pas être inferieur que la date actuel"
 }
