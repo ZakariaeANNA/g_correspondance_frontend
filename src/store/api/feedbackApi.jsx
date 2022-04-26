@@ -39,6 +39,9 @@ export const feedbackApi = createApi({
         };
       },
     }),
+    getReceiverByMail : builder.query({
+      query : (data) => `/correspondences/receivers/${data.mail_id}`,
+    }),
     updateFeedbackStatus: builder.mutation({
       query: (data) => {
         return {
@@ -82,5 +85,6 @@ export const {
   useGetFeedbackBymailAndBysenderAndByreceivercloneQuery,
   useConfirmMailByReceiverMutation,
   useConfirmMailBySenderMutation,
-  useUpdateFeedbackStatusMutation
+  useUpdateFeedbackStatusMutation,
+  useGetReceiverByMailQuery
 } = feedbackApi;
