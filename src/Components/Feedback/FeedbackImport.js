@@ -103,6 +103,8 @@ function SendFeedback(props){
     const [onUpdateConfirmationByReceiver] = useConfirmMailByReceiverMutation();
     const { enqueueSnackbar } = useSnackbar();
 
+    const [isConfirmation,setIsConfirmation] = useState(0);
+    
     const handleClickOpen = () => {
       setOpen(true);
     };
@@ -119,6 +121,7 @@ function SendFeedback(props){
         
     const handleRadioChange = (event) =>{
         setRadioValue(event.target.value);
+        setIsConfirmation(1)
     }
 
     const onAddFeedback = async() => {
@@ -128,6 +131,7 @@ function SendFeedback(props){
         formData.append('idSender',props.sender);
         formData.append('idReceiver',props.receiver.doti);
         formData.append('file', files);
+        if(isConfirmation) formData.append('isConfirmation',isConfirmation);
         if(plainTextValue) formData.append('message',value);
         files.map( file => {
             formData.append('file['+index+']', file);        
@@ -152,6 +156,7 @@ function SendFeedback(props){
             if( radioValue != null || radioValue != undefined ){
                 onUpdateConfirmationByReceiver({idReceiver: props.sender,mail_id: props.mailID,state: radioValue});
                 setRadioValue('')
+                setIsConfirmation(0)
             }
             enqueueSnackbar( t('add_feedback_succes') , { variant: "success" });
         }
@@ -180,7 +185,7 @@ function SendFeedback(props){
                     {t("add_feedback")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                   {(props.senderConfirm!=="approved" && props.receiverConfirm!=="finished") &&    
+                   {(props.senderConfirm!=="approved" || props.receiverConfirm!=="finished") &&    
                         <Box sx={{marginY: 1}}>
                             <FormControl variant='outlined' fullWidth sx={{border: "1px solid #d6d8da",padding: "4px 14px 4px 14px",borderRadius: "6px"}}>
                                 <FormLabel id="demo-row-radio-buttons-group-label">{t("achevement_state")}</FormLabel>
@@ -289,12 +294,12 @@ export default function FeedbackImport(props){
                                 <Divider orientation="vertical" flexItem />
                                 <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
                                     <Typography>{t("approval_achevement")}</Typography>
-                                    <Chip label={t(receivers.senderConfirmation)} sx={{marginX: 1} } />
+                                    <Chip label={t(receivers.senderConfirmation)} color={receivers.senderConfirmation==="approved" ? 'success': receivers.senderConfirmation==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />
                                 </Box>
                                 <Divider orientation="vertical" flexItem />
                                 <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
                                     <Typography>{t("achevement_state")}</Typography>
-                                    <Chip label={t(receivers.receiverConfirmation)} sx={{marginX: 1} } />                                   
+                                    <Chip label={t(receivers.receiverConfirmation)} color={receivers.receiverConfirmation==="finished"? 'success': receivers.receiverConfirmation==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />                                   
                                 </Box> 
                             </Box>
                         </Box>
@@ -328,6 +333,10 @@ export default function FeedbackImport(props){
                                                         { isJson(message.message) &&
                                                             <CardContent>
                                                                 <MUIRichTextEditor value={message.message} readOnly={true} toolbar={false} />
+                                                                { message.isConfirmation ? (<Box sx={{display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
+                                                                    <Chip sx={message.idSender===props.auth.doti ? {color: "white",marginX: 1} : {color: "black",marginX: 1}} label={t('is_confirmation')}/>
+                                                                    </Box>) : null
+                                                                }
                                                             </CardContent>
                                                         }
                                                         <Divider />

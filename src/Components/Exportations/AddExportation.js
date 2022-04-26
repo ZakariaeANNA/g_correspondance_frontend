@@ -20,7 +20,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 
 const departmentWorkers = [ 
-    { id : "chef" , nomar : "رئيس المصلحة" , nomla : "Chef de département" },
+    { id : "chefDep" , nomar : "رئيس المصلحة" , nomla : "Chef de département" },
     { id : "tous" , nomar : "كل الموظفين" , nomla : "Tous les employés" }
 ]
 

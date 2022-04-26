@@ -118,5 +118,7 @@
   "see_conversation" : "انقر فوق المستخدم لعرض المحادثة.",
   "admin" : "مشرف",
   "chefDep" : "رئيس مصلحة",
-  "delete" : "حذف"
+  "delete" : "حذف",
+  "is_confirmation": "رسالة التاكيد"
+
 }

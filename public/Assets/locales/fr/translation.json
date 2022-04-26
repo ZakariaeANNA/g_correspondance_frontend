@@ -118,5 +118,6 @@
   "see_conversation": "Cliquez sur l'utilisateur pour voir la conversation.",
   "admin" : "Admin" ,
   "chefDep": "Chef Département",
-  "delete" : "Supprimer"
+  "delete" : "Supprimer",
+  "is_confirmation": "Message de Confirmation"
 }
