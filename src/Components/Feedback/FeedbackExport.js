@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useConfirmMailBySenderMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation, useUpdateFeedbackStatusMutation } from "../../store/api/feedbackApi";
+import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useConfirmMailBySenderMutation,useGetFeedbackBymailAndBysenderAndByreceiverMutation, useUpdateFeedbackStatusMutation , useGetReceiverByMailQuery } from "../../store/api/feedbackApi";
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
 import { DialogContent, IconButton , ListItemButton  } from "@mui/material";
@@ -102,7 +102,7 @@ const defaultTheme = createTheme({
 function SendFeedback(props){
     const [open, setOpen] = React.useState(false);
     const [plainTextValue,setPlainTextValue] = useState();
-    const [isConirmation,setIsCormiation] = useState(0);
+    const [isConfirmation,setIsConfirmation] = useState(0);
     const [value,setValue] = React.useState('');
     const [ approval , setApproval ] = useState();
     const handleClickOpen = () => {
@@ -132,7 +132,7 @@ function SendFeedback(props){
         formData.append('idSender',props.sender);
         formData.append('idReceiver',props.receiver.doti);
         formData.append('file', files);
-        if(isConirmation) formData.append('isConfirmation',isConirmation);
+        if(isConfirmation) formData.append('isConfirmation',isConfirmation);
         if(plainTextValue) formData.append('message',value);
         files.map( file => {
             formData.append('file['+index+']', file);        
@@ -159,8 +159,10 @@ function SendFeedback(props){
                 confirmMailBySender({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : approval});
                 if(approval==="notcomplet") 
                     confirmMailByReceiever({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : "unfinished"});
+                props.setConfirmSender(approval);    
+                props.refetch();
                 setApproval();
-                setIsCormiation(0)
+                setIsConfirmation(0)
             }
             enqueueSnackbar( t('add_feedback_succes') , { variant: "success" });
         }
@@ -197,7 +199,7 @@ function SendFeedback(props){
                                 row
                                 aria-labelledby="demo-row-radio-buttons-group-label"
                                 name="row-radio-buttons-group"
-                                onChange={(event)=>{setApproval(event.target.value);setIsCormiation(1)}}
+                                onChange={(event)=>{setApproval(event.target.value);setIsConfirmation(1)}}
                             >
                                 <FormControlLabel value="notcomplet" control={<Radio />} label={t("notcomplet")} />
                                 <FormControlLabel value="approved" control={<Radio />} label={t("approved")} />
@@ -235,15 +237,19 @@ function SendFeedback(props){
 
   
 export default function FeedbackExport(props){
-    const receivers = JSON.parse(localStorage.getItem("receivers"));
     const [ receiverDisplay , setReceiverDisplay ] = useState();
     const [ selected , setSelected ] = useState();
+    const [ receivers , setReceivers ] = useState([]);
     const [getFeedbackBymailAndBysenderAndByreceiver,
             {data , isLoading , 
               isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
+    const { refetch , data : dataReceiver , isLoading : isLoadingReceiver
+     , isSuccess : isSuccessReceiver } = useGetReceiverByMailQuery({ mail_id : props.idemail });
     moment.locale(i18next.language === "ar" ? ("ar-ma"):("fr"));
     const [onUpdateStatus,{}]= useUpdateFeedbackStatusMutation();
     const listRef = useRef(null);
+    const [confirmSender,setConfirmSender] = useState('pending');
+    const [confirmReceiver,setConfirmReceiver] = useState('pending');
 
     useEffect(()=>{
         if(isSuccess){
@@ -254,9 +260,12 @@ export default function FeedbackExport(props){
                 listRef.current.scrollTop = listRef.current.scrollHeight
             }
         }
-    },[isSuccess]);
-    const [confirmSender,setConfirmSender] = React.useState('pending');
-    const [confirmReceiver,setConfirmReceiver] = React.useState('pending');
+        if(isSuccessReceiver){
+            setReceivers(dataReceiver.data);
+        }
+    },[isSuccess,isSuccessReceiver]);
+
+    
     const handleConversation = (receiver,confirmationSender,confirmationReceiver) => {
         setSelected(receiver.doti);
         setConfirmSender(confirmationSender);
@@ -282,31 +291,36 @@ export default function FeedbackExport(props){
                 }}
             >
                 <Box sx={{ display:"flex"}}>
-                    <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
-                        { receivers.map( receiver =>{
-                            return(
-                                <ListItem  
-                                    key={receiver.receiver[0].doti}
-                                    secondaryAction={
-                                        receiver.receiverConfirmation === "pending" ? (
-                                            <Chip label={t('pending')}  color={'warning'}/>
-                                        ):(
-                                            <Chip label={t(receiver.receiverConfirmation)} color={receiver.receiverConfirmation==="finished"? 'success': receiver.receiverConfirmation==="pending" ? "warning" :'error'} />
-                                        )
-                                    } 
-                                    onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation,receiver.receiverConfirmation)}
-                                    disablePadding
-                                >
-                                    <ListItemButton role={undefined} dense selected={selected === receiver.receiver[0].doti}>   
-                                        <ListItemAvatar>
-                                            <Avatar alt={receiver.receiver[0].fullnamela} sx={{ bgcolor : stringToColor(receiver.receiver[0].fullnamela) }} src="/static/images/avatar/1.jpg" />
-                                        </ListItemAvatar>
-                                        <ListItemText primary={ i18next.language === "fr" ? (receiver.receiver[0].fullnamela) : (receiver.receiver[0].fullnamear) }/>
-                                        <Divider variant="inset" component="li" />
-                                    </ListItemButton>
-                                </ListItem>
-                            )})}
-                    </List>
+                    {   isLoadingReceiver ? (
+                        <CircularProgress/>
+                    ):(
+                        <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
+                            { receivers.map( receiver =>{
+                                return(
+                                    <ListItem  
+                                        key={receiver.receiver[0].doti}
+                                        secondaryAction={
+                                            receiver.receiverConfirmation === "pending" ? (
+                                                <Chip label={t('pending')}  color={'warning'}/>
+                                            ):(
+                                                <Chip label={t(receiver.receiverConfirmation)} color={receiver.receiverConfirmation==="finished"? 'success': receiver.receiverConfirmation==="pending" ? "warning" :'error'} />
+                                            )
+                                        } 
+                                        onClick={()=>handleConversation(receiver.receiver[0],receiver.senderConfirmation,receiver.receiverConfirmation)}
+                                        disablePadding
+                                    >
+                                        <ListItemButton role={undefined} dense selected={selected === receiver.receiver[0].doti}>   
+                                            <ListItemAvatar>
+                                                <Avatar alt={receiver.receiver[0].fullnamela} sx={{ bgcolor : stringToColor(receiver.receiver[0].fullnamela) }} src="/static/images/avatar/1.jpg" />
+                                            </ListItemAvatar>
+                                            <ListItemText primary={ i18next.language === "fr" ? (receiver.receiver[0].fullnamela) : (receiver.receiver[0].fullnamear) }/>
+                                            <Divider variant="inset" component="li" />
+                                        </ListItemButton>
+                                    </ListItem>
+                                )})}
+                        </List>
+                    )}
+                    
                     {   receiverDisplay ? (
                         <Box sx={{ paddingX : 2 , width : "100%" }}>
                             <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -327,7 +341,7 @@ export default function FeedbackExport(props){
                                         },
                                     }}
                                 >
-                                    <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receiverDisplay} confirmReceiver={confirmReceiver} confirmSender={confirmSender}/>
+                                    <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receiverDisplay} confirmReceiver={confirmReceiver} confirmSender={confirmSender} setConfirmSender={setConfirmSender} refetch={refetch} />
                                     <Divider orientation="vertical" flexItem />
                                     <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
                                         <Typography>{t("approval_achevement")}</Typography>
