@@ -22,6 +22,14 @@ import { prefixer } from "stylis";
 import fontTheme from "../../Util/fontTheme";
 import Alert from '@mui/material/Alert';
 import { useLocation } from "react-router-dom";
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+
 const cacheLtr = createCache({
   key: "muiltr"
 });
@@ -44,6 +52,20 @@ export default function Login() {
   const history = useHistory();
   const { t } = useTranslation();
   const { appState } = useLocation();
+  const [values, setValues] = React.useState({
+    password: '',
+    showPassword: false,
+  });
+  const handleClickShowPassword = () => {
+    setValues({
+      ...values,
+      showPassword: !values.showPassword,
+    });
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
   useEffect(()=>{
     if (isSuccess) {
       localStorage.setItem( "token" , data );
@@ -118,17 +140,29 @@ export default function Login() {
                   autoFocus
                   disabled={isLoading}
                 />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label={t('password')}
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  disabled={isLoading}
-                />
+                <FormControl fullWidth variant="outlined" margin="normal">
+                  <InputLabel htmlFor="outlined-adornment-password">{t('password')}</InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-password"
+                    type={values.showPassword ? 'text' : 'password'}
+                    name="password"
+                    required
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    label={t('password')}
+                    disabled={isLoading}
+                  />
+                </FormControl>
                 { isLoading ? (
                   <LoadingButton 
                     fullWidth

@@ -111,9 +111,15 @@
   "correspondance_confirm_message": "؟ هل أنت متأكد أنك تريد حذف العنصر المحدد",
   "user_delete_error": "حدث خطأ أثناء حذف المستخدم",
   "user_delete_success": "تم حذف المستخدم بنجاح",
+  "the_etablishment" : "المؤسسة" ,
+  "departmentWorkers" : "موظفي المصلحة",
   "the_establishment": "المؤسسة",
   "the_department": "المصلحة",
+  "see_conversation" : "انقر فوق المستخدم لعرض المحادثة.",
+  "admin" : "مشرف",
+  "chefDep" : "رئيس مصلحة",
+  "delete" : "حذف",
   "is_confirmation": "رسالة التاكيد",
-  "achevement_date_error": "يجب ألا يكون تاريخ الإنجاز أقل من التاريخ الحالي"
+  "achevement_date_error" : "يجب ألا يكون تاريخ الٍانجاز أقل من التاريخ الحالي"
 
 }

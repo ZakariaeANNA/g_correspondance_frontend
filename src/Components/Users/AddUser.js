@@ -14,27 +14,37 @@ import { useSnackbar } from 'notistack';
 import { Box } from '@mui/system';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
-
+import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 
 export default function Adduser(){
     const [AddUser, { data, isLoading, error, isError, isSuccess }] = useAddUserMutation();
     const { data : dataDep , isLoading : isLoadingDep , error : errorDep , isError : isErrorDep , isSuccess : isSuccessDep } = useGetDepartmentsQuery();
     const { enqueueSnackbar } = useSnackbar();
+    const history = useHistory();
     const [ departments , setDepartments ] = useState([]);
     const [ refresh ] = useRefreshMutation();
-    const [userDepartement,setUserDepartement] = useState();
+    const [userDepartement,setUserDepartement] = useState(null);
+    const user = useSelector( state => state.auth.user );
+
+    if(user && user.role === "directeur")
+      history.push("/app/");
 
     const handleUserDepartementChange  = (event)  =>{
       setUserDepartement(event.target.value)
     }
+
     const handleUserDepartementSubmit = () => {
       setUserDepartement();
     }
+
     const onAddUser = async(event) =>{
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
       formData.append("online",1);
+      if(!formData.get("roles"))
+        formData.append("roles","directeur");
       try{
         await AddUser(formData).unwrap();
       }catch(error){
@@ -45,8 +55,9 @@ export default function Adduser(){
               });
           }
       }
-      event.target.reset();
+      event.target.reset(); setUserDepartement();
     }
+
     useEffect(()=>{
       if(isSuccess){
           enqueueSnackbar( t("add_user_success") ,  { variant: "success" });
@@ -63,6 +74,7 @@ export default function Adduser(){
         setDepartments(dataDep.data);
       }
     },[data,error,dataDep]);
+
     return (
       <React.Fragment>
           <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
@@ -98,29 +110,29 @@ export default function Adduser(){
                             onChange={handleUserDepartementChange}
                             onSubmit={handleUserDepartementSubmit}
                             style={{ textAlign : "start" }}
+                            value={userDepartement}
                         >
-                            <MenuItem value={'departement'}>Departement</MenuItem>
-                            <MenuItem value={'etablissement'}>Etablissement</MenuItem>
+                            <MenuItem value={'departement'}>{t("the_department")}</MenuItem>
+                            <MenuItem value={'etablissement'}>{t("the_establishment")}</MenuItem>
                         </Select>
                     </FormControl>
                     { userDepartement === undefined ? (
                       null
-                    ):(
+                    ) : userDepartement === "departement" ? (
                       <FormControl sx={{ width : 1/2 , paddingInlineEnd : 1 , marginY : 1 }} required>
                         <InputLabel id="demo-simple-select-label">{t("role")}</InputLabel>
                         <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            label={t("role")}
-                            name="roles"
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label={t("role")}
+                          name="roles"
+                          style={{ textAlign : "start" }}
                         >
-                          {userDepartement==="departement" ?
-                            (<MenuItem value={'admin'}>Admin</MenuItem>):
-                            (<MenuItem value={'directeur'}>Directeur</MenuItem>)
-                          }
+                          <MenuItem value={'admin'}>Admin</MenuItem>
+                          <MenuItem value={'chefDep'}>Chef département</MenuItem>
                         </Select>
                       </FormControl>
-                    )}
+                    ):null}
         
                     { userDepartement === "departement" ? (
                       <FormControl sx={{ width : 1/2 , marginY : 1 }} required>
@@ -138,7 +150,7 @@ export default function Adduser(){
                         </Select>
                       </FormControl>
                     ) : userDepartement === "etablissement" ? (
-                      <TextField name={"codegresa"} sx={{ width : 1/2  , marginY : 1 }} label={t("codeGresa")} variant="outlined" required/>
+                      <TextField name={"codegresa"} sx={{marginY : 1 }} fullWidth label={t("codeGresa")} variant="outlined" required/>
                     ) : null}
                   </Box>
                   <Box sx={{display:'flex',justifyContent: 'flex-end' , marginY : 1}}>

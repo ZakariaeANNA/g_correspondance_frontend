@@ -7,6 +7,7 @@ import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import MoveToInboxIcon from '@mui/icons-material/MoveToInbox';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 
 
 
@@ -37,16 +38,20 @@ export const MainListItems = () => {
 
 export const SecondaryListItems = () => {
   const { t } = useTranslation();
+  const auth = useSelector( state => state.auth.user );
+
   return (
     <React.Fragment>
-      <Link to={'/app/users'} style={{textDecoration: 'none',color: 'black'}}>
-        <ListItemButton>
-          <ListItemIcon>
-            <PeopleIcon />
-          </ListItemIcon>
-            <ListItemText primary={t('users_management')} sx={{ alignItems: "flex-start" , display : "inherit"}} />
-        </ListItemButton>
-      </Link>
+      { auth.role === "admin" ? (
+        <Link to={'/app/users'} style={{textDecoration: 'none',color: 'black'}}>
+          <ListItemButton>
+            <ListItemIcon>
+              <PeopleIcon />
+            </ListItemIcon>
+              <ListItemText primary={t('users_management')} sx={{ alignItems: "flex-start" , display : "inherit"}} />
+          </ListItemButton>
+        </Link>
+      ):null}
     </React.Fragment>
   );
 }

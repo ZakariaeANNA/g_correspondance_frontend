@@ -24,7 +24,8 @@ const UnAuthorized = () =>{
                 >
                     <img src={require('../../assets/unauthorizedImage.jpg')} height="30%" width={'30%'}/>
                     <Link to={'/app/'} style={{color: 'black',fontSize: 25,bottom: 20}}>
-                        <p>Accée non autorizé <span style={{textDecoration: 'underline'}}>Retour ver la page d'acceuil</span></p>
+                        <p>Accée non autorizé</p>
+                        <p style={{textDecoration: 'underline'}}>Retour vers la page d'acceuil</p>
                     </Link>
                 </Box>
             </Paper>

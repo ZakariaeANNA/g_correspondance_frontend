@@ -58,7 +58,6 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 };
 function DeleteImportation(props){
   
-    console.log(props.params)
     const { enqueueSnackbar } = useSnackbar();
     const [deleteImportation,{data,error,isLoading,isError,isSuccess}] = useDeleteImportationMutation()
     const [open, setOpen] = React.useState(false);
@@ -127,7 +126,7 @@ export default function Importations(){
         if(data){
             setPage(data.meta.current_page);
             setLoading(false);
-            console.log(data.data)
+            console.log(data.data);
             setRows(data.data.filter(row=>row.mail!==null && row.mail?.sender!==null));
         }
     },[data]);
@@ -143,7 +142,7 @@ export default function Importations(){
             )
         }},
         {field: "created_at",headerName: t("sending_date"), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
-            const date = moment(params.row.achevementdate).format('DD-MM-YYYY');
+            const date = moment(params.row.mail.created_at).format('DD-MM-YYYY');
             return(
                 <Box>{date}</Box>
             );
@@ -160,7 +159,7 @@ export default function Importations(){
             )
         }},
         {field: "achevementdate",headerName: t("achevement_date"), flex: 1 ,headerAlign : 'center',align:'center',renderCell : (params)=>{
-            const date = moment(params.row.achevementdate).format('DD-MM-YYYY');
+            const date = moment(params.row.mail.achevementdate).format('DD-MM-YYYY');
             return(
                 <Box>{date}</Box>
             );

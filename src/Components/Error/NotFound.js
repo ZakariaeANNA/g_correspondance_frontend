@@ -24,7 +24,8 @@ return(
             >
                 <img src={require('../../assets/notFoundImage.jpg')} height="40%" width={'45%'}/>
                 <Link to={'/app/'} style={{textDecoration: 'none',color: 'black',fontSize: 25,bottom: 20}}>
-                    <p>Page non trouvé <span style={{textDecoration: 'underline'}}>Retour ver la page d'acceuil</span></p>
+                    <p>Page non trouvé</p>
+                    <p style={{textDecoration: 'underline'}}>Retour vers la page d'acceuil</p>
                 </Link>
             </Box>
         </Paper>

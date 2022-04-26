@@ -1,4 +1,4 @@
-import React,{ useState,useEffect} from 'react'
+import React,{ useState,useEffect,useRef } from 'react'
 import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -243,11 +243,15 @@ export default function FeedbackExport(props){
               isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
     moment.locale(i18next.language === "ar" ? ("ar-ma"):("fr"));
     const [onUpdateStatus,{}]= useUpdateFeedbackStatusMutation();
+    const listRef = useRef(null);
+
     useEffect(()=>{
         if(isSuccess){
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
-                onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail})
-                
+                onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail}) 
+            }
+            if(listRef.current){
+                listRef.current.scrollTop = listRef.current.scrollHeight
             }
         }
     },[isSuccess]);
@@ -343,7 +347,7 @@ export default function FeedbackExport(props){
                             ):(
                                 <React.Fragment>
                                     {   data?.length > 0 ? (
-                                        <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable">
+                                        <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable" ref={listRef}>
                                             { data.map( message => (
                                                 <Card sx={message.idSender===props.auth.doti ? { textAlign:"left", marginY : 1,backgroundColor:  '#64b5f6' , color : "white"}:{ textAlign:"left" , marginY : 1}} key={message.id} >
                                                     <CardHeader
@@ -415,7 +419,7 @@ export default function FeedbackExport(props){
                             }}
                         >
                             <img src={require("../../StudyingConceptIllustration.jpg")} style={{ marginX : "auto"}} height="80%" alt="" />
-                            <Typography sx={{ fontWeight : "bold" , fontSize : "20px"}}>Cliquez sur l'utilisateur pour voir la conversation.</Typography>
+                            <Typography sx={{ fontWeight : "bold" , fontSize : "20px"}}>{t("see_conversation")}</Typography>
                         </Box>
                     )}
                 </Box>    

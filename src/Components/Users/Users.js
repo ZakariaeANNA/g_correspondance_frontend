@@ -90,7 +90,7 @@ function DeleteUser(props){
       <>
         <Tooltip title={t("deleteUser")}>
           <IconButton aria-label="delete" size="large" onClick={handleClickOpen}> 
-                <Delete  sx={{color: 'red'}}/>
+                <Delete sx={{color: 'red'}}/>
           </IconButton>
         </Tooltip>
         <BootstrapDialog
@@ -170,17 +170,19 @@ function ResetUserPassword({params}){
   );
 }
 export default function Users(){
-  const {data, isLoading , refetch } = useGetAllUsersQuery(); 
+  const { data, isLoading , refetch } = useGetAllUsersQuery(); 
   const user = useSelector( state => state.auth.user );
   const [rows,setRows] = React.useState([]); 
   const dispatch = useDispatch();
   const history = useHistory();
+
   useEffect(() => {
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     if(data){
         setRows(data.data.filter(row=>row.doti!==user.doti));
     }
   },[data]);
+
   const columns = [
     {field: "doti",headerName: t("doti"), flex: 1 ,headerAlign : 'center',align: 'center',renderCell : (params)=>(
       <Box>{params.row.doti}</Box>

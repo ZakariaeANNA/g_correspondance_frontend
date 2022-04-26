@@ -8,6 +8,9 @@ import cookies from 'js-cookie';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import fontTheme from "./Util/fontTheme";
+import NotFound from './Components/Error/NotFound';
+import UnAuthorized from './Components/Error/UnAuthorized';
+import Forbidden from './Components/Error/Forbidden';
 
 const languages = [
   {
@@ -29,7 +32,6 @@ function App() {
   const currentLanguageCode = cookies.get('i18next') || 'fr'
   const currentLanguage = languages.find((l) => l.code === currentLanguageCode)
   const { t } = useTranslation();
-
   useEffect(() => {
     document.body.dir = currentLanguage.dir || 'ltr'
     document.title = t('project_title')
@@ -47,8 +49,20 @@ function App() {
             <Route exact path="/auth" >
               <Login />
             </Route>
-            <Route path="/app/*">
+            <Route exact path="/app/*">
               <Home />
+            </Route>
+            <Route exact path="/403">
+              <Forbidden />
+            </Route>
+            <Route exact path="/401">
+              <UnAuthorized />
+            </Route>
+            <Route path="*">
+              <NotFound />
+            </Route>
+            <Route path="/404">
+              <NotFound />
             </Route>
           </Switch>
         </div>        
