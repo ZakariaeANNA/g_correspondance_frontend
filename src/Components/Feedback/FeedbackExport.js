@@ -155,7 +155,7 @@ function SendFeedback(props){
 
     useEffect(()=>{
         if(isSuccess){
-            if(approval != null){
+            if(approval != null && approval!==undefined){
                 confirmMailBySender({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : approval});
                 if(approval==="notcomplet") 
                     confirmMailByReceiever({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : "unfinished"});
