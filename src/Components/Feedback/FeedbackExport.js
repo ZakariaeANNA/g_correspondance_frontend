@@ -159,7 +159,6 @@ function SendFeedback(props){
                 if(approval==="notcomplet") 
                     confirmMailByReceiever({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : "unfinished"});
                 props.setConfirmSender(approval);    
-                props.refetch();
                 setApproval();
                 setIsConfirmation(0)
             }

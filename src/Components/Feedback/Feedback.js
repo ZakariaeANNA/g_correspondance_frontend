@@ -6,15 +6,17 @@ import FeedbackExport from './FeedbackExport';
 import FeedbackImport from './FeedbackImport';
 import { useCheckUserInMailQuery } from "../../store/api/feedbackApi";
 import { CircularProgress , Box  } from "@mui/material";
+import { isExpired, decodeToken } from "react-jwt";
 
   
 export default function Feedback(){
-    const auth = useSelector( state => state.auth.user );
+    const token = localStorage.getItem("token");
+    const user = decodeToken(token);
     const dispatch = useDispatch();
     const history = useHistory();
     const { idemail } = useParams();
     const previousRoute = localStorage.getItem("path");
-    const { isLoading , isError } = useCheckUserInMailQuery({ id : idemail , doti : auth.doti });
+    const { isLoading , isError } = useCheckUserInMailQuery({ id : idemail , doti : user.doti });
     
     useEffect(()=>{
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
@@ -39,11 +41,11 @@ export default function Feedback(){
 
     if(previousRoute === "export"){
         return(
-            <FeedbackExport idemail={idemail} auth={auth} />
+            <FeedbackExport idemail={idemail} auth={user} />
         )
     }else{
         return (
-            <FeedbackImport idemail={idemail} auth={auth}/>
+            <FeedbackImport idemail={idemail} auth={user}/>
         )
     }
 }
