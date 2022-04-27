@@ -153,13 +153,13 @@ function SendFeedback(props){
 
     useEffect(()=>{
         if(isSuccess){
+            props.handleChange(data);
             if( radioValue != null && radioValue != undefined ){
                 onUpdateConfirmationByReceiver({idReceiver: props.sender,mail_id: props.mailID,state: radioValue});
                 setRadioValue()
                 setIsConfirmation(0)
+                props.setConfirmReceiver(radioValue);   
             }
-            props.refetch()
-            props.refetchReceiver()
             enqueueSnackbar( t('add_feedback_succes') , { variant: "success" });
         }
         if(isError){
@@ -236,18 +236,21 @@ export default function FeedbackImport(props){
     const sender = JSON.parse(localStorage.getItem('sender'));
     const [receiver,setReceiver] = useState([]);
     const [ message , setMessage ] = useState([]);
-    const {refetch: refetchReceiver,data: dataReceiver , isLoading: isLoadingReceiver , 
+    const {data: dataReceiver , isLoading: isLoadingReceiver , 
         isError : isErrorReceiver , isSuccess : isSuccessReceiver } = useGetReceiverByMailIdAndDotiQuery({receiver: props.auth.doti ,mail_id : props.idemail});
     const { refetch,data , isLoading , 
             isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : sender?.doti});
-    
     const [onUpdateStatus] = useUpdateFeedbackStatusMutation();
-    const previousRoute = localStorage.getItem("path");
     const listRef = useRef(null);
+    const [confirmSender,setConfirmSender] = useState('pending');
+    const [confirmReceiver,setConfirmReceiver] = useState('pending');
+
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
     useEffect(()=>{
         if(isSuccessReceiver){
             setReceiver(dataReceiver)
+            setConfirmSender(dataReceiver[0].senderConfirmation);
+            setConfirmReceiver(dataReceiver[0].receiverConfirmation);
         }
         if(isSuccess){
             if(data.filter(item => item.status === 0 && item.idReceiver === props.auth.doti)?.length > 0){
@@ -259,6 +262,7 @@ export default function FeedbackImport(props){
             }
         }
     },[isSuccess,isSuccessReceiver,dataReceiver]);
+
     const isJson = (str) => {
         try {
             JSON.parse(str);
@@ -266,6 +270,10 @@ export default function FeedbackImport(props){
             return false;
         }
         return true;
+    }
+
+    const handleChange = (data) => {
+        setMessage((prev) => [...prev , data[0]]);
     }
 
     return(
@@ -302,16 +310,16 @@ export default function FeedbackImport(props){
                                     },
                                 }}
                             >
-                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} refetchReceiver={refetchReceiver} receiver={sender?.doti} senderConfirm={receiver[0]?.senderConfirmation} receiverConfirm={receiver[0]?.receiverConfirmation} refetch={refetch}/>
+                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={sender?.doti} senderConfirm={confirmSender} receiverConfirm={confirmReceiver} setConfirmReceiver={setConfirmReceiver} handleChange={handleChange}/>
                                 <Divider orientation="vertical" flexItem />
                                 <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
                                     <Typography>{t("approval_achevement")}</Typography>
-                                    <Chip label={t(receiver[0]?.senderConfirmation)} color={receiver[0]?.senderConfirmation==="approved" ? 'success': receiver[0]?.senderConfirmation==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />
+                                    <Chip label={t(confirmSender)} color={confirmSender==="approved" ? 'success': confirmSender==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />
                                 </Box>
                                 <Divider orientation="vertical" flexItem />
                                 <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
                                     <Typography>{t("achevement_state")}</Typography>
-                                    <Chip label={t(receiver[0]?.receiverConfirmation)} color={receiver[0]?.receiverConfirmation==="finished"? 'success': receiver[0]?.receiverConfirmation==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />                                   
+                                    <Chip label={t(confirmReceiver)} color={confirmReceiver==="finished"? 'success': confirmReceiver==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />                                   
                                 </Box> 
                             </Box>
                         </Box>
@@ -323,20 +331,20 @@ export default function FeedbackImport(props){
                                 </Box>
                             ):(
                                 <React.Fragment>
-                                    {   data?.length > 0 ? (
+                                    {   message?.length > 0 ? (
                                             <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable" ref={listRef}>
-                                                { data && data.map( message => (
+                                                { message && message.map( message => (
                                                     <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6' , color :"white" , boxShadow : 3 }:{ textAlign:"left" , marginY : 1  , boxShadow : 3}} key={message.id} >
                                                         <CardHeader
                                                             avatar={ message.idSender === props.auth.doti ? (
                                                                 <Avatar alt={props.auth.fullnamela} sx={{ bgcolor : stringToColor(props.auth.fullnamela) }} src="/static/images/avatar/1.jpg" />
                                                             ):(
-                                                                <Avatar alt={sender?.sender.fullnamela} sx={{ bgcolor : stringToColor(sender?.sender?.fullnamela) }} src="/static/images/avatar/1.jpg" />
+                                                                <Avatar alt={sender?.fullnamela} sx={{ bgcolor : stringToColor(sender?.fullnamela) }} src="/static/images/avatar/1.jpg" />
                                                             )}
                                                             title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
                                                                 : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
-                                                                : sender?.sender?.doti === message.idSender && i18next.language === "fr" ? (sender?.sender?.fullnamela) 
-                                                                : (sender?.sender?.fullnamear) }
+                                                                : sender?.doti === message.idSender && i18next.language === "fr" ? (sender?.fullnamela) 
+                                                                : (sender?.fullnamear) }
                                                             subheader={<Box sx={message.idSender===props.auth.doti ? { color : "white"} : {}}>{moment(message.created_at).format('MMMM Do YYYY, HH:mm')}</Box>}
                                                             action={
                                                             (message.idSender===props.auth.doti && message.status) ? 

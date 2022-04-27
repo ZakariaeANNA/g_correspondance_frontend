@@ -105,26 +105,26 @@ function SendFeedback(props){
     const [isConfirmation,setIsConfirmation] = useState(0);
     const [value,setValue] = React.useState('');
     const [ approval , setApproval ] = useState();
+    const [ refresh ] = useRefreshMutation();
+    const [addFeedback, { data , isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
+    const [confirmMailBySender] = useConfirmMailBySenderMutation();
+    const [confirmMailByReceiever] = useConfirmMailByReceiverMutation();
+    const [files,setFiles] = useState([]);
+    const { enqueueSnackbar } = useSnackbar();
+
     const handleClickOpen = () => {
       setOpen(true);
     };
     const handleClose = () => {
         setOpen(false);
     };
-  
-    const [ refresh ] = useRefreshMutation();
+   
     const handleDataChange = (event)=>{
         setPlainTextValue(event.getCurrentContent().getPlainText()) // for plain text
         const rteContent = convertToRaw(event.getCurrentContent()) // for rte content with text formating
         rteContent && setValue(JSON.stringify(rteContent)) // store your rteContent to state
     }
     
-    const [addFeedback, { data , isLoading, error, isError, isSuccess }] = useAddFeedbackMutation();
-    const [confirmMailBySender] = useConfirmMailBySenderMutation();
-    const [confirmMailByReceiever] = useConfirmMailByReceiverMutation();
-
-    const [files,setFiles] = useState([]);
-
     const onAddFeedback = async() => {
         const formData = new FormData();
         var index = 0;
@@ -151,16 +151,14 @@ function SendFeedback(props){
         setValue(); setFiles([]);
     }
 
-    const { enqueueSnackbar } = useSnackbar();
-
     useEffect(()=>{
         if(isSuccess){
-            if(approval != null && approval!==undefined){
+            props.handleChange(data);
+            if(approval != null){
                 confirmMailBySender({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : approval});
                 if(approval==="notcomplet") 
                     confirmMailByReceiever({ idReceiver : props.receiver.doti , mail_id : props.mailID , state : "unfinished"});
                 props.setConfirmSender(approval);    
-                props.refetch();
                 setApproval();
                 setIsConfirmation(0)
             }
@@ -240,6 +238,7 @@ export default function FeedbackExport(props){
     const [ receiverDisplay , setReceiverDisplay ] = useState();
     const [ selected , setSelected ] = useState();
     const [ receivers , setReceivers ] = useState([]);
+    const [ message , setMessage ] = useState([]);
     const [getFeedbackBymailAndBysenderAndByreceiver,
             {data , isLoading , 
               isSuccess }] = useGetFeedbackBymailAndBysenderAndByreceiverMutation();
@@ -256,8 +255,10 @@ export default function FeedbackExport(props){
             if(data.filter(item=>item.status===0 && item.idReceiver===props.auth.doti).length > 0){
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail}) 
             }
+            setMessage(data);
             if(listRef.current){
-                listRef.current.scrollTop = listRef.current.scrollHeight
+                console.log(listRef.current.scrollTop+" "+listRef.current.scrollHeight);
+                listRef.current.scrollTop = listRef.current.scrollHeight;
             }
         }
         if(isSuccessReceiver){
@@ -265,7 +266,6 @@ export default function FeedbackExport(props){
         }
     },[isSuccess,isSuccessReceiver]);
 
-    
     const handleConversation = (receiver,confirmationSender,confirmationReceiver) => {
         setSelected(receiver.doti);
         setConfirmSender(confirmationSender);
@@ -273,6 +273,11 @@ export default function FeedbackExport(props){
         getFeedbackBymailAndBysenderAndByreceiver({ mail : props.idemail , receiver : props.auth.doti , sender : receiver.doti });
         setReceiverDisplay(receiver);
     }
+
+    const handleChange = (data) => {
+        setMessage((prev) => [...prev , data[0]]);
+    }
+
     function isJson(str) {
         try {
             JSON.parse(str);
@@ -281,6 +286,7 @@ export default function FeedbackExport(props){
         }
         return true;
     }
+
     return(
         <React.Fragment>
             <Paper
@@ -294,7 +300,7 @@ export default function FeedbackExport(props){
                     {   isLoadingReceiver ? (
                         <CircularProgress/>
                     ):(
-                        <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable">
+                        <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable" component="nav">
                             { receivers.map( receiver =>{
                                 return(
                                     <ListItem  
@@ -340,7 +346,7 @@ export default function FeedbackExport(props){
                                         },
                                     }}
                                 >
-                                    <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receiverDisplay} confirmReceiver={confirmReceiver} confirmSender={confirmSender} setConfirmSender={setConfirmSender} refetch={refetch} />
+                                    <SendFeedback mailID={props.idemail} sender={props.auth.doti} receiver={receiverDisplay} confirmReceiver={confirmReceiver} confirmSender={confirmSender} setConfirmSender={setConfirmSender} refetch={refetch} handleChange={handleChange} />
                                     <Divider orientation="vertical" flexItem />
                                     <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1 , alignItems:"center"}}>
                                         <Typography>{t("approval_achevement")}</Typography>
@@ -359,9 +365,9 @@ export default function FeedbackExport(props){
                                 </Box>
                             ):(
                                 <React.Fragment>
-                                    {   data?.length > 0 ? (
+                                    {   message.length > 0 ? (
                                         <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable" ref={listRef}>
-                                            { data.map( message => (
+                                            { message.map( message => (
                                                 <Card sx={message.idSender===props.auth.doti ? { textAlign:"left", marginY : 1,backgroundColor:  '#64b5f6' , color : "white"}:{ textAlign:"left" , marginY : 1}} key={message.id} >
                                                     <CardHeader
                                                         avatar={ message.idSender === props.auth.doti ? (
