@@ -126,7 +126,6 @@ export default function Importations(){
         if(data){
             setPage(data.meta.current_page);
             setLoading(false);
-            console.log(data.data);
             setRows(data.data.filter(row=>row.mail!==null && row.mail?.sender!==null));
         }
     },[data]);

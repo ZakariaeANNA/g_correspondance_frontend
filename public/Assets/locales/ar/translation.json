@@ -119,6 +119,7 @@
   "admin" : "مشرف",
   "chefDep" : "رئيس مصلحة",
   "delete" : "حذف",
-  "is_confirmation": "رسالة التاكيد"
+  "is_confirmation": "رسالة التاكيد",
+  "achevement_date_error" : "يجب ألا يكون تاريخ الٍانجاز أقل من التاريخ الحالي"
 
 }

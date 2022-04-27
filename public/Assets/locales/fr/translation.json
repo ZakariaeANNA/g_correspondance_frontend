@@ -119,5 +119,6 @@
   "admin" : "Admin" ,
   "chefDep": "Chef Département",
   "delete" : "Supprimer",
-  "is_confirmation": "Message de Confirmation"
+  "is_confirmation": "Message de Confirmation",
+  "achevement_date_error": "La date d'achèvement ne doit pas être inferieur que la date actuel"
 }

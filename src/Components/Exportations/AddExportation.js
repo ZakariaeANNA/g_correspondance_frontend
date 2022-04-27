@@ -25,6 +25,7 @@ const departmentWorkers = [
 ]
 
 export default function AddExportation(){
+    const [dateAchevement,setDateAchevement] = useState() //la date achevement selectioné par l'utilisateur
     const [ departments , setDepartments ] = useState([]); // liste des departements existe dans la base de données
     const [ establishment , setEstablishment ] = useState([]); // liste des etablissements existe dans la base de données
     const [ dep , setDep ] = useState(null); // id departement ajouté par utilisateur
@@ -93,28 +94,31 @@ export default function AddExportation(){
     // la fonctions qui permet d'envoyer l'exportation vers backend
     const onAddExportations = async(event) => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        formData.append('receiver', JSON.stringify(tags));
-        if(dep && depWorkers){
-            formData.append('depRoles',depWorkers.id);
-            formData.append('department',dep.id);
-        } 
-        if(eta) formData.append('codegresa',eta.codegresa);
-        formData.append('sender',user.doti);
-        formData.append('file', files[0]);
-        try{
-            await addExportations(formData).unwrap();
-        }catch(error){
-            if(error.status === 401){
-                await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
-                    localStorage.setItem( "token" , data );
-                    addExportations(formData);
-                });
+        if(dateAchevement && new Date(dateAchevement) > new Date()){
+            const formData = new FormData(event.currentTarget);
+            formData.append('receiver', JSON.stringify(tags));
+            if(dep && depWorkers){
+                formData.append('depRoles',depWorkers.id);
+                formData.append('department',dep.id);
+            } 
+            if(eta) formData.append('codegresa',eta.codegresa);
+            formData.append('sender',user.doti);
+            formData.append('file', files[0]);
+            try{
+                await addExportations(formData).unwrap();
+            }catch(error){
+                if(error.status === 401){
+                    await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
+                        localStorage.setItem( "token" , data );
+                        addExportations(formData);
+                    });
+                }
+                setFiles([]); setTags([]); event.target.reset(); setDep(null); setEta(null); // pour supprimer tous les données saisies après l'envoi
             }
+        }else{
+            enqueueSnackbar(t('achevement_date_error') ,  { variant: "error" });
         }
-        setFiles([]); setTags([]); event.target.reset(); setDep(null); setEta(null); // pour supprimer tous les données saisies après l'envoi
     }
-
     return (
         <React.Fragment>
             <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'flex-start',paddingBottom:2,alignItems:"center"}}>
@@ -203,7 +207,7 @@ export default function AddExportation(){
                         <TextField sx={{ marginY : 1 , width : 6/12 , paddingRight : 1 }} fullWidth multiline rows={2} label={t("references")} variant="outlined" name="references" disabled={isLoading} />
                         <TextField sx={{ marginY : 1 , width : 6/12}} fullWidth multiline rows={2} label={t("concerned")} variant="outlined" name="concerned" required disabled={isLoading} />
                         <TextField sx={{ marginY : 1 , width : 8/12 , paddingRight : 1 }} fullWidth label={t("notes")} variant="outlined" rows={4} name="notes" disabled={isLoading} />
-                        <TextField sx={{ marginY : 1 , width : 4/12}} id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 , width : 4/12}} error={dateAchevement && new Date(dateAchevement) <= new Date()} onChange={(e)=>setDateAchevement(e.target.value)} id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
                         <TextField sx={{ marginY : 1 }} fullWidth multiline label={t("message")} variant="outlined" rows={4} name="message" required disabled={isLoading} />
                         <DropFileInput
                             files={files}
