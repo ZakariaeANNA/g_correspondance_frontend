@@ -190,7 +190,7 @@ function SendFeedback(props){
                     {t("add_feedback")}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    {  ((props.confirmReceiver==="finished" && props.confirmSender==="approved") || (props.confirmSender==="pending" && props.confirmReceiver==="pending")) ? (
+                    {  ((props.confirmReceiver==="finished" && props.confirmSender==="approved") || (props.confirmSender==="pending" && props.confirmReceiver==="pending") || (props.confirmSender==="notcomplet" && props.confirmReceiver==="unfinished")) ? (
                         null
                     ):(
                         <FormControl sx={{ border : "1px solid #d6d8da" , padding : "4px 14px 4px 14px" , borderRadius : "6px"}} fullWidth>
@@ -320,7 +320,6 @@ export default function FeedbackExport(props){
                                 )})}
                         </List>
                     )}
-                    
                     {   receiverDisplay ? (
                         <Box sx={{ paddingX : 2 , width : "100%" }}>
                             <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between'}}>
