@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Box from '@mui/material/Box';
-import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useGetFeedbackBymailAndBysenderAndByreceivercloneQuery, useUpdateFeedbackStatusMutation ,useGetSenderByMailIdQuery} from "../../store/api/feedbackApi";
+import { useAddFeedbackMutation,useConfirmMailByReceiverMutation,useGetFeedbackBymailAndBysenderAndByreceivercloneQuery, useUpdateFeedbackStatusMutation ,useGetReceiverByMailIdAndDotiQuery} from "../../store/api/feedbackApi";
 import moment from 'moment';
 import { Tooltip } from '@material-ui/core';
 import { DialogContent, IconButton} from "@mui/material";
@@ -153,13 +153,13 @@ function SendFeedback(props){
 
     useEffect(()=>{
         if(isSuccess){
-            if( radioValue != null || radioValue != undefined ){
+            if( radioValue != null && radioValue != undefined ){
                 onUpdateConfirmationByReceiver({idReceiver: props.sender,mail_id: props.mailID,state: radioValue});
-                setRadioValue('')
+                setRadioValue()
                 setIsConfirmation(0)
             }
             props.refetch()
-            props.refetchSender()
+            props.refetchReceiver()
             enqueueSnackbar( t('add_feedback_succes') , { variant: "success" });
         }
         if(isError){
@@ -233,23 +233,21 @@ function SendFeedback(props){
 
   
 export default function FeedbackImport(props){
-    const [sender,setSender] = useState();
+    const sender = JSON.parse(localStorage.getItem('sender'));
     const [receiver,setReceiver] = useState([]);
     const [ message , setMessage ] = useState([]);
-    const [isSenderReady,setIsSenderReady] = useState(true)
-    const {refetch: refetchSender,data: dataSender , isLoading: isLoadingSender , 
-        isError : isErrorSender , isSuccess : isSuccessSender } = useGetSenderByMailIdQuery({ mail_id : props.idemail});
+    const {refetch: refetchReceiver,data: dataReceiver , isLoading: isLoadingReceiver , 
+        isError : isErrorReceiver , isSuccess : isSuccessReceiver } = useGetReceiverByMailIdAndDotiQuery({receiver: props.auth.doti ,mail_id : props.idemail});
     const { refetch,data , isLoading , 
-            isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : sender?.sender.doti});
+            isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : sender?.doti});
     
     const [onUpdateStatus] = useUpdateFeedbackStatusMutation();
     const previousRoute = localStorage.getItem("path");
     const listRef = useRef(null);
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
     useEffect(()=>{
-        if(isSuccessSender){
-            setSender(dataSender[0]);
-            setReceiver(dataSender[0].incoming_email.filter(row=>row.idReceiver===props.auth.doti))
+        if(isSuccessReceiver){
+            setReceiver(dataReceiver)
         }
         if(isSuccess){
             if(data.filter(item => item.status === 0 && item.idReceiver === props.auth.doti)?.length > 0){
@@ -260,7 +258,7 @@ export default function FeedbackImport(props){
                 listRef.current.scrollTop = listRef.current.scrollHeight
             }
         }
-    },[isSuccess,isSuccessSender,dataSender]);
+    },[isSuccess,isSuccessReceiver,dataReceiver]);
     const isJson = (str) => {
         try {
             JSON.parse(str);
@@ -304,7 +302,7 @@ export default function FeedbackImport(props){
                                     },
                                 }}
                             >
-                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} refetchSender={refetchSender} receiver={sender?.sender.doti} senderConfirm={receiver[0]?.senderConfirmation} receiverConfirm={receiver[0]?.receiverConfirmation} refetch={refetch}/>
+                                <SendFeedback mailID={props.idemail} sender={props.auth.doti} refetchReceiver={refetchReceiver} receiver={sender?.doti} senderConfirm={receiver[0]?.senderConfirmation} receiverConfirm={receiver[0]?.receiverConfirmation} refetch={refetch}/>
                                 <Divider orientation="vertical" flexItem />
                                 <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
                                     <Typography>{t("approval_achevement")}</Typography>
