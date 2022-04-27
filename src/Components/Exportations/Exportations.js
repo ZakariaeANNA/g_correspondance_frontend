@@ -170,7 +170,7 @@ export default function Exportation(){
             </Box>
         )}, 
         {field: "Actions",headerName: "", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(
-            <Button variant="text" startIcon={<Style />} sx={{ mt: 3, mb: 2 }} onClick={() => { localStorage.setItem("receivers",JSON.stringify(params.row.receiver)); localStorage.setItem("path","export"); history.push({pathname: "/app/feedback/"+params.row.id , appState: { receivers : params.row.receiver } })}}>{t('correspondence_follow')}</Button>
+            <Button variant="text" startIcon={<Style />} sx={{ mt: 3, mb: 2 }} onClick={() => { localStorage.setItem("path","export"); history.push({pathname: "/app/feedback/"+params.row.id , appState: { receivers : params.row.receiver } })}}>{t('correspondence_follow')}</Button>
         )},        
     ]
     return(

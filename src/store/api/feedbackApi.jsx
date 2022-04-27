@@ -39,6 +39,9 @@ export const feedbackApi = createApi({
         };
       },
     }),
+    checkUserInMail : builder.query({
+      query : (data) => `/correspondences/checkmail/${data.id}/${data.doti}`,
+    }),
     getReceiverByMail : builder.query({
       query : (data) => `/correspondences/receivers/${data.mail_id}`,
     }),
@@ -90,5 +93,6 @@ export const {
   useConfirmMailBySenderMutation,
   useUpdateFeedbackStatusMutation,
   useGetReceiverByMailQuery,
-  useGetSenderByMailIdQuery
+  useGetSenderByMailIdQuery,
+  useCheckUserInMailQuery
 } = feedbackApi;

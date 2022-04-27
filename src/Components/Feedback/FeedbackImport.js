@@ -236,9 +236,9 @@ export default function FeedbackImport(props){
     const [sender,setSender] = useState();
     const [receiver,setReceiver] = useState([]);
     const [ message , setMessage ] = useState([]);
-    const [isSenderReady,setIsSenderReady] = useState(true)
     const {refetch: refetchSender,data: dataSender , isLoading: isLoadingSender , 
         isError : isErrorSender , isSuccess : isSuccessSender } = useGetSenderByMailIdQuery({ mail_id : props.idemail});
+    
     const { refetch,data , isLoading , 
             isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : sender?.sender.doti});
     
