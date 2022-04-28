@@ -120,5 +120,7 @@
   "chefDep": "Chef Département",
   "delete" : "Supprimer",
   "is_confirmation": "Message de Confirmation",
-  "achevement_date_error": "La date d'achèvement ne doit pas être inferieur que la date actuel"
+  "achevement_date_error": "La date d'achèvement ne doit pas être inferieur que la date actuel",
+  "correspondance_add/fields_required": "Merci de remplir tout les champs obligatoire",
+  "receiver_required": "Au moins un recépteur est obligatoire"
 }

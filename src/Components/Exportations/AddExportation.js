@@ -54,11 +54,12 @@ export default function AddExportation(){
         }
         //Sinon on va afficher un message d'erreur selon l'erreur recu
         if(isError){
-            console.log(error.data);
             if(error.data === "correspondence_add/user_not_found"){
                 enqueueSnackbar( t('correspondence_send_user_not_found') ,  { variant: "error" });
             }else if(error.data === "correspondence_add/informations_incorrects"){
                 enqueueSnackbar( t('correspondence_informations_incorrects') ,  { variant: "error" });
+            }else if(error.data[0]==="correspondance_add/fields_required"){
+                enqueueSnackbar( t('correspondance_add/fields_required') , { variant: "error" });
             }
         }
         // si les données d'etablissements ont recus avec succès on peut les sauvegarder dans une state
@@ -96,7 +97,11 @@ export default function AddExportation(){
         event.preventDefault();
         if(dateAchevement && new Date(dateAchevement) > new Date()){
             const formData = new FormData(event.currentTarget);
-            formData.append('receiver', JSON.stringify(tags));
+            if(!dep && !depWorkers && !tags.length){
+                enqueueSnackbar( t('receiver_required') , { variant: "error" });
+                return;
+            }
+            if(tags.length)formData.append('receiver', JSON.stringify(tags));
             if(dep && depWorkers){
                 formData.append('depRoles',depWorkers.id);
                 formData.append('department',dep.id);

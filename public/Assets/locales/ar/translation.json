@@ -120,6 +120,7 @@
   "chefDep" : "رئيس مصلحة",
   "delete" : "حذف",
   "is_confirmation": "رسالة التاكيد",
-  "achevement_date_error" : "يجب ألا يكون تاريخ الٍانجاز أقل من التاريخ الحالي"
-
+  "achevement_date_error" : "يجب ألا يكون تاريخ الٍانجاز أقل من التاريخ الحالي",
+  "correspondance_add/fields_required": "يرجى ملء جميع الحقول المطلوبة",
+  "receiver_required":"مستقبل  واحد على الأقل إلزامي"
 }
