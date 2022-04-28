@@ -122,5 +122,11 @@
   "is_confirmation": "Message de Confirmation",
   "achevement_date_error": "La date d'achèvement ne doit pas être inferieur que la date actuel",
   "correspondance_add/fields_required": "Merci de remplir tout les champs obligatoire",
-  "receiver_required": "Au moins un recépteur est obligatoire"
+  "receiver_required": "Au moins un recépteur est obligatoire",
+  "all_etablishment" : "Tous les établissements",
+  "all_department" : "Tous les départements",
+  "eta_primaire" : "Etablissments d'enseignements primaires",
+  "eta_college" : "Etablissments d'enseignements collèges",
+  "eta_lycee" : "Etablissements d'enseignements lycée",
+  "all": "Tous"
 }

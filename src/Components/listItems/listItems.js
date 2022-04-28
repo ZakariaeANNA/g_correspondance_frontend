@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -42,7 +42,7 @@ export const SecondaryListItems = () => {
 
   return (
     <React.Fragment>
-      { auth.role === "admin" ? (
+      { auth?.role === "admin" ? (
         <Link to={'/app/users'} style={{textDecoration: 'none',color: 'black'}}>
           <ListItemButton>
             <ListItemIcon>
