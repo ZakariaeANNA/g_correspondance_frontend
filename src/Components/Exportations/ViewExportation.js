@@ -234,22 +234,20 @@ export default function ViewExportation({params}){
                     <TextField sx={{ width : 1/2 , marginY : 1 }} id="outlined-basic" multiline rows={2} label={t("notes")} variant="filled" value={params.notes} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("references")} variant="filled" rows={4} value={params.references} inputProps={{ readOnly: true }}/>
                     {/*show users content*/}
-                    <List sx={{marginY : 1}} disablePadding>
+                    <List sx={{marginY : 1}} disablePadding component={'div'}>
                         <ListItemButton onClick={handleClick} className={classes.color}>
                             <ListItemText primary={t("receivers")} />
                             {display ? <ExpandLessIcon /> : <ExpandMoreIcon />} 
                         </ListItemButton>                                   
                         <Collapse in={display} timeout="auto" unmountOnExit >
-                            <List disablePadding>
+                            <List disablePadding component={'div'}>
                                 {
                                     params.receiver.map(email=>(
                                         email.receiver.map(receive=>(
                                             <ListItem key={receive.doti}> 
-                                                <ListItem>
-                                                    <ListItemText
-                                                        primary={<Typography>{i18next.language === "fr" ? (receive.fullnamela) : (receive.fullnamear)}</Typography>}
-                                                    />
-                                                </ListItem>
+                                                <ListItemText
+                                                    primary={<Typography>{i18next.language === "fr" ? (receive.fullnamela) : (receive.fullnamear)}</Typography>}
+                                                />
                                                 <ListItemSecondaryAction>
                                                     <ViewUserDetails params={receive}/>
                                                 </ListItemSecondaryAction>

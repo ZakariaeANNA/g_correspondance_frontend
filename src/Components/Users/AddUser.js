@@ -110,7 +110,7 @@ export default function Adduser(){
                             onChange={handleUserDepartementChange}
                             onSubmit={handleUserDepartementSubmit}
                             style={{ textAlign : "start" }}
-                            value={userDepartement}
+                            value={userDepartement ? userDepartement: ''}
                         >
                             <MenuItem value={'departement'}>{t("the_department")}</MenuItem>
                             <MenuItem value={'etablissement'}>{t("the_establishment")}</MenuItem>
@@ -145,7 +145,7 @@ export default function Adduser(){
                             style={{ textAlign : "start" }}
                         >
                           { departments.map( dep => (
-                            <MenuItem value={dep.id}>{i18next.language === "fr" ? (dep.nomLa):(dep.nomAr)}</MenuItem>
+                            <MenuItem key={dep.id} value={dep.id}>{i18next.language === "fr" ? (dep.nomLa):(dep.nomAr)}</MenuItem>
                           ))}
                         </Select>
                       </FormControl>

@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React,{useEffect, useState} from 'react';
 import { DataGrid } from "@mui/x-data-grid";
 import {LockReset, Delete} from "@mui/icons-material";
 import DialogTitle from '@mui/material/DialogTitle';
@@ -180,9 +180,8 @@ export default function Users(){
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     if(data){
         setRows(data.data.filter(row=>row.doti!==user.doti));
-    }
+      }
   },[data]);
-
   const columns = [
     {field: "doti",headerName: t("doti"), flex: 1 ,headerAlign : 'center',align: 'center',renderCell : (params)=>(
       <Box>{params.row.doti}</Box>
@@ -204,7 +203,7 @@ export default function Users(){
   ]
   function FilterInputSearch(inputVlaue){
     let filtered = data?.data?.filter((row)=>(
-      row.fullnamela.toLowerCase().includes(inputVlaue.toLowerCase()) || row.fullnamear.includes(inputVlaue)
+      (row.fullnamela.toLowerCase().includes(inputVlaue.toLowerCase()) || row.fullnamear.includes(inputVlaue)) && row.doti !== user.doti
     ))
     if(filtered){
       setRows(filtered);
@@ -214,11 +213,11 @@ export default function Users(){
   function FilterSelect(event){
     if(event.target.value!=='all'){
       let filtered = data?.data?.filter((row)=>(
-        row.etablissement?.type===event.target.value || row.departement?.type===event.target.value
+        (row.etablissement?.type===event.target.value || row.departement?.type===event.target.value) && row.doti!== user.doti
       ));
       setRows(filtered)
     }else{
-      setRows(data.data)
+      setRows(data.data.filter(row=>row.doti!==user.doti))
     }
   }
   return (
@@ -239,8 +238,10 @@ export default function Users(){
                     style={{ textAlign : "start" }}
                 >
                     <MenuItem value={'all'}>Tous les Etablissements</MenuItem>
-                    <MenuItem value={'GroupeScolaire'}>G-Scolaire</MenuItem>
-                    <MenuItem value={'Administrative'}>Adminstration</MenuItem>
+                    <MenuItem value={'primaire'}>Primaire</MenuItem>
+                    <MenuItem value={'college'}>Collége</MenuItem>
+                    <MenuItem value={'lycee'}>Lycée</MenuItem>
+                    <MenuItem value={'administrative'}>Adminstration</MenuItem>
                 </Select>
             </FormControl>
         </Box>
@@ -260,6 +261,7 @@ export default function Users(){
               <DataGrid
                 rows={rows}
                 columns={columns}
+                rowsPerPageOptions={[5]}
                 pageSize={5}
                 disableSelectionOnClick
               />

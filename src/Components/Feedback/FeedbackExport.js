@@ -257,7 +257,6 @@ export default function FeedbackExport(props){
             }
             setMessage(data);
             if(listRef.current){
-                console.log(listRef.current.scrollTop+" "+listRef.current.scrollHeight);
                 listRef.current.scrollTop = listRef.current.scrollHeight;
             }
         }
@@ -320,7 +319,7 @@ export default function FeedbackExport(props){
                                                 <Avatar alt={receiver.receiver[0].fullnamela} sx={{ bgcolor : stringToColor(receiver.receiver[0].fullnamela) }} src="/static/images/avatar/1.jpg" />
                                             </ListItemAvatar>
                                             <ListItemText primary={ i18next.language === "fr" ? (receiver.receiver[0].fullnamela) : (receiver.receiver[0].fullnamear) }/>
-                                            <Divider variant="inset" component="li" />
+                                            <Divider variant="inset" component="div" />
                                         </ListItemButton>
                                     </ListItem>
                                 )})}
