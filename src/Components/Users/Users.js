@@ -202,8 +202,8 @@ export default function Users(){
     )},
   ]
   function FilterInputSearch(inputVlaue){
-    let filtered = data?.data?.filter((row)=>(
-      (row.fullnamela.toLowerCase().includes(inputVlaue.toLowerCase()) || row.fullnamear.includes(inputVlaue)) && row.doti !== user.doti
+    let filtered = rows.filter((row)=>(
+      row.fullnamela.toLowerCase().includes(inputVlaue.toLowerCase()) || row.fullnamear.includes(inputVlaue)
     ))
     if(filtered){
       setRows(filtered);
@@ -211,13 +211,23 @@ export default function Users(){
    
   }
   function FilterSelect(event){
-    if(event.target.value!=='all'){
-      let filtered = data?.data?.filter((row)=>(
-        (row.etablissement?.type===event.target.value || row.departement?.type===event.target.value) && row.doti!== user.doti
+    if(event.target.value!=='eta' && event.target.value!=='dep' && event.target.value!=="all"){
+      let filtered = data?.data.filter((row)=>(
+        row.etablissement?.type===event.target.value
+      ));
+      setRows(filtered)
+    }else if(event.target.value==='eta'){
+      let filtered = data?.data.filter((row)=>(
+        row.etablissement?.codegresa
+      ));
+      setRows(filtered)
+    }else if(event.target.value==='dep'){
+      let filtered = data?.data.filter((row)=>(
+        row.departement?.id && row.doti !== user.doti
       ));
       setRows(filtered)
     }else{
-      setRows(data.data.filter(row=>row.doti!==user.doti))
+      setRows(data?.data?.filter(row=>row.doti!==user.doti));
     }
   }
   return (
@@ -237,11 +247,12 @@ export default function Users(){
                     onChange={FilterSelect}
                     style={{ textAlign : "start" }}
                 >
-                    <MenuItem value={'all'}>Tous les Etablissements</MenuItem>
-                    <MenuItem value={'primaire'}>Primaire</MenuItem>
-                    <MenuItem value={'college'}>Collége</MenuItem>
-                    <MenuItem value={'lycee'}>Lycée</MenuItem>
-                    <MenuItem value={'administrative'}>Adminstration</MenuItem>
+                    <MenuItem value={'all'}>{t("all")}</MenuItem>
+                    <MenuItem value={'dep'}>{t("all_department")}</MenuItem>
+                    <MenuItem value={'eta'}>{t("all_etablishment")}</MenuItem>
+                    <MenuItem value={'primaire'}>{t("eta_primaire")}</MenuItem>
+                    <MenuItem value={'college'}>{t("eta_college")}</MenuItem>
+                    <MenuItem value={'lycee'}>{t("eta_lycee")}</MenuItem>
                 </Select>
             </FormControl>
         </Box>
