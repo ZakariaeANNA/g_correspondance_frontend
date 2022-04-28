@@ -234,7 +234,6 @@ function SendFeedback(props){
   
 export default function FeedbackImport(props){
     const sender = JSON.parse(localStorage.getItem('sender'));
-    const [receiver,setReceiver] = useState([]);
     const [ message , setMessage ] = useState([]);
     const {data: dataReceiver , isLoading: isLoadingReceiver , 
         isError : isErrorReceiver , isSuccess : isSuccessReceiver } = useGetReceiverByMailIdAndDotiQuery({receiver: props.auth.doti ,mail_id : props.idemail});
@@ -248,9 +247,8 @@ export default function FeedbackImport(props){
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
     useEffect(()=>{
         if(isSuccessReceiver){
-            setReceiver(dataReceiver)
-            setConfirmSender(dataReceiver[0].senderConfirmation);
-            setConfirmReceiver(dataReceiver[0].receiverConfirmation);
+            setConfirmSender(dataReceiver.data[0].senderConfirmation);
+            setConfirmReceiver(dataReceiver.data[0].receiverConfirmation);
         }
         if(isSuccess){
             if(data.filter(item => item.status === 0 && item.idReceiver === props.auth.doti)?.length > 0){

@@ -246,6 +246,7 @@ export default function Users(){
                     label={t("type_search")}
                     onChange={FilterSelect}
                     style={{ textAlign : "start" }}
+                    defaultValue={'all'}
                 >
                     <MenuItem value={'all'}>{t("all")}</MenuItem>
                     <MenuItem value={'dep'}>{t("all_department")}</MenuItem>

@@ -118,8 +118,8 @@ export default function AddExportation(){
                         addExportations(formData);
                     });
                 }
-                setFiles([]); setTags([]); event.target.reset(); setDep(null); setEta(null); // pour supprimer tous les données saisies après l'envoi
             }
+            setFiles([]); setTags([]); event.target.reset(); setDep(null); setEta(null); // pour supprimer tous les données saisies après l'envoi
         }else{
             enqueueSnackbar(t('achevement_date_error') ,  { variant: "error" });
         }
@@ -212,7 +212,7 @@ export default function AddExportation(){
                         <TextField sx={{ marginY : 1 , width : 6/12 , paddingRight : 1 }} fullWidth multiline rows={2} label={t("references")} variant="outlined" name="references" disabled={isLoading} />
                         <TextField sx={{ marginY : 1 , width : 6/12}} fullWidth multiline rows={2} label={t("concerned")} variant="outlined" name="concerned" required disabled={isLoading} />
                         <TextField sx={{ marginY : 1 , width : 8/12 , paddingRight : 1 }} fullWidth label={t("notes")} variant="outlined" rows={4} name="notes" disabled={isLoading} />
-                        <TextField sx={{ marginY : 1 , width : 4/12}} error={dateAchevement && new Date(dateAchevement) <= new Date()} onChange={(e)=>setDateAchevement(e.target.value)} id="datetime-local" label={t("achevement_date")} type="datetime-local"defaultValue={new Date("dd-mm-yyyy hh:mm")} name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 , width : 4/12}} error={dateAchevement && new Date(dateAchevement) <= new Date()} onChange={(e)=>setDateAchevement(e.target.value)} id="datetime-local" label={t("achevement_date")} type="datetime-local" name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
                         <TextField sx={{ marginY : 1 }} fullWidth multiline label={t("message")} variant="outlined" rows={4} name="message" required disabled={isLoading} />
                         <DropFileInput
                             files={files}

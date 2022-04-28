@@ -2,9 +2,15 @@ import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import './drop-file-input.css';
-
+import ClearIcon from '@mui/icons-material/Clear';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
 import { ImageConfig } from '../../config/ImageConfig'; 
 import uploadImg from '../../assets/cloud-upload-regular-240.png';
+import { IconButton } from '@mui/material';
 
 const DropFileInput = props => {
 
@@ -40,7 +46,18 @@ const DropFileInput = props => {
     }
 
     const { t } = useTranslation();
-
+    const convertFileSize = (size) =>{
+         var convertedSize = size+'B'
+        if(size>1000){
+            const kilo = size/1000
+            convertedSize = kilo.toFixed(2)+"KB"
+            if(kilo>1024){
+               const mega = kilo/1024 
+                convertedSize = mega.toFixed(2)+'MB'
+            }
+        }
+        return convertedSize;
+    }
     return (
         <>
             <div
@@ -58,20 +75,27 @@ const DropFileInput = props => {
             </div>
             {
                 props.files.length > 0 ? (
-                    <div className="drop-file-preview">
-                        {
-                            props.files.map((item, index) => (
-                                <div key={index} className="drop-file-preview__item">
-                                    <img src={ImageConfig[item.type.split('/')[1]] || ImageConfig['default']} alt="" />
-                                    <div className="drop-file-preview__item__info">
-                                        <p>{item.name}</p>
-                                        <p>{item.size}B</p>
-                                    </div>
-                                    <span className="drop-file-preview__item__del" onClick={() => fileRemove(item)}>x</span>
-                                </div>
-                            ))
-                        }
-                    </div>
+                    <List disablePadding component={'div'}>
+                            {
+                                props.files.map((item,index)=>(
+                                    <ListItem key={index}
+                                        secondaryAction={
+                                            <IconButton onClick={() => fileRemove(item)} edge="end">
+                                                <ClearIcon/>
+                                            </IconButton>
+                                        }
+                                    >
+                                        <ListItemAvatar>
+                                                <Avatar alt="" src={ImageConfig[item.type.split('/')[1]] || ImageConfig['default']} />
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={item.name}
+                                            secondary={convertFileSize(item.size)}
+                                        />
+                                    </ListItem>
+                                ))
+                            }
+                        </List>
                 ) : null
             }
         </>
