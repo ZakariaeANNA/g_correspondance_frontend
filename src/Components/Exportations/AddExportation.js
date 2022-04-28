@@ -97,7 +97,7 @@ export default function AddExportation(){
         event.preventDefault();
         if(dateAchevement && new Date(dateAchevement) > new Date()){
             const formData = new FormData(event.currentTarget);
-            if(!dep && !depWorkers && !tags.length){
+            if(!eta && !dep && !depWorkers && !tags.length){
                 enqueueSnackbar( t('receiver_required') , { variant: "error" });
                 return;
             }
