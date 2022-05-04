@@ -45,6 +45,8 @@ import 'moment/locale/fr'
 import CircularProgress from '@mui/material/CircularProgress';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
+import Skeleton from '@mui/material/Skeleton';
+
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -297,7 +299,26 @@ export default function FeedbackExport(props){
             >
                 <Box sx={{ display:"flex"}}>
                     {   isLoadingReceiver ? (
-                        <CircularProgress/>
+                        <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable" component="nav">
+                            { [1, 2, 3, 4, 5, 6].map(loading => ( 
+                                <ListItem key={loading} disablePadding>
+                                    <ListItemButton role={undefined} dense >   
+                                        <ListItemAvatar>
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <Skeleton animation="wave" height={10} width="auto" style={{ marginBottom: 6 }} />
+                                            }
+                                            secondary={
+                                                <Skeleton animation="wave" height={10} width="50%" />
+                                            }
+                                        />
+                                        <Divider variant="inset" component="div" />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
                     ):(
                         <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable" component="nav">
                             { receivers.map( receiver =>{
