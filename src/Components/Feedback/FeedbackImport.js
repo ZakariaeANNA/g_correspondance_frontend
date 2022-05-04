@@ -41,6 +41,7 @@ import 'moment/locale/fr';
 import CircularProgress from '@mui/material/CircularProgress';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
+import Skeleton from '@mui/material/Skeleton';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -285,11 +286,6 @@ export default function FeedbackImport(props){
             >
                 <Box sx={{ display:"flex"}}>    
                     <Box sx={{ paddingX : 2 , width : "100%" }}>
-                        { isLoading ? 
-                        (<Box sx={{ display: 'flex' , p : 4 , position : "relative" , left : "50%" }}>
-                            <CircularProgress />
-                        </Box>):
-                        (
                         <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between'}}>
                             <Box
                                 sx={{
@@ -312,16 +308,23 @@ export default function FeedbackImport(props){
                                 <Divider orientation="vertical" flexItem />
                                 <Box sx={{display: 'flex',flexDirection: 'row', justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
                                     <Typography>{t("approval_achevement")}</Typography>
-                                    <Chip label={t(confirmSender)} color={confirmSender==="approved" ? 'success': confirmSender==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />
+                                    { isLoading ? ( 
+                                        <Skeleton animation="wave" height={40} width={40} style={{ marginLeft : 5 }} />
+                                    ):(
+                                        <Chip label={t(confirmSender)} color={confirmSender==="approved" ? 'success': confirmSender==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />
+                                    )}
                                 </Box>
                                 <Divider orientation="vertical" flexItem />
                                 <Box sx={{display: 'flex',flexDirection: 'row',justifyContent: 'space-between',marginY: 1,marginX: 1,alignItems: 'center'}}>
                                     <Typography>{t("achevement_state")}</Typography>
-                                    <Chip label={t(confirmReceiver)} color={confirmReceiver==="finished"? 'success': confirmReceiver==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />                                   
+                                    { isLoading ? (
+                                        <Skeleton animation="wave" height={40} width={40} style={{ marginLeft : 5 }} />
+                                    ):(
+                                        <Chip label={t(confirmReceiver)} color={confirmReceiver==="finished"? 'success': confirmReceiver==="pending" ? 'warning' : 'error'} sx={{marginX: 1} } />                                   
+                                    )}
                                 </Box> 
                             </Box>
                         </Box>
-                        )}
                         {
                             isLoading ? (
                                 <Box sx={{ display: 'flex' , p : 4 , position : "relative" , left : "50%" }}>
