@@ -114,7 +114,7 @@ export default function AddExportation(){
             }catch(error){
                 if(error.status === 401){
                     await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
-                        localStorage.setItem( "token" , data );
+                        localStorage.setItem( "token",data);
                         addExportations(formData);
                     });
                 }
