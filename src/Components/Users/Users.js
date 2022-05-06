@@ -201,10 +201,10 @@ export default function Users(){
       </div>
     )},
   ]
-  function FilterInputSearch(inputVlaue){
-    let filtered = rows.filter((row)=>(
-      row.fullnamela.toLowerCase().includes(inputVlaue.toLowerCase()) || row.fullnamear.includes(inputVlaue)
-    ))
+  function FilterInputSearch(inputValue){
+    let filtered = data.data.filter((row)=>(
+      row.fullnamela.toLowerCase().includes(inputValue.toLowerCase()) || row.fullnamear.includes(inputValue)
+    ));
     if(filtered){
       setRows(filtered);
     }

@@ -184,7 +184,7 @@ export default function Home() {
         <ThemeProvider theme={i18next.language === "ar" ? { rtlTheme , fontTheme } : { ltrTheme , fontTheme }}>
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="absolute" open={open} sx={{ justifyItems : "center" , zIndex : "2" }}>
+            <AppBar position="absolute" open={open} sx={{ justifyItems : "center" , zIndex : "2" }} >
               <Toolbar
                 sx={{
                   pr: '24px', // keep right padding when drawer closed
@@ -208,7 +208,7 @@ export default function Home() {
                     noWrap
                     sx={{ flexGrow: 1 , textAlign : "left" }}
                   >
-                    <Link to={"/app/"} style={{ textDecoration : "none" , color : "white"}}>
+                    <Link to={"/app/"} style={{ textDecoration : "none" , color : "white" }}>
                       {t('project_title')}
                     </Link>
                   </Typography>
@@ -239,7 +239,7 @@ export default function Home() {
                           <Typography textAlign="center">{t('ar')}</Typography>
                         </MenuItem>
                     </Menu>
-                  </Box>
+                </Box>
                 <Box sx={{ marginX : 2 }}>
                   <Tooltip title={t("notification")}>
                     <IconButton color="inherit" onClick={handleOpenNotification}>
@@ -301,7 +301,14 @@ export default function Home() {
                 </Box>
               </Toolbar>
             </AppBar>
-            <Drawer variant="permanent" open={open} sx={{ zIndex : "0" }}>
+            <Drawer 
+              variant="permanent" 
+              open={open} 
+              sx={{ zIndex : "0" }} 
+              PaperProps={{ sx: {
+                color: "primary",
+              }}} 
+            >
               <Toolbar
                   sx={{
                     display: 'flex',
@@ -311,7 +318,7 @@ export default function Home() {
                   }}
                 >
               </Toolbar>
-              <List component="nav" sx={{ paddingInlineStart: 1 }}>
+              <List component="nav" >
                 <MainListItems />
                 <Divider sx={{ my: 1 }} />
                 <SecondaryListItems/>

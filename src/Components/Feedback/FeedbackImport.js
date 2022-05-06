@@ -1,4 +1,4 @@
-import React,{ useState,useEffect,useRef } from 'react'
+import React,{ useState,useEffect,useCallback } from 'react'
 import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -42,6 +42,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
 import Skeleton from '@mui/material/Skeleton';
+import ModalImage from "react-modal-image";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -103,9 +104,9 @@ function SendFeedback(props){
     const [plainTextValue,setPlainTextValue] = useState();
     const [onUpdateConfirmationByReceiver] = useConfirmMailByReceiverMutation();
     const { enqueueSnackbar } = useSnackbar();
-
     const [isConfirmation,setIsConfirmation] = useState(0);
     
+
     const handleClickOpen = () => {
       setOpen(true);
     };
@@ -241,11 +242,16 @@ export default function FeedbackImport(props){
     const { refetch,data , isLoading , 
             isError , isSuccess } = useGetFeedbackBymailAndBysenderAndByreceivercloneQuery({ mail : props.idemail , receiver : props.auth.doti , sender : sender?.doti});
     const [onUpdateStatus] = useUpdateFeedbackStatusMutation();
-    const listRef = useRef(null);
     const [confirmSender,setConfirmSender] = useState('pending');
     const [confirmReceiver,setConfirmReceiver] = useState('pending');
-
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
+    
+    const measuredRef = useCallback(node => {
+        if (node !== null) {
+            node.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [message]);
+
     useEffect(()=>{
         if(isSuccessReceiver){
             setConfirmSender(dataReceiver.data[0].senderConfirmation);
@@ -256,9 +262,6 @@ export default function FeedbackImport(props){
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail});                  
             }
             setMessage(data);
-            if(listRef.current){
-                listRef.current.scrollTop = listRef.current.scrollHeight
-            }
         }
     },[isSuccess,isSuccessReceiver,dataReceiver]);
 
@@ -333,9 +336,9 @@ export default function FeedbackImport(props){
                             ):(
                                 <React.Fragment>
                                     {   message?.length > 0 ? (
-                                            <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable" ref={listRef}>
+                                            <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable" >
                                                 { message && message.map( message => (
-                                                    <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#64b5f6' , color :"white" , boxShadow : 3 }:{ textAlign:"left" , marginY : 1  , boxShadow : 3}} key={message.id} >
+                                                    <Card sx={message.idSender===props.auth.doti ? { textAlign:"left" , marginY : 1,backgroundColor: '#1976d2' , color :"white" , boxShadow : 3 }:{ textAlign:"left" , marginY : 1  , boxShadow : 3}} key={message.id} >
                                                         <CardHeader
                                                             avatar={ message.idSender === props.auth.doti ? (
                                                                 <Avatar alt={props.auth.fullnamela} sx={{ bgcolor : stringToColor(props.auth.fullnamela) }} src="/static/images/avatar/1.jpg" />
@@ -361,22 +364,32 @@ export default function FeedbackImport(props){
                                                                     </Box>) : null
                                                                 }
                                                             </CardContent>
-                                                        <Divider />
+                                                        { message.attachement.length != 0 ? <Divider /> : null }
                                                         <CardActions disableSpacing>
                                                         {
                                                             message.attachement.map(attach=>(
                                                                 <Tooltip title={attach.filename} arrow key={attach.id}>
-                                                                    <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
-                                                                        <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
-                                                                            <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
-                                                                        </Box>
-                                                                    </a>
+                                                                    { ["png","jpg","jpeg"].includes(attach.type) ? (
+                                                                        <ModalImage
+                                                                            className="modal-image"
+                                                                            small={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename}
+                                                                            large={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename}
+                                                                            alt={attach.filename}
+                                                                        />
+                                                                    ):(
+                                                                        <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
+                                                                            <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
+                                                                                <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
+                                                                            </Box>
+                                                                        </a>
+                                                                    )}  
                                                                 </Tooltip>
                                                             ))
                                                         }
                                                         </CardActions>
                                                     </Card>
                                                 ))}
+                                                <div ref={measuredRef} />
                                             </Box>
                                         ):(
                                             <Box
