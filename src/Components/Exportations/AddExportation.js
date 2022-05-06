@@ -11,10 +11,6 @@ import { useTranslation } from 'react-i18next';
 import DropFileInput from '../drop-file-input/DropFileInput';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useSelector } from 'react-redux';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
 import i18next from 'i18next';
 import Autocomplete from '@mui/material/Autocomplete';
 

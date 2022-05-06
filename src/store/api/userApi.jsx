@@ -81,7 +81,10 @@ endpoints: (builder) => ({
           method: 'get'
         }
       }
-    })
+    }),
+    getUnreadNotification: builder.query({
+      query: ()=>`/notifications`
+    }),
   }),
 });
 // Export hooks for usage in functional components, which are
@@ -95,5 +98,6 @@ export const {
   useDeleteUserMutation,
   useGetCurrentUserQuery,
   useGetUserByIdDepartementMutation,
-  useGetUserByCodeGresaMutation
+  useGetUserByCodeGresaMutation,
+  useGetUnreadNotificationQuery
 } = userApi;

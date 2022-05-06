@@ -43,6 +43,9 @@ import ChangePassword from './Components/Users/ChangePassword';
 import Profile from './Components/Users/Profile';
 import IdleTimer from 'react-idle-timer';
 import { isExpired } from "react-jwt";
+import { useGetUnreadNotificationQuery } from './store/api/userApi';
+import Echo from 'laravel-echo'
+window.Pusher = require('pusher-js')
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -125,7 +128,8 @@ export default function Home() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
-
+  const {refetch,data,isLoading,isError,isSuccess} = useGetUnreadNotificationQuery()
+  const [notification,setNotification] = useState();
   useEffect(()=>{
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     if(isSuccessLogout){
@@ -134,7 +138,10 @@ export default function Home() {
       else
         dispatch({ type : "logout" , history : history , route : "/auth/" });
     }
-  },[isSuccessLogout]);
+    if(data){
+      setNotification(data[0])
+    }
+    },[isSuccessLogout,data]);
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -173,7 +180,6 @@ export default function Home() {
     setTimeOut(true);
     logout({token : `${localStorage.getItem("token")}` });
   }
-
   return (
     <IdleTimer
       timeout={2000000}
@@ -243,7 +249,7 @@ export default function Home() {
                 <Box sx={{ marginX : 2 }}>
                   <Tooltip title={t("notification")}>
                     <IconButton color="inherit" onClick={handleOpenNotification}>
-                        <Badge badgeContent={4} color="secondary">
+                        <Badge badgeContent={notification?.count} color="secondary">
                             <NotificationsIcon />
                         </Badge>
                     </IconButton>
