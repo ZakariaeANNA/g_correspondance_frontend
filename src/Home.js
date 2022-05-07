@@ -44,9 +44,14 @@ import Profile from './Components/Users/Profile';
 import IdleTimer from 'react-idle-timer';
 import { isExpired } from "react-jwt";
 import { useDeleteNotificationMutation, useGetUnreadNotificationQuery } from './store/api/userApi';
-import Chip from '@mui/material/Chip';
 import moment from 'moment';
-
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Email from '@mui/icons-material/Email';
+import Send from '@mui/icons-material/Send';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -141,7 +146,8 @@ export default function Home() {
         dispatch({ type : "logout" , history : history , route : "/auth/" });
     }
     if(data){
-      setNotification(data[0])
+      console.log(data[0]);
+      setNotification(data[0]);
     }
     if(isSuccessDelete){
       refetch()
@@ -274,52 +280,69 @@ export default function Home() {
                     </IconButton>
                   </Tooltip>
                   <Menu
-                        sx={{ mt: '45px' }}
-                        id="menu-appbar"
-                        anchorEl={notifications}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        open={Boolean(notifications)}
-                        onClose={handleCloseNotification}
-                        >
-                        {notification ? (notification?.notification?.map((notif) => (
-                            <MenuItem key={notif?.id} onClick={()=>handleCloseNotification(notif)}>
-                              {notif.data?.type==="correspondance"?(
-                              <Box>
-                                <Box sx={{}}>
-                                    <Typography sx={{fontWeight: 'bold',fontSize: 20}} component={'p'}>{notif.data?.correspondance?.title}</Typography>
-                                    <Typography component={'p'}>{`vous avaez une correspondance de la part de ${notif.data?.senderName}`}</Typography>
-                                </Box>
-                                <Box sx={{display: 'flex',justifyContent: 'flex-end',alignItems: 'center'}}>
-                                  <Chip label={moment(notif.created_at).format('DD-MM-YYYY HH:mm')}/>
-                                </Box>
-                              </Box>
-                              ):(
-                                <Box>
-                                  <Box sx={{}}>
-                                    <Typography component={'p'}>{`vous recus une feedback sur la corresponadnce de ${notif.data?.correspondanceSubject}`}</Typography>
-                                  </Box>
-                                  <Box sx={{display: 'flex',justifyContent: 'flex-end',alignItems: 'center'}}>
-                                    <Chip label={moment(notif.created_at).format('DD-MM-YYYY HH:mm')}/>
-                                  </Box>
-                                </Box>
-                              )
-                              }
-                              <Divider variant="inset" component="div" />
-                            </MenuItem>
-                        ))):(
-                              <Box>
-                                <Typography>{t('no_notification_found')}</Typography>
-                              </Box>)}
-                    </Menu>
-
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar"
+                    anchorEl={notifications}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    open={Boolean(notifications)}
+                    onClose={handleCloseNotification}
+                  >
+                    {notification?.notification?.length > 0 ? (notification?.notification?.map((notif) => (
+                      <ListItem
+                        key={notif?.id} 
+                        sx={{ padding : 0 , maxWidth : "350px" }}
+                        secondaryAction={
+                          <IconButton edge="end" aria-label="delete" onClick={ () => DeleteNotification(notif?.id) }>
+                            <DeleteIcon sx={{ color : "red" }} />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemButton onClick={()=>handleCloseNotification(notif)}>
+                          {notif.data?.type==="correspondance" ? (
+                            <>
+                              <ListItemAvatar>
+                                <Avatar>
+                                  <Email />
+                                </Avatar>
+                              </ListItemAvatar>
+                              <ListItemText 
+                                sx={{ fontSize : "12px" }}
+                                primary={`vous avaez une correspondance de la part de ${notif.data?.senderName}`} 
+                                secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD-MM-YYYY')}
+                              />
+                            </>
+                          ):(
+                            <>
+                              <ListItemAvatar>
+                                <Avatar>
+                                  <Send />
+                                </Avatar>
+                              </ListItemAvatar>
+                              <ListItemText 
+                                sx={{ fontSize : "12px" }}
+                                primary={`vous recus une feedback sur la corresponadnce de ${notif.data?.correspondanceSubject}`}
+                                secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD-MM-YYYY')}
+                              />
+                            </>
+                          )}
+                        </ListItemButton>
+                      </ListItem>
+                    ))):(
+                      <ListItemButton>
+                        <ListItemText 
+                          primary={t('no_notification_found')}
+                        />
+                      </ListItemButton>
+                    )}
+                  </Menu>
                 </Box>
                 <Box sx={{ flexGrow: 0 }}>
                     <Tooltip title={auth?.fullnamela || "Open Settings"}>
