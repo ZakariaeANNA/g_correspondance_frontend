@@ -1,4 +1,4 @@
-import React,{ useState,useEffect,useRef } from 'react'
+import React,{ useState,useEffect,useCallback } from 'react'
 import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -46,6 +46,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
 import Skeleton from '@mui/material/Skeleton';
+import ModalImage from "react-modal-image";
 
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -134,6 +135,7 @@ function SendFeedback(props){
         formData.append('idSender',props.sender);
         formData.append('idReceiver',props.receiver.doti);
         formData.append('file', files);
+        formData.append('direction','export');
         if(isConfirmation) formData.append('isConfirmation',isConfirmation);
         if(plainTextValue) formData.append('message',value);
         files.map( file => {
@@ -248,9 +250,13 @@ export default function FeedbackExport(props){
      , isSuccess : isSuccessReceiver } = useGetReceiverByMailQuery({ mail_id : props.idemail });
     moment.locale(i18next.language === "ar" ? ("ar-ma"):("fr"));
     const [onUpdateStatus,{}]= useUpdateFeedbackStatusMutation();
-    const listRef = useRef(null);
     const [confirmSender,setConfirmSender] = useState('pending');
     const [confirmReceiver,setConfirmReceiver] = useState('pending');
+    const measuredRef = useCallback(node => {
+        if (node !== null) {
+            node.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [message]);
 
     useEffect(()=>{
         if(isSuccess){
@@ -258,9 +264,6 @@ export default function FeedbackExport(props){
                 onUpdateStatus({idReceiver: props.auth.doti,mail_id: props.idemail}) 
             }
             setMessage(data);
-            if(listRef.current){
-                listRef.current.scrollTop = listRef.current.scrollHeight;
-            }
         }
         if(isSuccessReceiver){
             setReceivers(dataReceiver.data);
@@ -386,9 +389,9 @@ export default function FeedbackExport(props){
                             ):(
                                 <React.Fragment>
                                     {   message.length > 0 ? (
-                                        <Box sx={{ maxHeight:400 , overflow : "auto" , marginY : 2 }} className="scrollable" ref={listRef}>
+                                        <Box sx={{ maxHeight:400 , overflow : "scroll" , marginY : 2 }} className="scrollable">
                                             { message.map( message => (
-                                                <Card sx={message.idSender===props.auth.doti ? { textAlign:"left", marginY : 1,backgroundColor:  '#64b5f6' , color : "white"}:{ textAlign:"left" , marginY : 1}} key={message.id} >
+                                                <Card sx={message.idSender===props.auth.doti ? { textAlign:"left", marginY : 1,backgroundColor:  '#1976d2' , color : "white"}:{ textAlign:"left" , marginY : 1}} key={message.id} >
                                                     <CardHeader
                                                         avatar={ message.idSender === props.auth.doti ? (
                                                             <Avatar alt={props.auth.fullnamela} sx={{ bgcolor : stringToColor(props.auth.fullnamela) }} src="/static/images/avatar/1.jpg" />
@@ -416,22 +419,32 @@ export default function FeedbackExport(props){
                                                                 </Box>) : null
                                                             }
                                                         </CardContent>
-                                                    <Divider />
+                                                    { message.attachement.length != 0 ? <Divider /> : null }
                                                     <CardActions sx={{ p:2 }}>
                                                     {
                                                         message?.attachement?.map(attach=>(
                                                             <Tooltip title={attach.filename} arrow key={attach.id}>
-                                                                <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
+                                                                { ["png","jpg","jpeg"].includes(attach.type) ? (
+                                                                    <ModalImage
+                                                                        className="modal-image"
+                                                                        small={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename}
+                                                                        large={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename}
+                                                                        alt={attach.filename}
+                                                                    />
+                                                                ):(
+                                                                    <a href={'http://localhost:8000/api/'+attach.attachement+'/'+attach.filename} style={{textDecoration: 'none'}}>
                                                                         <Box sx={{display: 'flex',justifyContent: 'center',alignContent: 'center',height: '3.5em',width: '3.5em'}}>
-                                                                                <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
+                                                                            <FileIcon extension={attach.type} {...defaultStyles[attach.type]}/>
                                                                         </Box>
-                                                                </a>
+                                                                    </a>
+                                                                )}  
                                                             </Tooltip>
                                                         ))
                                                     }
                                                     </CardActions>
                                                 </Card>
                                             ))}
+                                            <div ref={measuredRef}/>
                                         </Box>
                                     ):(
                                         <Box

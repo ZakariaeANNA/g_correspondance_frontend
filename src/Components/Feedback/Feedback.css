@@ -16,3 +16,11 @@
 .scrollable::-webkit-scrollbar-thumb:hover {
     background-color: #a8bbbf;
 }
+
+.modal-image{
+    height: 55px;
+    padding-left: 2px;
+    padding-right: 2px;
+    border-radius: 8%;
+    margin-top: 9%;
+}

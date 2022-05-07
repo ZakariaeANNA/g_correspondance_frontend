@@ -43,9 +43,10 @@ import ChangePassword from './Components/Users/ChangePassword';
 import Profile from './Components/Users/Profile';
 import IdleTimer from 'react-idle-timer';
 import { isExpired } from "react-jwt";
-import { useGetUnreadNotificationQuery } from './store/api/userApi';
-import Echo from 'laravel-echo'
-window.Pusher = require('pusher-js')
+import { useDeleteNotificationMutation, useGetUnreadNotificationQuery } from './store/api/userApi';
+import Chip from '@mui/material/Chip';
+import moment from 'moment';
+
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -63,7 +64,7 @@ const ltrTheme = createTheme({ direction: "ltr" });
 const rtlTheme = createTheme({ direction: "rtl" });
 
 const settings = ['Profile', 'Account', 'Logout'];
-const notificationsList = ['mohamed addhamed have sent this notification', 'account that one sent from that one', 'hello body how are you ?', 'there is too many notifications'];
+const notificationsList = ['mohamed addhamed have sent this notification'];
 const drawerWidth = 240;
 
 
@@ -128,8 +129,9 @@ export default function Home() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
-  const {refetch,data,isLoading,isError,isSuccess} = useGetUnreadNotificationQuery()
-  const [notification,setNotification] = useState();
+  const {refetch,data,isLoading,isError,isSuccess} = useGetUnreadNotificationQuery();
+  const [DeleteNotification,{isSuccess: isSuccessDelete}] = useDeleteNotificationMutation();
+  const [notification,setNotification] = useState([]);
   useEffect(()=>{
     dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
     if(isSuccessLogout){
@@ -141,7 +143,10 @@ export default function Home() {
     if(data){
       setNotification(data[0])
     }
-    },[isSuccessLogout,data]);
+    if(isSuccessDelete){
+      refetch()
+    }
+    },[isSuccessLogout,data,isSuccessDelete]);
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -172,7 +177,21 @@ export default function Home() {
     setNotifications(event.currentTarget);
   };
 
-  const handleCloseNotification = () => {
+  const handleCloseNotification = (notification) => {
+    if(notification?.data?.type==="feedback"){
+      if(notification?.data?.sender!==null){
+        history.push("/app/feedback/"+notification?.data?.mail_id);
+        localStorage.setItem("sender",JSON.stringify(notification?.data.sender));
+        localStorage.setItem('path',"import");
+        DeleteNotification(notification?.id)
+      }else{
+        history.push("/app/feedback/"+notification?.data?.mail_id);
+        localStorage.setItem('path','export')
+        DeleteNotification(notification?.id)
+      }
+    }else{
+      DeleteNotification(notification?.id)
+    }
     setNotifications(null);
   };
 
@@ -190,7 +209,7 @@ export default function Home() {
         <ThemeProvider theme={i18next.language === "ar" ? { rtlTheme , fontTheme } : { ltrTheme , fontTheme }}>
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="absolute" open={open} sx={{ justifyItems : "center" , zIndex : "2" }}>
+            <AppBar position="absolute" open={open} sx={{ justifyItems : "center" , zIndex : "2" }} >
               <Toolbar
                 sx={{
                   pr: '24px', // keep right padding when drawer closed
@@ -214,7 +233,7 @@ export default function Home() {
                     noWrap
                     sx={{ flexGrow: 1 , textAlign : "left" }}
                   >
-                    <Link to={"/app/"} style={{ textDecoration : "none" , color : "white"}}>
+                    <Link to={"/app/"} style={{ textDecoration : "none" , color : "white" }}>
                       {t('project_title')}
                     </Link>
                   </Typography>
@@ -245,7 +264,7 @@ export default function Home() {
                           <Typography textAlign="center">{t('ar')}</Typography>
                         </MenuItem>
                     </Menu>
-                  </Box>
+                </Box>
                 <Box sx={{ marginX : 2 }}>
                   <Tooltip title={t("notification")}>
                     <IconButton color="inherit" onClick={handleOpenNotification}>
@@ -270,11 +289,35 @@ export default function Home() {
                         open={Boolean(notifications)}
                         onClose={handleCloseNotification}
                         >
-                        {notificationsList.map((notification) => (
-                            <MenuItem key={notification} onClick={handleCloseNotification}>
-                              <Typography textAlign="center">{notification}</Typography>
+                        {notification ? (notification?.notification?.map((notif) => (
+                            <MenuItem key={notif?.id} onClick={()=>handleCloseNotification(notif)}>
+                              {notif.data?.type==="correspondance"?(
+                              <Box>
+                                <Box sx={{}}>
+                                    <Typography sx={{fontWeight: 'bold',fontSize: 20}} component={'p'}>{notif.data?.correspondance?.title}</Typography>
+                                    <Typography component={'p'}>{`vous avaez une correspondance de la part de ${notif.data?.senderName}`}</Typography>
+                                </Box>
+                                <Box sx={{display: 'flex',justifyContent: 'flex-end',alignItems: 'center'}}>
+                                  <Chip label={moment(notif.created_at).format('DD-MM-YYYY HH:mm')}/>
+                                </Box>
+                              </Box>
+                              ):(
+                                <Box>
+                                  <Box sx={{}}>
+                                    <Typography component={'p'}>{`vous recus une feedback sur la corresponadnce de ${notif.data?.correspondanceSubject}`}</Typography>
+                                  </Box>
+                                  <Box sx={{display: 'flex',justifyContent: 'flex-end',alignItems: 'center'}}>
+                                    <Chip label={moment(notif.created_at).format('DD-MM-YYYY HH:mm')}/>
+                                  </Box>
+                                </Box>
+                              )
+                              }
+                              <Divider variant="inset" component="div" />
                             </MenuItem>
-                        ))}
+                        ))):(
+                              <Box>
+                                <Typography>{t('no_notification_found')}</Typography>
+                              </Box>)}
                     </Menu>
 
                 </Box>
@@ -307,7 +350,14 @@ export default function Home() {
                 </Box>
               </Toolbar>
             </AppBar>
-            <Drawer variant="permanent" open={open} sx={{ zIndex : "0" }}>
+            <Drawer 
+              variant="permanent" 
+              open={open} 
+              sx={{ zIndex : "0" }} 
+              PaperProps={{ sx: {
+                color: "primary",
+              }}} 
+            >
               <Toolbar
                   sx={{
                     display: 'flex',
@@ -317,7 +367,7 @@ export default function Home() {
                   }}
                 >
               </Toolbar>
-              <List component="nav" sx={{ paddingInlineStart: 1 }}>
+              <List component="nav" >
                 <MainListItems />
                 <Divider sx={{ my: 1 }} />
                 <SecondaryListItems/>
