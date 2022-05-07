@@ -93,7 +93,7 @@ export default function AddExportation(){
         event.preventDefault();
         if(dateAchevement && new Date(dateAchevement) > new Date()){
             const formData = new FormData(event.currentTarget);
-            if(!eta && !dep && !depWorkers && !tags.length){
+            if(!eta && !dep && !tags.length){
                 enqueueSnackbar( t('receiver_required') , { variant: "error" });
                 return;
             }
@@ -101,7 +101,7 @@ export default function AddExportation(){
             if(dep && depWorkers){
                 formData.append('depRoles',depWorkers.id);
                 formData.append('department',dep.id);
-            } 
+            }
             if(eta) formData.append('codegresa',eta.codegresa);
             formData.append('sender',user.doti);
             formData.append('file', files[0]);
