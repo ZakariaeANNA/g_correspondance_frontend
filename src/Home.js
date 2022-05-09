@@ -130,6 +130,7 @@ export default function Home() {
   const history = useHistory();
   const token = localStorage.getItem("token");
   const { t } = useTranslation();
+  moment.locale(i18next.language === "ar" ? ("ar-ma"):("fr"));
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -297,7 +298,7 @@ export default function Home() {
                     {notification?.notification?.length > 0 ? (notification?.notification?.map((notif) => (
                       <ListItem
                         key={notif?.id} 
-                        sx={{ padding : 0 , maxWidth : "350px" }}
+                        sx={{ padding : 0 , maxWidth : "320px" }}
                         secondaryAction={
                           <IconButton edge="end" aria-label="delete" onClick={ () => DeleteNotification(notif?.id) }>
                             <DeleteIcon sx={{ color : "red" }} />
@@ -313,9 +314,11 @@ export default function Home() {
                                 </Avatar>
                               </ListItemAvatar>
                               <ListItemText 
-                                sx={{ fontSize : "12px" }}
-                                primary={`vous avez recus une correspondance de la part de la ${notif.data?.senderName[0]?.frensh}`} 
-                                secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD-MM-YYYY')}
+                                primaryTypographyProps={{
+                                  fontSize: 15,
+                                }}
+                                primary={t("correspondance_notification",{ sender : notif.data?.senderName[0] })} 
+                                secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD MMMM YYYY')}
                               />
                             </>
                           ):(
@@ -326,9 +329,11 @@ export default function Home() {
                                 </Avatar>
                               </ListItemAvatar>
                               <ListItemText 
-                                sx={{ fontSize : "12px" }}
-                                primary={`vous avez recus une feedback sur la corresponadnce de ${notif.data?.correspondanceSubject}`}
-                                secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD-MM-YYYY')}
+                                primaryTypographyProps={{
+                                  fontSize: 15,
+                                }}
+                                primary={t("feedback_notification", { correspondance : notif.data?.correspondanceSubject } )}
+                                secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD MMMM YYYY')}
                               />
                             </>
                           )}

@@ -129,5 +129,7 @@
   "eta_college" : "Etablissments d'enseignements collèges",
   "eta_lycee" : "Etablissements d'enseignements lycée",
   "all": "Tous",
-  "no_notification_found": "Aucune notification trouvé"
+  "no_notification_found": "Aucune notification trouvé",
+  "correspondance_notification" : "Vous avez reçus une correspondance de la part de {{sender.latin}}",
+  "feedback_notification" : "Vous avez une feedback à propos de la correspondance N°{{correspondance}}"
 }
