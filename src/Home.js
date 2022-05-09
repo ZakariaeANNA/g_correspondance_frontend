@@ -146,7 +146,6 @@ export default function Home() {
         dispatch({ type : "logout" , history : history , route : "/auth/" });
     }
     if(data){
-      console.log(data[0]);
       setNotification(data[0]);
     }
     if(isSuccessDelete){
@@ -315,7 +314,7 @@ export default function Home() {
                               </ListItemAvatar>
                               <ListItemText 
                                 sx={{ fontSize : "12px" }}
-                                primary={`vous avaez une correspondance de la part de ${notif.data?.senderName}`} 
+                                primary={`vous avez recus une correspondance de la part de la ${notif.data?.senderName[0]?.frensh}`} 
                                 secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD-MM-YYYY')}
                               />
                             </>
@@ -328,7 +327,7 @@ export default function Home() {
                               </ListItemAvatar>
                               <ListItemText 
                                 sx={{ fontSize : "12px" }}
-                                primary={`vous recus une feedback sur la corresponadnce de ${notif.data?.correspondanceSubject}`}
+                                primary={`vous avez recus une feedback sur la corresponadnce de ${notif.data?.correspondanceSubject}`}
                                 secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD-MM-YYYY')}
                               />
                             </>
