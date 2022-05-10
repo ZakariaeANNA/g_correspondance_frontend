@@ -183,20 +183,27 @@ export default function Home() {
     setNotifications(event.currentTarget);
   };
 
-  const handleCloseNotification = (notification) => {
-    if(notification?.data?.type==="feedback"){
-      if(notification?.data?.sender!==null){
-        history.push("/app/feedback/"+notification?.data?.mail_id);
-        localStorage.setItem("sender",JSON.stringify(notification?.data.sender));
+  const handleCloseNotification = (notificationParam) => {
+    var ids_array = [];
+    ids_array.push(notificationParam?.id);
+    if(notificationParam?.data?.type==="feedback"){
+      notification?.notification?.map((elm)=>{
+        if(elm?.data?.mail_id===notificationParam?.data?.mail_id && elm.id!==notificationParam?.id){
+          ids_array.push(elm.id)
+        }
+    });
+      if(notificationParam?.data?.sender!==null){
+        history.push("/app/feedback/"+notificationParam?.data?.mail_id);
+        localStorage.setItem("sender",JSON.stringify(notificationParam?.data.sender));
         localStorage.setItem('path',"import");
-        DeleteNotification(notification?.id)
+        DeleteNotification(ids_array)
       }else{
-        history.push("/app/feedback/"+notification?.data?.mail_id);
+        history.push("/app/feedback/"+notificationParam?.data?.mail_id);
         localStorage.setItem('path','export')
-        DeleteNotification(notification?.id)
+        DeleteNotification(ids_array)
       }
     }else{
-      DeleteNotification(notification?.id)
+      DeleteNotification(ids_array)
     }
     setNotifications(null);
   };
