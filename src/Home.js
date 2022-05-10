@@ -147,6 +147,29 @@ export default function Home() {
         dispatch({ type : "logout" , history : history , route : "/auth/" });
     }
     if(data){
+      // const count = data[0].notification.reduce((a, b) => (a[JSON.stringify(b.data)] = (a[JSON.stringify(b.data)] || 0) + 1,a), {});
+      // data[0].notification.map((row) => {
+      //   for (var key in count){
+      //     console.log("****");
+      //     console.log(key);
+      //     console.log(count[key]);
+      //     console.log(JSON.stringify(row.data));
+      //     console.log("****");
+      //     if( key == JSON.stringify(row.data) ){
+      //       setNotification({ })
+      //     }
+      //   }
+      // })
+      const result = Array.from(new Set(data[0].notification.map(s => JSON.stringify(s.data) )))
+          .map(lab => {
+            return {
+              label: JSON.parse(lab),
+              data: data[0].notification.filter( s => JSON.stringify(s.data) === lab ).map( edition => edition )
+            }
+          })
+
+      console.log(result);
+
       setNotification(data[0]);
     }
     if(isSuccessDelete){
@@ -191,7 +214,8 @@ export default function Home() {
         if(elm?.data?.mail_id===notificationParam?.data?.mail_id && elm.id!==notificationParam?.id){
           ids_array.push(elm.id)
         }
-    });
+      });
+      console.log(ids_array);
       if(notificationParam?.data?.sender!==null){
         history.push("/app/feedback/"+notificationParam?.data?.mail_id);
         localStorage.setItem("sender",JSON.stringify(notificationParam?.data.sender));
