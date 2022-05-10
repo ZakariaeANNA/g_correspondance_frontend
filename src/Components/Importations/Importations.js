@@ -124,7 +124,6 @@ export default function Importations(){
     useEffect(() => {
         dispatch({ type : "checkLogin" , history : history , route : "/auth/"});
         if(data){
-            console.log(data)
             setPage(data.meta.current_page);
             setLoading(false);
             setRows(data.data.filter(row=>row.mail!==null && row.mail?.sender!==null));
