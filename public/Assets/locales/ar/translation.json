@@ -131,5 +131,5 @@
   "all": "الكل",
   "no_notification_found": "لا توجد اي اشعارات",
   "correspondance_notification" : "لقد تلقيت مراسلة من {{sender.arabic}}",
-  "feedback_notification" : "لديك ملاحظة حول المراسلة رقم {{correspondance}}"
+  "feedback_notification" : "لديك {{count}} ملاحظة حول المراسلة رقم {{correspondance}}"
 }

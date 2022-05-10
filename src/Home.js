@@ -169,8 +169,7 @@ export default function Home() {
           })
 
       console.log(result);
-
-      setNotification(data[0]);
+      setNotification(result);
     }
     if(isSuccessDelete){
       refetch()
@@ -208,14 +207,10 @@ export default function Home() {
 
   const handleCloseNotification = (notificationParam) => {
     var ids_array = [];
-    ids_array.push(notificationParam?.id);
+    notificationParam.data.map((elm)=>{
+      ids_array.push(elm.id)
+    });
     if(notificationParam?.data?.type==="feedback"){
-      notification?.notification?.map((elm)=>{
-        if(elm?.data?.mail_id===notificationParam?.data?.mail_id && elm.id!==notificationParam?.id){
-          ids_array.push(elm.id)
-        }
-      });
-      console.log(ids_array);
       if(notificationParam?.data?.sender!==null){
         history.push("/app/feedback/"+notificationParam?.data?.mail_id);
         localStorage.setItem("sender",JSON.stringify(notificationParam?.data.sender));
@@ -305,7 +300,7 @@ export default function Home() {
                 <Box sx={{ marginX : 2 }}>
                   <Tooltip title={t("notification")}>
                     <IconButton color="inherit" onClick={handleOpenNotification}>
-                        <Badge badgeContent={notification?.count} color="secondary">
+                        <Badge badgeContent={notification?.length} color="secondary">
                             <NotificationsIcon />
                         </Badge>
                     </IconButton>
@@ -326,9 +321,9 @@ export default function Home() {
                     open={Boolean(notifications)}
                     onClose={handleCloseNotification}
                   >
-                    {notification?.notification?.length > 0 ? (notification?.notification?.map((notif) => (
+                    {notification?.length > 0 ? (notification?.map((notif) => (
                       <ListItem
-                        key={notif?.id} 
+                        //key={notif?.id} 
                         sx={{ padding : 0 , maxWidth : "320px" }}
                         secondaryAction={
                           <IconButton edge="end" aria-label="delete" onClick={ () => DeleteNotification(notif?.id) }>
@@ -337,7 +332,7 @@ export default function Home() {
                         }
                       >
                         <ListItemButton onClick={()=>handleCloseNotification(notif)}>
-                          {notif.data?.type==="correspondance" ? (
+                          {notif.label?.type==="correspondance" ? (
                             <>
                               <ListItemAvatar>
                                 <Avatar>
@@ -348,8 +343,8 @@ export default function Home() {
                                 primaryTypographyProps={{
                                   fontSize: 15,
                                 }}
-                                primary={t("correspondance_notification",{ sender : notif.data?.senderName[0] })} 
-                                secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD MMMM YYYY')}
+                                primary={t("correspondance_notification",{ sender : notif?.label?.senderName[0]})} 
+                                secondary={moment(notif.label.created_at).isSame(moment(new Date()),"d") ? moment(notif.label.created_at).format('HH:mm') : moment(notif.label.created_at).format('DD MMMM YYYY')}
                               />
                             </>
                           ):(
@@ -363,8 +358,8 @@ export default function Home() {
                                 primaryTypographyProps={{
                                   fontSize: 15,
                                 }}
-                                primary={t("feedback_notification", { correspondance : notif.data?.correspondanceSubject } )}
-                                secondary={moment(notif.created_at).isSame(moment(new Date()),"d") ? moment(notif.created_at).format('HH:mm') : moment(notif.created_at).format('DD MMMM YYYY')}
+                                primary={t("feedback_notification", { correspondance : notif.label?.correspondanceSubject , count: notif.data.length } )}
+                                secondary={moment(notif?.label?.created_at).isSame(moment(new Date()),"d") ? moment(notif.label.created_at).format('HH:mm') : moment(notif.label.created_at).format('DD MMMM YYYY')}
                               />
                             </>
                           )}

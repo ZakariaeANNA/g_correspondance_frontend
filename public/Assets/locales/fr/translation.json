@@ -131,5 +131,5 @@
   "all": "Tous",
   "no_notification_found": "Aucune notification trouvé",
   "correspondance_notification" : "Vous avez reçus une correspondance de la part de {{sender.latin}}",
-  "feedback_notification" : "Vous avez une feedback à propos de la correspondance N°{{correspondance}}"
+  "feedback_notification" : "Vous avez une feedback {{count}} à propos de la correspondance N°{{correspondance}}"
 }
