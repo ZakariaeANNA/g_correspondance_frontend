@@ -26,7 +26,7 @@ export default function AddExportation(){
     const [ establishment , setEstablishment ] = useState([]); // liste des etablissements existe dans la base de données
     const [ dep , setDep ] = useState(null); // id departement ajouté par utilisateur
     const [ depWorkers , setDepWorkers ] = useState(null); // les employés du departement choisi
-    const [ eta , setEta ] = useState(null); // codegresa de l'etablissement ajouté par l'utilisateur
+    const [ eta , setEta ] = useState([]); // codegresa de l'etablissement ajouté par l'utilisateur
     const [ files , setFiles ] = useState([]); // fichier saisie par l'utilisateur ( pdf , image )
     const [ tags , setTags ] = React.useState([]); // les doti saisie par l'utilisateur 
     const [ addExportations, { data, isLoading, error, isError, isSuccess }] = useAddExportationsMutation(); // la fonction qui envoi l'exportation vers backend avec les messages d'erreurs et de succès
@@ -79,7 +79,11 @@ export default function AddExportation(){
                 ]);
         }
     },[data,isError,isSuccessDep,isSuccessEsta]); // les données qui actualiser components
-    
+    function getCodegresaArray(value){
+        const codegresaArray = []
+        value?.map(item=> codegresaArray.push(item.codegresa));
+        return codegresaArray;
+    }
     // la fonction addTags qui permet d'ajouter les doti saisie par l'utilisateur dans state
     const addTags = event => {
         if (event.key === " " && event.target.value !== "") {
@@ -102,7 +106,7 @@ export default function AddExportation(){
                 formData.append('depRoles',depWorkers.id);
                 formData.append('department',dep.id);
             }
-            if(eta) formData.append('codegresa',eta.codegresa);
+            if(eta) formData.append('codegresa',getCodegresaArray(eta));
             formData.append('sender',user.doti);
             formData.append('file', files[0]);
             try{
@@ -168,9 +172,10 @@ export default function AddExportation(){
                         <Box sx={{ display : "flex" , marginBottom : 1 , marginTop : 2  }}>
                             { auth.role != "directeur" ? (
                                 <Autocomplete
-                                    value={eta}
+                                    multiple={true}
+                                    value={eta!==null ? eta : []}
                                     autoHighlight
-                                    onChange={(e,v) => setEta(v)}
+                                    onChange={(e,v) =>{setEta(v)}}
                                     id="combo-box-demo"
                                     options={establishment}
                                     getOptionLabel={(option) => i18next.language === "ar" ? (option.nomar) : (option.nomla) }
@@ -206,10 +211,10 @@ export default function AddExportation(){
                         <TextField sx={{ marginY : 1 , width : 3/12 , paddingRight : 1 }} label={t("correspondance_number")} variant="outlined" name="number" required disabled={isLoading} />
                         <TextField sx={{ marginY : 1 , width : 9/12 }} label={t("subject_message")} variant="outlined" name="title" required disabled={isLoading} />
                         <TextField sx={{ marginY : 1 , width : 6/12 , paddingRight : 1 }} fullWidth multiline rows={2} label={t("references")} variant="outlined" name="references" disabled={isLoading} />
-                        <TextField sx={{ marginY : 1 , width : 6/12}} fullWidth multiline rows={2} label={t("concerned")} variant="outlined" name="concerned" required disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 , width : 6/12}} fullWidth multiline rows={2} label={t("concerned")} variant="outlined" name="concerned" disabled={isLoading} />
                         <TextField sx={{ marginY : 1 , width : 8/12 , paddingRight : 1 }} fullWidth label={t("notes")} variant="outlined" rows={4} name="notes" disabled={isLoading} />
                         <TextField sx={{ marginY : 1 , width : 4/12}} error={dateAchevement && new Date(dateAchevement) <= new Date()} onChange={(e)=>setDateAchevement(e.target.value)} id="datetime-local" label={t("achevement_date")} type="datetime-local" name="dateachevement" fullWidth InputLabelProps={{ shrink: true,}} disabled={isLoading} />
-                        <TextField sx={{ marginY : 1 }} fullWidth multiline label={t("message")} variant="outlined" rows={4} name="message" required disabled={isLoading} />
+                        <TextField sx={{ marginY : 1 }} fullWidth multiline label={t("message")} variant="outlined" rows={4} name="message" disabled={isLoading} />
                         <DropFileInput
                             files={files}
                             setFiles={setFiles}
