@@ -401,8 +401,8 @@ export default function FeedbackExport(props){
                                                         )}
                                                         title={ message.idSender === props.auth.doti && i18next.language === "fr" ? (props.auth.fullnamela) 
                                                             : message.idSender === props.auth.doti && i18next.language === "ar" ? (props.auth.fullnamear) 
-                                                            : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.fullnamela) 
-                                                            : (receiverDisplay.fullnamear) }
+                                                            : receiverDisplay.doti === message.idSender && i18next.language === "fr" ? (receiverDisplay.etablissement?.nomla || receiverDisplay.departement?.nomLa) 
+                                                            : (receiverDisplay.etablissement?.nomar || receiverDisplay.departement?.nomAr) }
                                                         subheader={<Box sx={message.idSender===props.auth.doti ? { color : "white"} : {}}>{moment(message.created_at).format('MMMM Do YYYY, HH:mm')}</Box>}
                                                         action={
                                                             (message.idSender===props.auth.doti && message.status) ?
