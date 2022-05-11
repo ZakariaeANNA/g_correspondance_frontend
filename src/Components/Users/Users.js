@@ -134,9 +134,9 @@ function ResetUserPassword({params}){
   }
   useEffect(()=>{
     if(isError)
-      enqueueSnackbar("une erreur survenue lors de la reinitialisation de mot de passe",  { variant: "error" });
+      enqueueSnackbar(t('reset_password_error'),  { variant: "error" });
     if(isSuccess)
-      enqueueSnackbar("le mot de pass a ete reinitialiser avec succe",  { variant: "success" });
+      enqueueSnackbar(t('reset_password_success'),  { variant: "success" });
   },[data,error])
   return(
       <div>

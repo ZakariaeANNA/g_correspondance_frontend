@@ -266,7 +266,6 @@ export default function FeedbackExport(props){
             setMessage(data);
         }
         if(isSuccessReceiver){
-            console.log(dataReceiver.data);
             setReceivers(dataReceiver.data);
         }
     },[isSuccess,isSuccessReceiver]);

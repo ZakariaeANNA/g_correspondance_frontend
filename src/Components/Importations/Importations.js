@@ -77,7 +77,7 @@ function DeleteImportation(props){
         }
         if(isSuccess){
             enqueueSnackbar(t("correspondance_delete_success"),  { variant: "success" });
-            window.location.reload()
+            props.refetch()
         }
     },[data,error])
     return(
@@ -166,7 +166,7 @@ export default function Importations(){
         {field: "Actions",headerName: t("actions"), flex: 1 ,headerAlign : 'center',align : "center",renderCell : (params)=>(
             <div style={{display: 'flex',flexDirection: 'row',alignContent:"center"}}>
                 <ViewImportation params={params.row}/>
-                <DeleteImportation params={params.row.id} />
+                <DeleteImportation params={params.row.id} refetch={refetch} />
             </div>
         )},  
         {field: "Aions",headerName: "", flex: 2 ,headerAlign : 'center',align:'center',renderCell : (params)=>(

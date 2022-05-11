@@ -16,7 +16,7 @@ const ChangePassword =  () =>{
     const handleSaveButton = (event) =>{
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        if(formData.get("oldPassword").length <= 8){
+        if(formData.get("newpassword").length <= 8){
             enqueueSnackbar( t("password_length_error"),  { variant: "error" });
         }else{
             if(formData.get("newpassword") !== formData.get("retypepassword")){
