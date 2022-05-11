@@ -266,6 +266,7 @@ export default function FeedbackExport(props){
             setMessage(data);
         }
         if(isSuccessReceiver){
+            console.log(dataReceiver.data);
             setReceivers(dataReceiver.data);
         }
     },[isSuccess,isSuccessReceiver]);
@@ -342,7 +343,7 @@ export default function FeedbackExport(props){
                                             <ListItemAvatar>
                                                 <Avatar alt={receiver.receiver[0].fullnamela} sx={{ bgcolor : stringToColor(receiver.receiver[0].fullnamela) }} src="/static/images/avatar/1.jpg" />
                                             </ListItemAvatar>
-                                            <ListItemText primary={ i18next.language === "fr" ? (receiver.receiver[0].fullnamela) : (receiver.receiver[0].fullnamear) }/>
+                                            <ListItemText primary={ i18next.language === "fr" ? (receiver.receiver[0].etablissement?.nomla || receiver.receiver[0].departement?.nomLa) : (receiver.receiver[0].etablissement?.nomar || receiver.receiver[0].departement?.nomAr) }/>
                                             <Divider variant="inset" component="div" />
                                         </ListItemButton>
                                     </ListItem>
