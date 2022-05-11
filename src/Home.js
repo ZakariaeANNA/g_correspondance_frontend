@@ -147,7 +147,6 @@ export default function Home() {
         dispatch({ type : "logout" , history : history , route : "/auth/" });
     }
     if(data){
-      console.log(data[0]);
       const result = Array.from(new Set(data[0].notification.map(s => JSON.stringify(s.data) )))
         .map(lab => {
           return {
@@ -155,7 +154,6 @@ export default function Home() {
             data: data[0].notification.filter( s => JSON.stringify(s.data) === lab ).map( edition => edition )
           }
         });
-        console.log(result);
       setNotification(result);
     }
     if(isSuccessDelete){
@@ -197,14 +195,14 @@ export default function Home() {
     notificationParam?.data?.map((elm)=>{
       ids_array.push(elm.id)
     });
-    if(notificationParam?.data?.type==="feedback"){
-      if(notificationParam?.data?.sender!==null){
-        history.push("/app/feedback/"+notificationParam?.data?.mail_id);
-        localStorage.setItem("sender",JSON.stringify(notificationParam?.data.sender));
+    if(notificationParam?.label?.type==="feedback"){
+      if(notificationParam?.label?.sender!==null){
+        history.push("/app/feedback/"+notificationParam?.label?.mail_id);
+        localStorage.setItem("sender",JSON.stringify(notificationParam?.label.sender));
         localStorage.setItem('path',"import");
         DeleteNotification(ids_array)
       }else{
-        history.push("/app/feedback/"+notificationParam?.data?.mail_id);
+        history.push("/app/feedback/"+notificationParam?.label?.mail_id);
         localStorage.setItem('path','export')
         DeleteNotification(ids_array)
       }
@@ -213,7 +211,13 @@ export default function Home() {
     }
     setNotifications(null);
   };
-
+  const handleDeleteNotificationButton = (data) =>{
+    var ids_array = [];
+      data?.map(elm=>{
+      ids_array.push(elm.id)
+    })
+    DeleteNotification(ids_array)
+  }
   const handleOnIdle = () => {
     setTimeOut(true);
     logout({token : `${localStorage.getItem("token")}` });
@@ -313,7 +317,7 @@ export default function Home() {
                         key={i} 
                         sx={{ padding : 0 , maxWidth : "320px" }}
                         secondaryAction={
-                          <IconButton edge="end" aria-label="delete" onClick={ () => DeleteNotification(notif) }>
+                          <IconButton edge="end" aria-label="delete" onClick={ () => handleDeleteNotificationButton(notif?.data) }>
                             <DeleteIcon sx={{ color : "red" }} />
                           </IconButton>
                         }

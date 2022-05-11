@@ -246,6 +246,7 @@ export default function FeedbackImport(props){
     const [onUpdateStatus] = useUpdateFeedbackStatusMutation();
     const [confirmSender,setConfirmSender] = useState('pending');
     const [confirmReceiver,setConfirmReceiver] = useState('pending');
+    console.log(confirmReceiver);
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
     
     const measuredRef = useCallback(node => {
