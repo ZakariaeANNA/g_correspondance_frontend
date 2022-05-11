@@ -147,26 +147,15 @@ export default function Home() {
         dispatch({ type : "logout" , history : history , route : "/auth/" });
     }
     if(data){
-      // const count = data[0].notification.reduce((a, b) => (a[JSON.stringify(b.data)] = (a[JSON.stringify(b.data)] || 0) + 1,a), {});
-      // data[0].notification.map((row) => {
-      //   for (var key in count){
-      //     console.log("****");
-      //     console.log(key);
-      //     console.log(count[key]);
-      //     console.log(JSON.stringify(row.data));
-      //     console.log("****");
-      //     if( key == JSON.stringify(row.data) ){
-      //       setNotification({ })
-      //     }
-      //   }
-      // })
+      console.log(data[0]);
       const result = Array.from(new Set(data[0].notification.map(s => JSON.stringify(s.data) )))
-          .map(lab => {
-            return {
-              label: JSON.parse(lab),
-              data: data[0].notification.filter( s => JSON.stringify(s.data) === lab ).map( edition => edition )
-            }
-          })
+        .map(lab => {
+          return {
+            label: JSON.parse(lab),
+            data: data[0].notification.filter( s => JSON.stringify(s.data) === lab ).map( edition => edition )
+          }
+        });
+        console.log(result);
       setNotification(result);
     }
     if(isSuccessDelete){
@@ -319,9 +308,9 @@ export default function Home() {
                     open={Boolean(notifications)}
                     onClose={handleCloseNotification}
                   >
-                    {notification?.length > 0 ? (notification?.map((notif) => (
+                    {notification?.length > 0 ? (notification?.map((notif, i) => (
                       <ListItem
-                        key={notif?.label.id} 
+                        key={i} 
                         sx={{ padding : 0 , maxWidth : "320px" }}
                         secondaryAction={
                           <IconButton edge="end" aria-label="delete" onClick={ () => DeleteNotification(notif) }>
