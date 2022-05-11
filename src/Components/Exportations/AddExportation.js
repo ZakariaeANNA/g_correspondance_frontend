@@ -42,7 +42,6 @@ export default function AddExportation(){
     const removeTags = indexToRemove => { 
 		setTags([...tags.filter((_, index) => index !== indexToRemove)]);
 	};
-
     useEffect(()=>{
         // Si la requete est effectue avec succès on peut afficher un message de succès
         if(isSuccess){

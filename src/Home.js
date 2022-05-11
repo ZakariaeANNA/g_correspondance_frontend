@@ -324,7 +324,7 @@ export default function Home() {
                         key={notif?.label.id} 
                         sx={{ padding : 0 , maxWidth : "320px" }}
                         secondaryAction={
-                          <IconButton edge="end" aria-label="delete" onClick={ () => DeleteNotification(notif?.id) }>
+                          <IconButton edge="end" aria-label="delete" onClick={ () => DeleteNotification(notif) }>
                             <DeleteIcon sx={{ color : "red" }} />
                           </IconButton>
                         }
