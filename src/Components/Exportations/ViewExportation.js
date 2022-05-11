@@ -229,10 +229,10 @@ export default function ViewExportation({params}){
                     <TextField sx={{ width : 1/4 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" fullWidth label={t("sending_date")} variant="filled" value={date} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ width : 1/4 , marginY : 1 }} id="outlined-basic" fullWidth label={t("achevement_date")} variant="filled" value={achevelentDate} inputProps={{ readOnly: true }}/>
                     <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("subject_message")} variant="filled" value={params.title} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("message")} variant="filled" rows={4} value={params.message} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ width : 1/2 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" multiline rows={2} label={t("concerned")} variant="filled" value={params.concerned} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ width : 1/2 , marginY : 1 }} id="outlined-basic" multiline rows={2} label={t("notes")} variant="filled" value={params.notes} inputProps={{ readOnly: true }}/>
-                    <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("references")} variant="filled" rows={4} value={params.references} inputProps={{ readOnly: true }}/>
+                    {params.message!==null && <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth multiline label={t("message")} variant="filled" rows={4} value={params.message===null ? '': params.message} inputProps={{ readOnly: true }}/>}
+                    {params.concerned!==null && <TextField sx={{ width : 1/2 , marginY : 1 , paddingInlineEnd : 1 }} id="outlined-basic" multiline rows={2} label={t("concerned")} variant="filled" value={params.concerned} inputProps={{ readOnly: true }}/>}
+                    {params.notes!==null && <TextField sx={{ width : 1/2 , marginY : 1 }} id="outlined-basic" multiline rows={2} label={t("notes")} variant="filled" value={params.notes} inputProps={{ readOnly: true }}/>}
+                    {params.references!==null && <TextField sx={{ marginY : 1 }} id="outlined-basic" fullWidth label={t("references")} variant="filled" rows={4} value={params.references} inputProps={{ readOnly: true }}/>}
                     {/*show users content*/}
                     <List sx={{marginY : 1}} disablePadding component={'div'}>
                         <ListItemButton onClick={handleClick} className={classes.color}>

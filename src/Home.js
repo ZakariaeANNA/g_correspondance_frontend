@@ -167,8 +167,6 @@ export default function Home() {
               data: data[0].notification.filter( s => JSON.stringify(s.data) === lab ).map( edition => edition )
             }
           })
-
-      console.log(result);
       setNotification(result);
     }
     if(isSuccessDelete){
@@ -207,7 +205,7 @@ export default function Home() {
 
   const handleCloseNotification = (notificationParam) => {
     var ids_array = [];
-    notificationParam.data.map((elm)=>{
+    notificationParam?.data?.map((elm)=>{
       ids_array.push(elm.id)
     });
     if(notificationParam?.data?.type==="feedback"){
@@ -323,7 +321,7 @@ export default function Home() {
                   >
                     {notification?.length > 0 ? (notification?.map((notif) => (
                       <ListItem
-                        //key={notif?.id} 
+                        key={notif?.label.id} 
                         sx={{ padding : 0 , maxWidth : "320px" }}
                         secondaryAction={
                           <IconButton edge="end" aria-label="delete" onClick={ () => DeleteNotification(notif?.id) }>
