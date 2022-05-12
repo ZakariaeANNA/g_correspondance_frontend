@@ -24,7 +24,7 @@ export default function AddExportation(){
     const [dateAchevement,setDateAchevement] = useState() //la date achevement selectioné par l'utilisateur
     const [ departments , setDepartments ] = useState([]); // liste des departements existe dans la base de données
     const [ establishment , setEstablishment ] = useState([]); // liste des etablissements existe dans la base de données
-    const [ dep , setDep ] = useState(null); // id departement ajouté par utilisateur
+    const [ dep , setDep ] = useState([]); // id departement ajouté par utilisateur
     const [ depWorkers , setDepWorkers ] = useState(null); // les employés du departement choisi
     const [ eta , setEta ] = useState([]); // codegresa de l'etablissement ajouté par l'utilisateur
     const [ files , setFiles ] = useState([]); // fichier saisie par l'utilisateur ( pdf , image )
@@ -83,6 +83,12 @@ export default function AddExportation(){
         value?.map(item=> codegresaArray.push(item.codegresa));
         return codegresaArray;
     }
+    function getidArray(value){
+        const idsArray = []
+        value?.map(item=> idsArray.push(item.id));
+        console.log(idsArray)
+        return idsArray;
+    }
     // la fonction addTags qui permet d'ajouter les doti saisie par l'utilisateur dans state
     const addTags = event => {
         if (event.key === " " && event.target.value !== "") {
@@ -96,14 +102,14 @@ export default function AddExportation(){
         event.preventDefault();
         if(dateAchevement && new Date(dateAchevement) > new Date()){
             const formData = new FormData(event.currentTarget);
-            if(!eta && !dep && !tags.length){
+            if(!eta?.length && !dep?.length && !tags?.length){
                 enqueueSnackbar( t('receiver_required') , { variant: "error" });
                 return;
             }
-            if(tags.length)formData.append('receiver', JSON.stringify(tags));
-            if(dep && depWorkers){
+            if(tags?.length)formData.append('receiver', JSON.stringify(tags));
+            if(dep?.length && depWorkers){
                 formData.append('depRoles',depWorkers.id);
-                formData.append('department',dep.id);
+                formData.append('department',getidArray(dep));
             }
             if(eta) formData.append('codegresa',getCodegresaArray(eta));
             formData.append('sender',user.doti);
@@ -184,17 +190,18 @@ export default function AddExportation(){
                                 />
                             ): null}
                             <Autocomplete
-                                value={dep}
+                                multiple={true}
+                                value={dep!==null ? dep : []}
                                 autoHighlight
-                                onChange={(e,v) => setDep(v)}
+                                onChange={(e,v) => {setDep(v)}}
                                 id="combo-box-demo"
                                 options={departments}
                                 getOptionLabel={(option) => i18next.language === "ar" ? (option.nomAr) : (option.nomLa) }
-                                sx={{ paddingInlineEnd : dep ? 1 : 0 }}
+                                sx={{ paddingInlineEnd : dep?.length ? 1 : 0 }}
                                 fullWidth
                                 renderInput={(params) => <TextField {...params} label={t("the_department")} inputProps={{...params.inputProps,autoComplete: "disabled"}} />}
                             />
-                            {   dep ? (
+                            {   dep?.length ? (
                                 <Autocomplete
                                     value={depWorkers}
                                     autoHighlight
