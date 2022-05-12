@@ -47,7 +47,9 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
 import Skeleton from '@mui/material/Skeleton';
 import ModalImage from "react-modal-image";
-
+import FilledInput from '@mui/material/FilledInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchIcon from '@mui/icons-material/Search';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -282,6 +284,17 @@ export default function FeedbackExport(props){
         setMessage((prev) => [...prev , data[0]]);
     }
 
+    const handleSearch = (user) => {
+        if(dataReceiver){
+            let filtered = dataReceiver.data.filter((row)=>(
+                row.receiver[0].etablissement?.nomla.toLowerCase().includes(user.toLowerCase()) || row.receiver[0].etablissement?.nomar.includes(user) || row.receiver[0].departement?.nomLa.toLowerCase().includes(user.toLowerCase()) || row.receiver[0].departement?.nomAr.includes(user)
+            ));
+            if(filtered){
+                setReceivers(filtered);
+            }
+        }
+    }
+
     function isJson(str) {
         try {
             JSON.parse(str);
@@ -324,6 +337,13 @@ export default function FeedbackExport(props){
                         </List>
                     ):(
                         <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable" component="nav">
+                            <FormControl fullWidth sx={{ marginBottom : 1 }} variant="filled">
+                                <FilledInput
+                                    hiddenLabel
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                    endAdornment={<InputAdornment position="end"> <SearchIcon /> </InputAdornment>}
+                                />
+                            </FormControl>
                             { receivers.map( receiver =>{
                                 return(
                                     <ListItem  

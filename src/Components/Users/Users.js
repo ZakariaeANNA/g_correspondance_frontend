@@ -208,7 +208,6 @@ export default function Users(){
     if(filtered){
       setRows(filtered);
     }
-   
   }
   function FilterSelect(event){
     if(event.target.value!=='eta' && event.target.value!=='dep' && event.target.value!=="all"){
