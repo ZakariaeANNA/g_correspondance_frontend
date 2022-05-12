@@ -46,7 +46,7 @@ endpoints: (builder) => ({
       query: (data)=>{
         return {
           url: `/resetpassword/${data.doti}/${data.cin}`,
-          method: "put"
+          method: "post"
         }
       }
     }),

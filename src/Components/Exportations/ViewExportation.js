@@ -265,7 +265,7 @@ export default function ViewExportation({params}){
                         </Box>
                         <Box>
                             <Typography sx={{textTransform: 'uppercase'}}>{params.type}</Typography>
-                            <Typography style={{marginTop: 10}}>{params.filename}</Typography>
+                            <Typography style={{marginTop: 10}} dir="ltr">{params.filename}</Typography>
                         </Box>
                     </Button>
                     {/*end user content section*/}

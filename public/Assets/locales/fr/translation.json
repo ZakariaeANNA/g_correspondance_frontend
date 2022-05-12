@@ -90,6 +90,8 @@
   "confirm": "Confirmer",
   "edit_user": "Modifier les informations utilisateur",
   "reset_password_tip": "Réinitialiser le mot de passe",
+  "reset_password_error": "Une erreur s'est produite lors de la réinitialisation du mot de passe.",
+  "reset_password_success": "Le mot de passe a été réinitialisé avec succès.",
   "add_user_success" : "L'utilisateur est ajouté avec succès",
   "user_already_exist" : "L'utilisateur saisie est déjà existe dans la base de données.",
   "foreign_not_exist" : "L'établissement n'existe pas dans la base de données.",

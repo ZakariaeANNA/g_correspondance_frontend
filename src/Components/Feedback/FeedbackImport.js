@@ -157,7 +157,8 @@ function SendFeedback(props){
     useEffect(()=>{
         if(isSuccess){
             props.handleChange(data);
-            if( radioValue != null && radioValue != undefined ){
+            if( radioValue != null && radioValue != undefined && radioValue){
+                console.log(radioValue)
                 onUpdateConfirmationByReceiver({idReceiver: props.sender,mail_id: props.mailID,state: radioValue});
                 setRadioValue()
                 setIsConfirmation(0)
@@ -246,7 +247,6 @@ export default function FeedbackImport(props){
     const [onUpdateStatus] = useUpdateFeedbackStatusMutation();
     const [confirmSender,setConfirmSender] = useState('pending');
     const [confirmReceiver,setConfirmReceiver] = useState('pending');
-    console.log(confirmReceiver);
     moment.locale(i18next.language == "ar" ? ("ar-ma"):("fr"));
     
     const measuredRef = useCallback(node => {

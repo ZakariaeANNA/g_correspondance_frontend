@@ -91,7 +91,7 @@ export default function ViewImportation({params}){
                         </Box>
                         <Box>
                             <Typography sx={{textTransform: 'uppercase'}}>{params.mail.type}</Typography>
-                            <Typography style={{marginTop: 10}}>{params.mail.filename}</Typography>
+                            <Typography style={{marginTop: 10}} dir="ltr">{params.mail.filename}</Typography>
                         </Box>
                     </Button>
                 </DialogContent>
