@@ -30,6 +30,7 @@ import TableRow from '@mui/material/TableRow';
 import { Box } from '@mui/system';
 import i18next from 'i18next';
 import { stringAvatar } from "../../Util/stringToAvatar";
+import ModalImage from "react-modal-image";
 
 
 const style = {
