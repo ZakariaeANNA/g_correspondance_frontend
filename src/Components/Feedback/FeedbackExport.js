@@ -47,7 +47,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
 import Skeleton from '@mui/material/Skeleton';
 import ModalImage from "react-modal-image";
-import FilledInput from '@mui/material/FilledInput';
+import Input from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -337,8 +337,8 @@ export default function FeedbackExport(props){
                         </List>
                     ):(
                         <List sx={{ width: '100%', maxWidth: 360, minWidth:"max-content" , bgcolor: 'background.paper',maxHeight:500 , overflow : "auto" }} className="scrollable" component="nav">
-                            <FormControl fullWidth sx={{ marginBottom : 1 }} variant="filled">
-                                <FilledInput
+                            <FormControl fullWidth sx={{ marginBottom : 1 }} variant="standard">
+                                <Input
                                     hiddenLabel
                                     onChange={(e) => handleSearch(e.target.value)}
                                     endAdornment={<InputAdornment position="end"> <SearchIcon /> </InputAdornment>}
