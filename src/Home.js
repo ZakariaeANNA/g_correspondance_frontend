@@ -52,6 +52,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Email from '@mui/icons-material/Email';
 import Send from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Departement from './Components/departments/Department';
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -478,6 +479,9 @@ export default function Home() {
                       </Route>
                       <Route path="/app/profile">
                         <Profile />
+                      </Route>
+                      <Route path="/app/departement">
+                        <Departement />
                       </Route>
                     </React.Fragment>
                   )}

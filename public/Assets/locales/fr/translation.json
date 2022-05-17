@@ -133,5 +133,22 @@
   "all": "Tous",
   "no_notification_found": "Aucune notification trouvé",
   "correspondance_notification" : "Vous avez reçus une correspondance de la part de {{sender.latin}}",
-  "feedback_notification" : "Vous avez une feedback {{count}} à propos de la correspondance N°{{correspondance}}"
+  "feedback_notification" : "Vous avez une feedback {{count}} à propos de la correspondance N°{{correspondance}}",
+  "empty_feedback": "Cliquez sur l'utilisateur pour voir la conversation.",
+  "empty_exportation": "Il n'y aucune correspondance pour le moment",
+  "eta_management" : "G.Etablissements",
+  "dep_management" : "G.Départements",
+  "nomDepartement" : "Nom de département",
+  "type" : "Type",
+  "name_search_dep": "Chercher par le nom de département",
+  "edit_dep" : "Modifier les informations de département",
+  "nomdepla" : "Nom de département en Francais",
+  "nomdepar" : "Nom de département en Arabe",
+  "department_already_exist" : "Departement saisie est déjà existe dans la base de données.",
+  "edit_department_success" : "La modification de département est effectué avec succès",
+  "addDep" : "Ajouter Départment",
+  "addDepswithfile" : "Ajouter des départments avec un fichier",
+  "or" : "ou",
+  "confirmationfile" : "Confirmation l'envoi du fichier",
+  "confirm_send_file": "Est vous sûr de vouloir Envoyer le fichier {{name}} pour enregister les départements saisie ?"
 }
