@@ -17,10 +17,39 @@ export const establishementApi = createApi({
     getEstablishments: builder.query({
       query: () =>''
     }),
+    updateEstablishment: builder.mutation({
+      query: ({body,id}) => {
+        return {
+          url: `/${id}`,
+          method: "put",
+          body,
+        };
+      },
+    }),
+    deleteEstablishment: builder.mutation({
+      query: (id)=>{
+        return {
+          url: `/${id}`,
+          method: "delete"
+        }
+      }
+    }),
+    addEstablishment: builder.mutation({
+      query: (body)=>{
+        return {
+          url: `/`,
+          method: "post",
+          body
+        }
+      }
+    }),
   }),
 });
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
     useGetEstablishmentsQuery,
+    useUpdateEstablishmentMutation,
+    useDeleteEstablishmentMutation,
+    useAddEstablishmentMutation
 } = establishementApi;

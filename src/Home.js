@@ -53,6 +53,8 @@ import Email from '@mui/icons-material/Email';
 import Send from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Departement from './Components/departments/Department';
+import Establishment from './Components/establishment/Establishment';
+
 
 const cacheLtr = createCache({
   key: "muiltr"
@@ -482,6 +484,9 @@ export default function Home() {
                       </Route>
                       <Route path="/app/departement">
                         <Departement />
+                      </Route>
+                      <Route path="/app/etablissement">
+                        <Establishment />
                       </Route>
                     </React.Fragment>
                   )}

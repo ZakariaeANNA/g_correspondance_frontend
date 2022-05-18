@@ -16,7 +16,7 @@ import i18next from 'i18next'
 import MenuItem from '@mui/material/MenuItem';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { useSnackbar } from 'notistack';
-import { useUpdateDepartmentMutation } from "../../store/api/departmentApi";
+import { useAddEstablishmentMutation } from "../../store/api/establishementApi";
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRefreshMutation } from "../../store/api/authApi";
 
@@ -57,11 +57,12 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     onClose: PropTypes.func.isRequired,
 };
 
-const UpdateDepartment = (props) =>{
+const AddEstablishment = (props) =>{
     const [open, setOpen] = useState(false);
+    const [addEstablishment,{data,error,isLoading,isError,isSuccess}] = useAddEstablishmentMutation();
     const { enqueueSnackbar } = useSnackbar();
     const [ refresh ] = useRefreshMutation();
-    const [ updateDepartment , { data,error,isLoading,isError,isSuccess } ] = useUpdateDepartmentMutation();
+
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -70,46 +71,45 @@ const UpdateDepartment = (props) =>{
         setOpen(false);
     };
     
-    const onUpdateUser = async(event)=>{
+    const onAddEstablishment = async(event)=>{
         event.preventDefault();
         const formdata = new FormData(event.currentTarget);
         const body = {
-            nomLa: formdata.get("nomLa"),
-            nomAr: formdata.get("nomAr"),
-            type: formdata.get("type"),
-            delegation: formdata.get("delegation"),
+          codegresa: formdata.get("codegresa"),
+          nomla: formdata.get("nomla"),
+          nomar: formdata.get("nomar"),
+          type: formdata.get("type"),
+          delegation: formdata.get("delegation"),
         }
         try{
-            await updateDepartment({body: body ,id: props.department.id}).unwrap();
+            await addEstablishment(body).unwrap();
         }catch(error){
             if(error.status === 401){
                 await refresh({ token : localStorage.getItem("token") }).unwrap().then( data => {
                     localStorage.setItem( "token" , data );
-                    updateDepartment({body: body ,id: props.department.id});
+                    addEstablishment(body);
                 });
             }
         }
     }
     useEffect(()=>{
         if(isError){
-            if(error.data === "edit_department/fields_required")
+            if(error.data === "add_establishment/fields_required")
                 enqueueSnackbar(t("credentials_empty"),  { variant: "error" });
-            else if(error.data === "edit_department/department_already_exist")
-                enqueueSnackbar(t("department_already_exist"),  { variant: "error" });
+            else if(error.data === "add_establishment/establishment_already_exist")
+                enqueueSnackbar(t("establishment_already_exist"),  { variant: "error" });
         }
         if(isSuccess){
-            enqueueSnackbar(t("edit_department_success"),  { variant: "success" });
+            enqueueSnackbar(t("edit_user_success"),  { variant: "success" });
             props.refetch();
         }
     },[data,error]);
 
     return(
         <>
-            <Tooltip title={t("edit_dep")}>
-                <IconButton aria-label="delete" size="large" onClick={handleClickOpen}> 
-                    <ModeEditIcon sx={{ color: 'blue' }}/>
-                </IconButton>
-            </Tooltip>
+            <Button variant="outlined" onClick={handleClickOpen} fullWidth>
+              {t("addEta")}
+            </Button>
             <BootstrapDialog
                 onClose={handleClose}
                 aria-labelledby="customized-dialog-title"
@@ -118,15 +118,30 @@ const UpdateDepartment = (props) =>{
                 maxWidth="sm" 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    {t("edit_dep")}
+                    {t("addEta")}
                 </BootstrapDialogTitle>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                    <form className="p" onSubmit={onUpdateUser}>
+                    <form className="p" onSubmit={onAddEstablishment}>
                         <Box>
-                            <TextField defaultValue={props.department.nomLa} fullWidth name='nomLa' margin="normal" label={t("nomdepla")} variant="outlined" required disabled={isLoading}/>
-                            <TextField defaultValue={props.department.nomAr} fullWidth name='nomAr' margin="normal" label={t("nomdepar")} variant="outlined" required disabled={isLoading}/>
-                            <TextField defaultValue={props.department.type} fullWidth name='type' margin="normal" label={t("type")} variant="outlined" required disabled={isLoading}/>
-                            <TextField defaultValue={props.department.delegation} fullWidth name='delegation' margin="normal" label={t("delegation")} variant="outlined" required disabled={isLoading}/>
+                            <TextField fullWidth name='codegresa' margin="normal" label={t("codegresa")} variant="outlined" required disabled={isLoading}/>
+                            <TextField fullWidth name='nomla' margin="normal" label={t("nometala")} variant="outlined" required disabled={isLoading}/>
+                            <TextField fullWidth name='nomar' margin="normal" label={t("nometaar")} variant="outlined" required disabled={isLoading}/>
+                            <FormControl fullWidth margin="normal">
+                                <InputLabel id="demo-simple-select-label">{t("type")}</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    label={t("type")}
+                                    name="type"
+                                    required
+                                    disabled={isLoading}
+                                >
+                                    <MenuItem value={"primaire"}>{t("primaire")}</MenuItem>
+                                    <MenuItem value={"college"}>{t("college")}</MenuItem>
+                                    <MenuItem value={"lycee"}>{t("lycee")}</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <TextField fullWidth name='delegation' margin="normal" label={t("delegation")} variant="outlined" required disabled={isLoading}/>
                         </Box>
                         <Box sx={{display:'flex',justifyContent: 'flex-end',alignItems: 'center',paddingTop:2}}>
                             { isLoading ? (
@@ -148,4 +163,4 @@ const UpdateDepartment = (props) =>{
         </>
     )
 }
-export default UpdateDepartment;
+export default AddEstablishment
