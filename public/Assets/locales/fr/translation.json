@@ -150,5 +150,6 @@
   "addDepswithfile" : "Ajouter des départments avec un fichier",
   "or" : "ou",
   "confirmationfile" : "Confirmation l'envoi du fichier",
-  "confirm_send_file": "Est vous sûr de vouloir Envoyer le fichier {{name}} pour enregister les départements saisie ?"
+  "confirm_send_file": "Est vous sûr de vouloir Envoyer le fichier {{name}} pour enregister les départements saisie ?",
+  "add_department_success" : "Département est ajouté avec succès"
 }
